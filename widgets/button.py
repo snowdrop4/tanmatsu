@@ -1,15 +1,26 @@
+from typing import Callable
+
 import terminal.input as ti
 from .box import Box
+from screenbuffer import Screenbuffer
+from geometry import Rectangle
 
 
 class Button(Box):
-	def __init__(self, *args, label="Button", callback=None, **kwargs):
+	"""
+	A button widget. Calls the callback when activated.
+	
+	:param label: The text to show on the button.
+	:param callback: The function the button should call when activated.
+	"""
+	
+	def __init__(self, *args, label: str = "Button", callback: Callable, **kwargs):
 		super().__init__(*args, **kwargs)
 		
 		self.label = label
 		self.callback = callback
 	
-	def draw(self, s, clip=None):
+	def draw(self, s: Screenbuffer, clip: Rectangle | None = None):
 		super().draw(s, clip=clip)
 		
 		widget_midpoint = self._Widget__available_space.w // 2
@@ -33,7 +44,7 @@ class Button(Box):
 					style=None
 				)
 	
-	def keyboard_event(self, key, modifier):
+	def keyboard_event(self, key: ti.Keyboard_key, modifier: int):
 		if super().keyboard_event(key, modifier):
 			return True
 		

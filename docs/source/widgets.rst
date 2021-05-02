@@ -8,3 +8,4 @@ Widgets
 
    widgets/base
    widgets/box
+   widgets/button
