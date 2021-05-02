@@ -1,12 +1,20 @@
+from typing import Dict
+
 from tri_declarative import declarative
 
 from .base import Widget
 
 
-# A widget that can have children widgets.
 @declarative(Widget, 'children')
 class Container(Widget):
-	def __init__(self, children, *args, **kwargs):
+	"""
+	A widget that can have children widgets. Doesn't do much on its own.
+	
+	:param children: Dictionary containing child widgets. Keys are `str` (the
+	  names of the widgets) and values are `Widget` objects (the children).
+	"""
+	
+	def __init__(self, children: Dict[str, Widget], *args, **kwargs):
 		super(Container, self).__init__(*args, **kwargs)
 		
 		self.children = children

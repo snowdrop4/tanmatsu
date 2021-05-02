@@ -9,3 +9,4 @@ Widgets
    widgets/base
    widgets/box
    widgets/button
+   widgets/container
