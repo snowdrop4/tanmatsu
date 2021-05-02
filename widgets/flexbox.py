@@ -1,15 +1,30 @@
 from tri_declarative import with_meta
 
-from geometry import Rectangle, Dimensions, Point
 from .container import Container
 from .box import Box
 from .scrollable import Scrollable
+from geometry import Rectangle, Dimensions, Point
+from screenbuffer import Screenbuffer
 
 
 @with_meta
 class FlexBox(Container, Box, Scrollable):
+	"""
+	A widget that contains other widgets. Has similar behaviour to `flexbox`
+	from CSS.
+	
+	:param flex_direction: Must be either :attr:`VERTICAL` or :attr:`HORIZONTAL`.
+	"""
+	
 	VERTICAL   = 0
+	"""
+	Flex from top to bottom. Equivalent to `flex-direction: column` in CSS.
+	"""
+	
 	HORIZONTAL = 1
+	"""
+	Flex from left to right. Equivalent to `flex-direction: row` in CSS.
+	"""
 	
 	def __init__(
 		self, *args, flex_direction=VERTICAL, **kwargs,
@@ -71,7 +86,7 @@ class FlexBox(Container, Box, Scrollable):
 		
 		self.scroll()
 	
-	def draw(self, s, clip=None):
+	def draw(self, s: Screenbuffer, clip: Rectangle | None = None):
 		super().draw(s, clip=clip)
 		
 		for (k, v) in self.children.items():

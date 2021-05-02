@@ -10,3 +10,4 @@ Widgets
    widgets/box
    widgets/button
    widgets/container
+   widgets/flexbox
