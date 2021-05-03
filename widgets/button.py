@@ -44,7 +44,7 @@ class Button(Box):
 					style=None
 				)
 	
-	def keyboard_event(self, key: ti.Keyboard_key, modifier: int):
+	def keyboard_event(self, key: ti.Keyboard_key, modifier: int) -> bool:
 		if super().keyboard_event(key, modifier):
 			return True
 		

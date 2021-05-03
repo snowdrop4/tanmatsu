@@ -1,5 +1,5 @@
-Box Widget
-==========
+Box
+===
 
 .. autoclass:: widgets.Box
    :members:

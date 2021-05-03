@@ -4,7 +4,7 @@ import itertools
 from tri_declarative import with_meta
 
 import terminal.input as ti
-import geometry
+from geometry import Rectangle, Dimensions, Point
 import theme
 import debug
 from .box import Box
@@ -251,10 +251,8 @@ class TextBox(Box, Scrollable):
 		
 		self.wrapped = list(wrap(self.text, self.wrap_width))
 		
-		self._Scrollable__total_content_size.w = self._Widget__available_space.w
-		self._Scrollable__total_content_size.h = len(self.wrapped)
-		
-		self.scroll()
+		content_size = Dimensions(self._Widget__available_space.w, len(self.wrapped))
+		self.scroll(content_size)
 	
 	def draw(self, s, clip=None):
 		super().draw(s, clip=clip)

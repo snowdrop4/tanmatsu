@@ -1,5 +1,5 @@
-Button Widget
-=============
+Button
+======
 
 .. autoclass:: widgets.Button
    :members:

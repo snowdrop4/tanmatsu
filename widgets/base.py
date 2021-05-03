@@ -94,8 +94,6 @@ class Widget():
 		
 		  `False`: Treat the mouse event as ignored. Pass the mouse event 
 		  to other widgets after this one.
-		
-		:rtype: bool
 		"""
 		return False
 	
@@ -109,7 +107,5 @@ class Widget():
 		
 		  `False`: Treat the keyboard event as ignored. Pass the keyboard event 
 		  to other widgets after this one.
-		
-		:rtype: bool
 		"""
 		return False

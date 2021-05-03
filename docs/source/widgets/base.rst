@@ -1,5 +1,5 @@
-Base Widget
-===========
+Base
+====
 
 .. autoclass:: widgets.Widget
    :members:

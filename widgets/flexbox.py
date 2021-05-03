@@ -83,9 +83,7 @@ class FlexBox(Container, Box, Scrollable):
 				total_size.w = max(total_size.w, v._Widget__calculated_size.w)
 				total_size.h += v._Widget__calculated_size.h
 		
-		self._Scrollable__total_content_size = total_size
-		
-		self.scroll()
+		self.scroll(total_size)
 	
 	def draw(self, s: Screenbuffer, clip: Rectangle | None = None):
 		super().draw(s, clip=clip)

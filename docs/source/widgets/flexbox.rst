@@ -1,5 +1,5 @@
-FlexBox Widget
-==============
+FlexBox
+=======
 
 .. autoclass:: widgets.FlexBox
    :members:

@@ -1,16 +1,22 @@
 from tri_declarative import with_meta
 
 import draw
-import geometry
 import theme
 import terminal.input as ti
 import debug
+from geometry import Rectangle, Dimensions, Point
+from screenbuffer import Screenbuffer
 from .container import Container
+from .base import Widget
 
 
 @with_meta
 class TabBox(Container):
-	def __init__(self, *args, active_tab=None, **kwargs):
+	"""
+	Widget that contains other widgets, arranged as tabs.
+	"""
+	
+	def __init__(self, *args, active_tab: Widget | None = None, **kwargs):
 		super().__init__(*args, **kwargs)
 		
 		if active_tab:
@@ -60,7 +66,7 @@ class TabBox(Container):
 			self._Widget__available_space.h
 		)
 	
-	def draw(self, s, clip=None):
+	def draw(self, s: Screenbuffer, clip: Rectangle | None = None):
 		super().draw(s, clip=clip)
 		
 		if self.focused:
@@ -97,9 +103,11 @@ class TabBox(Container):
 		self.__active_tab.draw(s, clip=clip.overlap_rectangle(self._Widget__available_space))
 	
 	def left(self):
+		"""Switches tab to the left."""
 		self.__switch_tab(list(reversed(self.children.items())))
 	
 	def right(self):
+		"""Switches tab to the right."""
 		self.__switch_tab(list(self.children.items()))
 	
 	def __switch_tab(self, c):
@@ -113,7 +121,7 @@ class TabBox(Container):
 		if self.focused_child is not None:
 			self.focused_child = self.__active_tab
 	
-	def keyboard_event(self, key, modifier):
+	def keyboard_event(self, key: ti.Keyboard_key, modifier: int) -> bool:
 		if super().keyboard_event(key, modifier):
 			return True
 		

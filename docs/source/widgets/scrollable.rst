@@ -1,5 +1,5 @@
-Scrollable Widget
-=================
+Scrollable
+==========
 
 .. autoclass:: widgets.Scrollable
    :members:

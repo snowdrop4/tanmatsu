@@ -12,3 +12,4 @@ Widgets
    widgets/container
    widgets/flexbox
    widgets/scrollable
+   widgets/tabbox

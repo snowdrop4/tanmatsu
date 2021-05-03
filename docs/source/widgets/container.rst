@@ -1,5 +1,5 @@
-Container Widget
-================
+Container
+=========
 
 .. autoclass:: widgets.Container
    :members:
