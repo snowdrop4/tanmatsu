@@ -12,9 +12,7 @@ from .base import Widget
 
 @with_meta
 class TabBox(Container):
-	"""
-	Widget that contains other widgets, arranged as tabs.
-	"""
+	"""Widget that contains other widgets, arranged as tabs."""
 	
 	def __init__(self, *args, active_tab: Widget | None = None, **kwargs):
 		super().__init__(*args, **kwargs)

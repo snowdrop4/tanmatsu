@@ -4,11 +4,12 @@ import itertools
 from tri_declarative import with_meta
 
 import terminal.input as ti
-from geometry import Rectangle, Dimensions, Point
 import theme
 import debug
 from .box import Box
 from .scrollable import Scrollable
+from geometry import Rectangle, Dimensions, Point
+from screenbuffer import Screenbuffer
 
 
 # Given a string, generates a series of tuples of type (str, str).
@@ -70,26 +71,35 @@ def wrap(text: str, max_width: int) -> typing.Generator[(str, str), None, None]:
 
 @with_meta
 class TextBox(Box, Scrollable):
-	def __init__(self, *args, text="", **kwargs):
+	"""
+	Widget containing editable or non-editable text.
+	
+	:param text: The text the TextBox should contain.
+	:param editable: Whether the TextBox should be editable or not.
+	"""
+	
+	def __init__(self, *args, text: str = "", editable: bool = True, **kwargs):
 		super().__init__(*args, **kwargs)
 		
 		self.cursor = 0
-		self.text = ""
+		self.text = text
+		self.editable = editable
 	
 	@property
 	def wrap_width(self):
 		return self._Widget__available_space.w - 1
 	
 	def get_text(self) -> str:
+		"""Return the current contents of the TextBox."""
 		return self.text
 	
 	def set_text(self, text: str):
+		"""Set the contents of the TextBox."""
 		self.text = text
+		
+		self.cursor = min(self.cursor, len(self.text))
 	
-	def append_text(self, appendage: str):
-		self.text += appendage
-	
-	def curr_line(self):
+	def curr_line(self) -> (int, int):
 		start = self.text.rfind("\n", 0, self.cursor)
 		end = self.text.find("\n", self.cursor)
 		
@@ -105,7 +115,7 @@ class TextBox(Box, Scrollable):
 		
 		return (start, end)
 	
-	def next_line(self):
+	def next_line(self) -> (int, int) | None:
 		end_of_current = self.text.find("\n", self.cursor)
 		
 		if end_of_current == -1:
@@ -121,7 +131,7 @@ class TextBox(Box, Scrollable):
 		
 		return (start, end)
 	
-	def prev_line(self):
+	def prev_line(self) -> (int, int) | None:
 		end = self.text.rfind("\n", 0, self.cursor)
 		
 		if end == -1:
@@ -203,7 +213,7 @@ class TextBox(Box, Scrollable):
 		else:
 			self.cursor = c2 - 1
 	
-	def character(self, c):
+	def character(self, c: str):
 		self.text = self.text[:self.cursor] + c + self.text[self.cursor:]
 		self.cursor += 1
 	
@@ -216,9 +226,12 @@ class TextBox(Box, Scrollable):
 		if self.cursor < len(self.text):
 			self.text = self.text[:self.cursor] + self.text[self.cursor + 1:]
 	
-	def keyboard_event(self, key, modifier):
+	def keyboard_event(self, key: ti.Keyboard_key, modifier: int) -> bool:
 		if super().keyboard_event(key, modifier):
 			return True
+		
+		if self.editable is False:
+			return False
 		
 		match key:
 			case ti.Keyboard_key.ENTER:
@@ -254,7 +267,7 @@ class TextBox(Box, Scrollable):
 		content_size = Dimensions(self._Widget__available_space.w, len(self.wrapped))
 		self.scroll(content_size)
 	
-	def draw(self, s, clip=None):
+	def draw(self, s: Screenbuffer, clip: Rectangle | None = None):
 		super().draw(s, clip=clip)
 		
 		start_line = self._Scrollable__scroll_position.y
@@ -278,10 +291,15 @@ class TextBox(Box, Scrollable):
 			for (j, character) in enumerate(line):
 				x = self._Widget__available_space.x + j
 				
+				# If we attempt to draw this character, it screws up the screen.
+				# Just turn it into a space, since it's meant to not be visible,
+				# but it is nevertheless a valid space for the cursor to occupy.
 				if character == "\n":
 					character = " "
 				
-				if self.cursor == characters_seen:
+				# If we're on the character the cursor occupies,
+				# set the theme appropriately.
+				if self.editable and self.cursor == characters_seen:
 					style = theme.DefaultTheme.textbox_cursor
 				else:
 					style = None

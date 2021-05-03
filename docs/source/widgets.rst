@@ -13,3 +13,4 @@ Widgets
    widgets/flexbox
    widgets/scrollable
    widgets/tabbox
+   widgets/textbox

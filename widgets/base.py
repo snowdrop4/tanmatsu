@@ -72,7 +72,7 @@ class Widget():
 	
 	def draw(self, s: Screenbuffer, clip: Rectangle | None = None):
 		"""
-		Draws the widget.
+		Draws the widget to the given screenbuffer.
 		
 		.. note::
 		   If a widget has child widgets, it must make sure to pass the correct
