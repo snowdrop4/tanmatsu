@@ -1,5 +1,3 @@
-from typing import Dict
-
 from tri_declarative import declarative
 
 from .base import Widget
@@ -14,7 +12,7 @@ class Container(Widget):
 	  names of the widgets) and values are `Widget` objects (the children).
 	"""
 	
-	def __init__(self, children: Dict[str, Widget], *args, **kwargs):
+	def __init__(self, children: dict[str, Widget], *args, **kwargs):
 		super(Container, self).__init__(*args, **kwargs)
 		
 		self.children = children

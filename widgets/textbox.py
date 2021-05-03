@@ -99,7 +99,7 @@ class TextBox(Box, Scrollable):
 		
 		self.cursor = min(self.cursor, len(self.text))
 	
-	def curr_line(self) -> (int, int):
+	def curr_line(self) -> tuple[int, int]:
 		start = self.text.rfind("\n", 0, self.cursor)
 		end = self.text.find("\n", self.cursor)
 		
@@ -115,7 +115,7 @@ class TextBox(Box, Scrollable):
 		
 		return (start, end)
 	
-	def next_line(self) -> (int, int) | None:
+	def next_line(self) -> tuple[int, int] | None:
 		end_of_current = self.text.find("\n", self.cursor)
 		
 		if end_of_current == -1:
@@ -131,7 +131,7 @@ class TextBox(Box, Scrollable):
 		
 		return (start, end)
 	
-	def prev_line(self) -> (int, int) | None:
+	def prev_line(self) -> tuple[int, int] | None:
 		end = self.text.rfind("\n", 0, self.cursor)
 		
 		if end == -1:

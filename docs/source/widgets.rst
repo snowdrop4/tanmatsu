@@ -14,3 +14,4 @@ Widgets
    widgets/scrollable
    widgets/tabbox
    widgets/textbox
+   widgets/textlog

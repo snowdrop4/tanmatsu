@@ -17,7 +17,7 @@ def print(s):
 	__lines.append(s)
 	
 	if __output_widget is not None:
-		__output_widget.add_line(s)
+		__output_widget.append_line(s)
 
 
 def flush_print_buffer():
