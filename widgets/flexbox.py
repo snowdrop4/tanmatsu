@@ -13,27 +13,28 @@ class FlexBox(Container, Box, Scrollable):
 	A widget that contains other widgets. Has similar behaviour to `flexbox`
 	from CSS.
 	
-	:param flex_direction: Must be either :attr:`VERTICAL` or :attr:`HORIZONTAL`.
+	:param flex_direction: Must be either :attr:`VERTICAL` or
+	  :attr:`HORIZONTAL`. Defaults to :attr:`VERTICAL`.
 	"""
 	
 	VERTICAL   = 0
-	"""
-	Flex from top to bottom. Equivalent to `flex-direction: column` in CSS.
-	"""
+	"""Flex from top to bottom. Equivalent to `flex-direction: column` in CSS."""
 	
 	HORIZONTAL = 1
-	"""
-	Flex from left to right. Equivalent to `flex-direction: row` in CSS.
-	"""
+	"""Flex from left to right. Equivalent to `flex-direction: row` in CSS."""
 	
 	def __init__(
-		self, *args, flex_direction=VERTICAL, **kwargs,
+		self, *args, flex_direction: int = VERTICAL, **kwargs,
 	):
 		super().__init__(*args, **kwargs)
 		
-		if (flex_direction != FlexBox.VERTICAL) and (
-			flex_direction != FlexBox.HORIZONTAL
-		):
+		self.set_flex_direction(flex_direction)
+	
+	def get_flex_direction(self) -> int:
+		return self.flex_direction
+	
+	def set_flex_direction(self, flex_direction: int):
+		if flex_direction != FlexBox.VERTICAL and flex_direction != FlexBox.HORIZONTAL:
 			raise ValueError(
 				"Invalid value for `flex_direction`. \
 					Must equal either `FlexBox.VERTICAL` or `FlexBox.HORIZONTAL`."

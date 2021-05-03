@@ -1,5 +1,5 @@
 Widgets
-===========
+=======
 
 
 .. toctree::
@@ -11,3 +11,4 @@ Widgets
    widgets/button
    widgets/container
    widgets/flexbox
+   widgets/scrollable

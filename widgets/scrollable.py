@@ -1,28 +1,34 @@
-import geometry
+from geometry import Rectangle, Dimensions, Point
+from screenbuffer import Screenbuffer
 import draw
 import terminal.input as ti
 from .base import Widget
 
 
-# A widget that can scroll.
 class Scrollable(Widget):
-	NONE       = 0b00
-	VERTICAL   = 0b01
-	HORIZONTAL = 0b10
+	"""
+	A widget that can scroll.
 	
-	def __init__(self, *args, scroll_direction=VERTICAL, **kwargs):
+	:param scroll_direction: Must be either :attr:`NONE`, :attr:`VERTICAL`,
+	  or :attr:`HORIZONTAL`. Defaults to :attr:`VERTICAL`.
+	"""
+	
+	NONE       = 0b00
+	"""Not scrollable."""
+	
+	VERTICAL   = 0b01
+	"""Scrollable vertically."""
+	
+	HORIZONTAL = 0b10
+	"""Scrollable horizontally."""
+	
+	def __init__(self, *args, scroll_direction: int = VERTICAL, **kwargs):
 		super().__init__(*args, **kwargs)
+		self.set_scroll_direction(scroll_direction)
 		
-		if scroll_direction > 0b11 or scroll_direction < 0b00:
-			raise ValueError("`scroll_direction` is a bitmask and must be equal to \
-				`Scrollable.NONE`, `Scrollable.VERTICAL`, or `Scrollable.HORIZONTAL`, \
-				or a combination thereof.")
+		self.__scroll_position = Point(0, 0)
 		
-		self.__scroll_direction = scroll_direction
-		
-		self.__scroll_position = geometry.Point(0, 0)
-		
-		self.__total_content_size = geometry.Dimensions(0, 0)
+		self.__total_content_size = Dimensions(0, 0)
 	
 	def layout(self, *args, **kwargs):
 		super().layout(*args, **kwargs)
@@ -42,7 +48,7 @@ class Scrollable(Widget):
 				self.__vertical_scrollbar_rectangle.h   -= 1
 				self.__horizontal_scrollbar_rectangle.w -= 1
 	
-	def draw(self, s, clip=None):
+	def draw(self, s: Screenbuffer, clip: Rectangle | None = None):
 		super().draw(s, clip=clip)
 		
 		if self.__scroll_direction != Scrollable.NONE:
@@ -67,16 +73,27 @@ class Scrollable(Widget):
 				)
 	
 	def scrollable(self) -> bool:
+		"""Whether the widget is scrollable or not."""
 		return self.__scroll_direction != Scrollable.NONE
 	
-	def scroll(self, delta_x=0, delta_y=0):
+	def set_scroll_direction(self, scroll_direction: int):
+		"""Set the scroll direction to `scroll_direction`."""
+		if scroll_direction > 0b11 or scroll_direction < 0b00:
+			raise ValueError("`scroll_direction` is a bitmask and must be equal to \
+				`Scrollable.NONE`, `Scrollable.VERTICAL`, or `Scrollable.HORIZONTAL`, \
+				or a combination thereof.")
+		
+		self.__scroll_direction = scroll_direction
+	
+	def scroll(self, delta_x: int = 0, delta_y: int = 0):
+		"""Scroll the widget by the specified deltas."""
 		if self.__scroll_direction & Scrollable.HORIZONTAL:
 			self.scroll_(delta_x, Scrollable.HORIZONTAL)
 		
 		if self.__scroll_direction & Scrollable.VERTICAL:
 			self.scroll_(delta_y, Scrollable.VERTICAL)
 	
-	def scroll_(self, line_delta, direction):
+	def scroll_(self, line_delta: int, direction):
 		if direction == Scrollable.VERTICAL:
 			content_length   = self.__total_content_size.h
 			available_space  = self._Widget__available_space.h
@@ -87,9 +104,6 @@ class Scrollable(Widget):
 			available_space  = self._Widget__available_space.w
 			scroll_position  = self.__scroll_position.x
 			scrollbar_length = self.__horizontal_scrollbar_rectangle.w - 2
-		else:
-			raise ValueError("Invalid value for `direction`. \
-				Must equal either `Scrollable.VERTICAL`, or `Scrollable.HORIZONTAL`.")
 		
 		# Make it so that the scrolling bottoms out when the bottom of the
 		# content is at the bottom of the screen rather than when the bottom 
@@ -127,7 +141,7 @@ class Scrollable(Widget):
 			self.__horizontal_scrollbar_handle_length = scrollbar_handle_length
 			self.__horizontal_scroll_percent = scroll_percent
 	
-	def mouse_event(self, button, button_state, position):
+	def mouse_event(self, button: ti.Mouse_button, button_state: ti.Mouse_state, position: Point):
 		if super().mouse_event(button, button_state, position):
 			return True
 		
