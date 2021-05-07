@@ -40,8 +40,7 @@ class RootWidget(widgets.FlexBox):
 		h = size.ParentRequested()
 
 
-with terminal.Terminal():
-	t = tanmatsu.Tanmatsu()
+with tanmatsu.Tanmatsu() as t:
 	f = RootWidget()
 	t.set_root_widget(f)
 	

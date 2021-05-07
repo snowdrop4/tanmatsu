@@ -2,7 +2,7 @@ from geometry import Rectangle, Dimensions, Point
 import theme
 import size
 from screenbuffer import Screenbuffer
-from terminal.input import Mouse_button, Mouse_state, Keyboard_key
+import terminal.input as ti
 
 
 class Widget():
@@ -86,26 +86,30 @@ class Widget():
 		"""
 		pass
 	
-	def mouse_event(self, button: Mouse_button, button_state: Mouse_state, position: Point) -> bool:
+	def mouse_event(self, button: ti.Mouse_button, button_state: ti.Mouse_state, position: Point) -> bool:
 		"""
+		Process a mouse event.
+		
 		:return:
 		  `True`: Treat the mouse event as consumed. Do not pass the mouse
 		  event to other widgets after this one.
 		
-		  `False`: Treat the mouse event as ignored. Pass the mouse event 
+		  `False`: Treat the mouse event as ignored. Pass the mouse event
 		  to other widgets after this one.
 		"""
 		return False
 	
-	def keyboard_event(self, key: Keyboard_key, modifier: int) -> bool:
+	def keyboard_event(self, key: ti.Keyboard_key, modifier: ti.Keyboard_modifier) -> bool:
 		"""
-		:param modifier: A bitmask. See :mod:`terminal.input`.
+		Process a keyboard event.
+		
+		:param modifier: A bitmask. See :class:`terminal.input.Keyboard_modifier`.
 		
 		:return:
 		  `True`: Treat the keyboard event as consumed. Do not pass the keyboard
 		  event to other widgets after this one.
 		
-		  `False`: Treat the keyboard event as ignored. Pass the keyboard event 
+		  `False`: Treat the keyboard event as ignored. Pass the keyboard event
 		  to other widgets after this one.
 		"""
 		return False

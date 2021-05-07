@@ -11,6 +11,8 @@ from geometry import Point
 # Event types
 # ==============================================================================
 class Event_type(Enum):
+	"""The event type."""
+	
 	MOUSE    = auto()
 	KEYBOARD = auto()
 
@@ -19,11 +21,15 @@ class Event_type(Enum):
 # Mouse
 # ==============================================================================
 class Mouse_state(Enum):
+	"""The state of the mouse button."""
+	
 	PRESSED  = auto()
 	RELEASED = auto()
 
 
 class Mouse_button(Enum):
+	"""The mouse button."""
+	
 	LMB = auto()
 	MMB = auto()
 	RMB = auto()
@@ -68,17 +74,26 @@ def mouse_sequence():
 # ==============================================================================
 # Keyboard
 # ==============================================================================
-MODIFIER_NONE  = 0b0000
-MODIFIER_SHIFT = 0b0001
-MODIFIER_ALT   = 0b0010
-MODIFIER_CTRL  = 0b0100
+class Keyboard_modifier(Enum):
+	"""
+	The modifier key pressed at the same time as the keyboard key.
+	
+	The members of this enum may be bitmasked together.
+	"""
+	
+	NONE  = 0b0000
+	SHIFT = 0b0001
+	ALT   = 0b0010
+	CTRL  = 0b0100
 
 
 class Keyboard_key(Enum):
-	TAB = auto()
+	"""The keyboard key."""
+	
+	TAB   = auto()
 	ENTER = auto()
 	BACKSPACE = auto()
-	ESCAPE = auto()
+	ESCAPE    = auto()
 	
 	F1  = auto()
 	F2  = auto()
@@ -146,8 +161,8 @@ legacy_keyboard_keycode_lookup = {
 	b"C": Keyboard_key.RIGHT_ARROW,
 	b"D": Keyboard_key.LEFT_ARROW,
 	
-	# Special case. Produced when SHIFT+TAB is pressed. We must make sure we
-	# set the modifier bitmask to `MODIFIER_SHIFT` when encountering this.
+	# Special case. Produced when SHIFT+TAB is pressed. We must make sure we set
+	# the modifier bitmask to `Keyboard_modifier.SHIFT` when encountering this.
 	b"Z": Keyboard_key.TAB,
 }
 
@@ -173,9 +188,9 @@ def key_sequence():
 		# for the alt key is 0b0010, but the value we're given when 
 		# the shift and alt key is pressed is `(0b0001 & 0b0010) + 1`,
 		# giving 0b0100 instead of 0b0011.
-		modifier_bitmask = modifier_bitmask -1
+		modifier_bitmask = modifier_bitmask - 1
 	else:
-		modifier_bitmask = MODIFIER_NONE
+		modifier_bitmask = Keyboard_modifier.NONE
 	
 	key = keyboard_keycode_lookup[code]
 	
@@ -189,7 +204,7 @@ def legacy_f1_to_f4():
 	code = yield regex(re.compile(rb"[PQRS]"))
 	
 	key = legacy_keyboard_keycode_lookup[code]
-	return (Event_type.KEYBOARD, (key, MODIFIER_NONE))
+	return (Event_type.KEYBOARD, (key, Keyboard_modifier.NONE))
 
 
 # Arrow, home, and end keys.
@@ -204,9 +219,9 @@ def legacy_key_sequence():
 	# keycodes parsed by this function have any modifier keys associated
 	# with them.
 	if key == Keyboard_key.TAB:
-		modifier_bitmask = MODIFIER_SHIFT
+		modifier_bitmask = Keyboard_modifier.SHIFT
 	else:
-		modifier_bitmask = MODIFIER_NONE
+		modifier_bitmask = Keyboard_modifier.NONE
 	
 	return (Event_type.KEYBOARD, (key, modifier_bitmask))
 
@@ -218,7 +233,7 @@ def legacy_key_sequence_with_modifier():
 	modifier_bitmask = yield regex(re.compile(rb"[0-9]")).map(int)
 	code = yield regex(re.compile(rb"[A-Z]"))
 	
-	modifier_bitmask = modifier_bitmask -1  # see comment in function `key_sequence()` for explanation
+	modifier_bitmask = modifier_bitmask - 1  # see comment in function `key_sequence()` for explanation
 	key = legacy_keyboard_keycode_lookup[code]
 	return (Event_type.KEYBOARD, (key, modifier_bitmask))
 
@@ -230,7 +245,7 @@ def special_key():
 	
 	if code in special_keyboard_keycode_lookup:
 		key = special_keyboard_keycode_lookup[code]
-		return (Event_type.KEYBOARD, (key, MODIFIER_NONE))
+		return (Event_type.KEYBOARD, (key, Keyboard_modifier.NONE))
 	else:
 		return fail("expecting special key codepoint")
 
@@ -271,7 +286,7 @@ def select_keys_with_ctrl():
 		case _:
 			key = chr(0x60 ^ code)
 	
-	return (Event_type.KEYBOARD, (key, MODIFIER_CTRL))
+	return (Event_type.KEYBOARD, (key, Keyboard_modifier.CTRL))
 
 
 @generate
@@ -284,8 +299,19 @@ def select_keys_with_alt():
 	with_ctrl = yield select_keys_with_ctrl.optional()
 	if with_ctrl is not None:
 		(_, (key, _)) = with_ctrl
-		return (Event_type.KEYBOARD, (key, MODIFIER_CTRL ^ MODIFIER_ALT))
+		return (Event_type.KEYBOARD, (key, Keyboard_modifier.CTRL ^ Keyboard_modifier.ALT))
 	
+	# There is ambiguity with the ESCAPE key, as is not escaped itself, so when
+	# presented with input like `\x1Bq`, there is no way of knowing whether
+	# the user pressed pressed ALT and `q`, or whether they pressed the ESCAPE
+	# key and then the `q` key with such speed as to cause both keycodes to
+	# appear in the input buffer before it nextgets processed and cleared.
+	# Both actions would produce the same raw byte sequence in the input buffer.
+	# 
+	# Thus, in the above case, we just have to assume the user pressed
+	# ALT and `q`, as correctly recognising the ALT key in all cases is
+	# decidedly more important than, under limited circumstances, mistaking
+	# the ESCAPE key for the ALT key.
 	code = yield any_char
 	code = code.to_bytes(1, "big")
 	
@@ -294,7 +320,7 @@ def select_keys_with_alt():
 	else:
 		key = code.decode("utf-8")
 	
-	return (Event_type.KEYBOARD, (key, MODIFIER_ALT))
+	return (Event_type.KEYBOARD, (key, Keyboard_modifier.ALT))
 
 
 # Make sure this parser is attempted last!
@@ -304,23 +330,10 @@ def unicode_codepoint():
 	codepoint = yield any_char
 	
 	# Special case: If we find the escape keycode all the way down here,
-	# it probably means the user just pressed the escape key.
-	# 
-	# There is ambiguity with the ESCAPE key as is not escaped itself, so when
-	# presented with input like `\x1Bq`, there is no way of knowing whether
-	# the user pressed the ESCAPE button and the `q` button such that both
-	# keycodes appeared in the input buffer inbetween calls to clear and
-	# process it, or whether they pressed ALT and `q` at the same time.
-	# Both actions would produce the same sequence -- `\x1Bq`.
-	# 
-	# Thus, in the above case, we just have to assume that they pressed
-	# ALT and `q`, as correctly recognising the ALT key in all cases is
-	# decidedly more important than *sometimes* mistaking the ESCAPE key
-	# for the ALT key (it's a timing problem and \x1B isn't guaranteed to end
-	# up in the input buffer alongside `q` even if both keys are pressed
-	# simultaneously.
+	# it probably means the user pressed the actual escape key, rather than
+	# some special key combination.
 	if codepoint == 0x1B:
-		return (Event_type.KEYBOARD, (Keyboard_key.ESCAPE, MODIFIER_NONE))
+		return (Event_type.KEYBOARD, (Keyboard_key.ESCAPE, Keyboard_modifier.NONE))
 	
 	match codepoint & 0b11110000:
 		case 0b11000000:
@@ -336,13 +349,21 @@ def unicode_codepoint():
 		byte = yield any_char
 		codepoint = codepoint | byte << (i + 1) * 8  # concat the bytes together
 	
-	return (Event_type.KEYBOARD, (chr(codepoint), MODIFIER_NONE))
+	return (Event_type.KEYBOARD, (chr(codepoint), Keyboard_modifier.NONE))
 
 
 # ==============================================================================
 # Keyboard + mouse
 # ==============================================================================
-def parse_input(input):
+mouse_t    = tuple[Mouse_button, Mouse_state, Point]
+keyboard_t = tuple[Keyboard_key | str, Keyboard_modifier]
+
+
+def parse_input(input: bytes) -> list[tuple[Event_type, mouse_t | keyboard_t ]]:
+	"""
+	Parse raw bytes from stdin.
+	"""
+	
 	parser = mouse_sequence \
 		| key_sequence \
 		| legacy_f1_to_f4 \

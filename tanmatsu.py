@@ -2,10 +2,13 @@ import os
 import sys
 import fcntl
 import signal
+import shutil
+import termios
 import selectors
 
-import terminal as tt
+import debug
 import terminal.input as ti
+import terminal.output as to
 import screenbuffer
 from geometry import Rectangle, Dimensions, Point
 
@@ -22,37 +25,113 @@ def exhaust_file_descriptor(fd):
 
 class Tanmatsu:
 	def __init__(self):
-		(w, h) = tt.get_terminal_size()
+		
+		(w, h) = shutil.get_terminal_size()
 		self.screenbuffer = screenbuffer.Screenbuffer(w, h)
 		
+		self.__setup_terminal()  # Set the proper terminal emulator/stdin/stdout modes
+		self.__setup_selector()  # Set up input handling
+	
+	def __setup_terminal(self):
+		# Normally stdin and stdout are set to the same file descriptor.
+		# This doesn't work, as we need stdin to be nonblocking and stdout
+		# to be blocking.
+		# 
+		# Manually open two separate file descriptors for stdin and stdout:
+		sys.stdin  = open("/dev/stdin",  "r")
+		sys.stdout = open("/dev/stdout", "w")
+		
+		os.set_blocking(sys.stdin.fileno(),  False)
+		os.set_blocking(sys.stdout.fileno(), True)
+		
+		# Fiddle with the control modes for stdin:
+		STDIN_TERMIOS = termios.tcgetattr(sys.stdin.fileno())
+		
+		# Configure the `c_cflag` bitmask inside the `termios` struct that
+		# contains the control modes.
+		# 
+		# Turn off the following control modes:
+		# 
+		# termios.ICANON = False: do not buffer input until the enter button is pressed
+		# termios.ECHO   = False: do not echo keys pressed to the screen
+		STDIN_TERMIOS[3] = STDIN_TERMIOS[3] & ~termios.ICANON & ~termios.ECHO
+		
+		termios.tcsetattr(sys.stdin.fileno(), termios.TCSADRAIN, STDIN_TERMIOS)
+		
+		# Fiddle with the terminal emulator options:
+		self.terminal_modes = []
+		
+		# Drop the terminal into an alternative screenbuffer just for us,
+		# so that we can draw to it at will without overwriting the terminal
+		# history.
+		# 
+		# This way, when the user quits our program, no trace of it will be
+		# left in their terminal.
+		self.terminal_modes += [to.set_mode_alternate_screenbuffer]
+		
+		# Stop the terminal from reflowing text when it is resized.
+		# It causes flickering as it fights with the redrawing we do on
+		# terminal resize.
+		self.terminal_modes += [to.set_mode_line_wrap]
+		
+		# Turn on mouse events.
+		self.terminal_modes += [to.set_mode_mouse_up_down_tracking]
+		
+		# Use variable length ASCII digits to report mouse location in order
+		# to support terminals of any size.
+		self.terminal_modes += [to.set_mode_mouse_report_format_digits]
+		
+		for f in self.terminal_modes:
+			f(to.HIGH)
+	
+	def __setup_selector(self):
 		# Terminal resizes are notified through signals, but if we act on the
 		# resize right away (as soon as we receive the signal), we end up with
-		# a safety problem not unsimilar to threaded code. As the resize
-		# signal can come at any time, we might be executing other code 
-		# when does, which means we might end up with crashing or worse.
+		# a safety problem. Given that the resize signal can come at any time,
+		# we might be executing other code when it does, which means we might
+		# end up with crashing or worse.
 		# 
 		# Thus, we create a pipe and write to it every time we receive a
 		# resize signal. We can then select on the pipe and on STDIN, to safely
 		# handle input.
+		
+		# Create the pipe
 		(self.resize_pipe_r, self.resize_pipe_w) = os.pipe()
+		
+		# Turn off blocking on the read end of the resize pipe,
+		# as we block with our selector instead.
+		resize_pipe_r_fcntl = fcntl.fcntl(self.resize_pipe_r, fcntl.F_GETFL)
+		resize_pipe_r_fcntl = resize_pipe_r_fcntl | os.O_NONBLOCK
+		fcntl.fcntl(self.resize_pipe_r, fcntl.F_SETFL, resize_pipe_r_fcntl)
+		
+		# Connect SIGWINCH (terminal resize signal) to our handler function
+		# that will populate the resize pipe.
 		signal.signal(signal.SIGWINCH, self.resize_signal_handler)
 		
+		# Create our selector and connect our handler functions for STDIN input
+		# and terminal resizes.
 		self.selector = selectors.DefaultSelector()
 		self.selector.register(sys.stdin,          selectors.EVENT_READ, self.process_stdin_input)
 		self.selector.register(self.resize_pipe_r, selectors.EVENT_READ, self.process_resize_input)
-		
-		# Turn off blocking on the resize pipe, as we block with our selector
-		# instead. At this point, `stdin` has already been set to non-blocking
-		# in the `Terminal` class.
-		self.resize_pipe_fcntl_original = fcntl.fcntl(self.resize_pipe_r, fcntl.F_GETFL)
-		self.resize_pipe_fcntl_nonblock = self.resize_pipe_fcntl_original | os.O_NONBLOCK
-		fcntl.fcntl(self.resize_pipe_r, fcntl.F_SETFL, self.resize_pipe_fcntl_nonblock)
 	
-	def __del__(self):
+	def __enter__(self):
+		return self
+	
+	def __exit__(self, exception_type, exception_value, traceback):
 		self.selector.close()
 		
 		os.close(self.resize_pipe_r)
 		os.close(self.resize_pipe_w)
+		
+		for f in self.terminal_modes:
+			f(to.LOW)
+		
+		debug.flush_print_buffer()
+		
+		sys.stdin.close()
+		sys.stdout.close()
+		
+		return False
 	
 	def set_root_widget(self, widget):
 		self.root_widget = widget
@@ -92,7 +171,7 @@ class Tanmatsu:
 		(key, modifier) = data
 		
 		if key == ti.Keyboard_key.TAB:
-			self.tab(reverse=modifier == ti.MODIFIER_SHIFT)
+			self.tab(reverse=modifier == ti.Keyboard_modifier.SHIFT)
 			return
 		
 		# Start at the bottom of the focus chain (i.e., the currently focused
@@ -118,7 +197,7 @@ class Tanmatsu:
 		# (nothing is writing to the pipe except `resize_signal_handler()`).
 		_ = exhaust_file_descriptor(self.resize_pipe_r)
 		
-		(w, h) = tt.get_terminal_size()
+		(w, h) = shutil.get_terminal_size()
 		self.screenbuffer.resize(w, h)
 	
 	def resize_signal_handler(self, signum, frame):

@@ -11,6 +11,7 @@ Welcome to tanmatsu's documentation!
    :caption: Contents:
    
    widgets
+   terminal
 
 
 Indices and tables
