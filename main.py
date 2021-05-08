@@ -47,6 +47,4 @@ with tanmatsu.Tanmatsu() as t:
 	f.textbox.set_text(test.random_prose())
 	debug.set_output_widget(f.textlog)
 	
-	while True:
-		t.draw()
-		t.process_input()
+	t.loop()

@@ -12,6 +12,7 @@ Welcome to tanmatsu's documentation!
    
    widgets
    terminal
+   tanmatsu
 
 
 Indices and tables

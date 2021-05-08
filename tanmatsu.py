@@ -10,6 +10,7 @@ import debug
 import terminal.input as ti
 import terminal.output as to
 import screenbuffer
+from widgets.base import Widget
 from geometry import Rectangle, Dimensions, Point
 
 
@@ -24,8 +25,29 @@ def exhaust_file_descriptor(fd):
 
 
 class Tanmatsu:
+	"""
+	This class fulfils two functions:
+	
+	- Configures the terminal emulator (setting proper modes and so on).
+	- Handles the main TUI loop (draw, take input, process input).
+	
+	As a bare minimum, a program written with tanmatsu must perform the
+	following three steps:
+	
+	- Instantiate `Tanmatsu()` as a context manager.
+	- Set the root widget with :meth:`set_root_widget`.
+	- Start the main TUI loop with :meth:`loop`.
+	
+	For example:
+	
+	.. code-block:: python
+	   
+	   with Tanmatsu() as t:
+	       t.set_root_widget(MyRootWidget())
+	       t.loop()
+	"""
+	
 	def __init__(self):
-		
 		(w, h) = shutil.get_terminal_size()
 		self.screenbuffer = screenbuffer.Screenbuffer(w, h)
 		
@@ -132,9 +154,6 @@ class Tanmatsu:
 		sys.stdout.close()
 		
 		return False
-	
-	def set_root_widget(self, widget):
-		self.root_widget = widget
 	
 	# Build a list, starting out from the root widget, and descending
 	# until we find the focused widget (i.e., the end of the focus chain).
@@ -341,3 +360,18 @@ class Tanmatsu:
 		# Defocus the widget we just focused, so that there aren't multiple
 		# focused widgets next time we draw.
 		current_focused_widget.focused = False
+	
+	def set_root_widget(self, widget: Widget):
+		"""
+		Set the root widget to `widget`. A root widget must be set before
+		:meth:`loop` is called.
+		"""
+		self.root_widget = widget
+	
+	def loop(self):
+		"""
+		Enter the main TUI loop.
+		"""
+		while True:
+			self.draw()
+			self.process_input()
