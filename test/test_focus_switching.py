@@ -1,13 +1,12 @@
 import unittest
 
-import terminal
 import tanmatsu
 import widgets
 
 
 class ChildWidget(widgets.TextBox):
 	class Meta:
-		lines = ["Child Widget"]
+		text = ["Child Widget"]
 
 
 class ParentWidget(widgets.FlexBox):
@@ -25,25 +24,24 @@ class RootWidget(widgets.FlexBox):
 
 class TestFocusSwitching(unittest.TestCase):
 	def setUp(self):
-		self.term = terminal.Terminal()
-		self.tanm = tanmatsu.Tanmatsu()
+		self.t = tanmatsu.Tanmatsu()
 		
 		self.root_widget = RootWidget()
-		self.tanm.set_root_widget(self.root_widget)
+		self.t.set_root_widget(self.root_widget)
 	
 	def tearDown(self):
-		self.term.__exit__(None, None, None)
+		self.t.__exit__(None, None, None)
 	
 	def test_forward(self):
-		self.assertEqual(self.tanm.get_current_focused_widget(), self.root_widget)
+		self.assertEqual(self.t.get_current_focused_widget(), self.root_widget)
 		
 		for i in range(0, 8):
-			self.tanm.tab()
+			self.t.tab()
 		
-		self.assertEqual(self.tanm.get_current_focused_widget(), self.root_widget.parent2.child1)
+		self.assertEqual(self.t.get_current_focused_widget(), self.root_widget.parent2.child1)
 	
 	def test_backward(self):
-		self.assertEqual(self.tanm.get_current_focused_widget(), self.root_widget)
+		self.assertEqual(self.t.get_current_focused_widget(), self.root_widget)
 		
 		for i in range(0, 8):
-			self.tanm.tab(reverse=True)
+			self.t.tab(reverse=True)
