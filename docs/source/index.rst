@@ -13,6 +13,7 @@ Welcome to tanmatsu's documentation!
    widgets
    terminal
    tanmatsu
+   screenbuffer
 
 
 Indices and tables

@@ -1,13 +1,20 @@
 import terminal.output as to
 import theme
-import style
+from geometry import Rectangle
+from style import Style
 
 
 class Screenbuffer:
-	def __init__(self, w, h):
+	"""
+	Buffer holding characters to be written to the screen.
+	"""
+	
+	def __init__(self, w: int, h: int):
 		self.resize(w, h)
 	
-	def resize(self, w, h):
+	def resize(self, w: int, h: int):
+		"""Resize the screenbuffer to `w`, `h`."""
+		
 		self.w = w
 		self.h = h
 		
@@ -21,7 +28,21 @@ class Screenbuffer:
 				self.buffer[i][j] = b' '
 				self.style_buffer[i][j] = theme.DefaultTheme.default
 	
-	def set(self, x, y, v: str, clip=None, style=None):
+	def set(self, 
+		x: int,
+		y: int,
+		v: str,
+		clip: Rectangle | None = None,
+		style: Style | None = None
+	):
+		"""
+		Set the character at the given `x`, `y` to `v`. If `style` is given,
+		said character will be set to `style` as well.
+		
+		This function does nothing if `clip` is given and `x`, `y` is outside
+		the clip.
+		"""
+		
 		# Make sure we don't get an empty string. Empty space in the
 		# screenbuffer is represented by space characters, so an empty string
 		# making its way into the screenbuffer screws up alignment for the line
@@ -40,7 +61,14 @@ class Screenbuffer:
 		
 		self.set_style(x, y, style, clip=clip)
 	
-	def set_style(self, x, y, v: style.Style, clip=None):
+	def set_style(self, x: int, y: int, v: Style, clip: Rectangle | None = None):
+		"""
+		Set the style of the character at the given `x`, `y` to `style`.
+		
+		This function does nothing if `clip` is given and `x`, `y` is outside
+		the clip.
+		"""
+		
 		if v is None:
 			return
 		
@@ -51,10 +79,6 @@ class Screenbuffer:
 			self.style_buffer[y][x] = v
 		except IndexError:
 			return
-	
-	def draw(self):
-		self.root_widget.layout(0, 0, self.w, self.h, self.w, self.h)
-		self.root_widget.draw(self)
 	
 	def write(self):
 		last_seen_style = None
