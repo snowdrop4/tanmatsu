@@ -1,0 +1,5 @@
+Geometry
+========
+
+.. automodule:: geometry
+   :members:
