@@ -115,7 +115,7 @@ class Rectangle():
 		y1 = max(self.y1, other.y1)
 		
 		x2 = min(self.x2, other.x2)
-		y2 = min(self.x2, other.y2)
+		y2 = min(self.y2, other.y2)
 		
 		w = x2 - x1 + 1
 		h = y2 - y1 + 1
