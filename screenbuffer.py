@@ -61,7 +61,7 @@ class Screenbuffer:
 		
 		self.set_style(x, y, style, clip=clip)
 	
-	def set_style(self, x: int, y: int, v: Style, clip: Rectangle | None = None):
+	def set_style(self, x: int, y: int, v: Style | None, clip: Rectangle | None = None):
 		"""
 		Set the style of the character at the given `x`, `y` to `style`.
 		

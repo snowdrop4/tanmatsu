@@ -20,8 +20,7 @@ class Point():
 		return Point(self.x, self.y)
 	
 	def __eq__(self, other: Point) -> bool:
-		(x, y) = other
-		return self.x == x and self.y == y
+		return self.x == other.x and self.y == other.y
 	
 	def __str__(self) -> str:
 		return f"Point: {self.x}x, {self.y}y"
@@ -49,8 +48,7 @@ class Dimensions():
 		return Dimensions(self.w, self.h)
 	
 	def __eq__(self, other: Dimensions) -> bool:
-		(w, h) = other
-		return self.w == w and self.h == h
+		return self.w == other.w and self.h == other.h
 	
 	def __str__(self) -> str:
 		return f"Dimensions: {self.w}w by {self.h}h"
@@ -95,9 +93,9 @@ class Rectangle():
 	def intersects(self, other: Rectangle) -> bool:
 		"""Whether this rectangle intersects with rectangle `other`."""
 		
-		a = self.x <= other.x2
+		a = self.x1 <= other.x2
 		b = self.x2 >= other.x1
-		c = self.y <= other.y2
+		c = self.y1 <= other.y2
 		d = self.y2 >= other.y1
 		
 		return a and b and c and d
@@ -113,8 +111,8 @@ class Rectangle():
 	def overlap_rectangle(self, other: Rectangle) -> Rectangle:
 		"""Returns the rectangle that overlaps with this rectangle and rectangle `other`."""
 		
-		x1 = max(self.x, other.x1)
-		y1 = max(self.y, other.y1)
+		x1 = max(self.x1, other.x1)
+		y1 = max(self.y1, other.y1)
 		
 		x2 = min(self.x2, other.x2)
 		y2 = min(self.x2, other.y2)
@@ -143,7 +141,11 @@ class Rectangle():
 	
 	def __eq__(self, other) -> bool:
 		(x, y, w, h) = other
-		return self.x == x and self.y == y and self.w == w and self.h == h
+		
+		return self.x == other.x\
+		   and self.y == other.y\
+		   and self.w == other.w\
+		   and self.h == other.h
 	
 	def __str__(self) -> str:
 		return f"Rectangle: {self.w}w by {self.h}h at {self.x}x, {self.y}y"
