@@ -1,8 +1,8 @@
-from geometry import Rectangle, Dimensions, Point
-from screenbuffer import Screenbuffer
 import draw
 import terminal.input as ti
 from .base import Widget
+from geometry import Rectangle, Dimensions, Point
+from screenbuffer import Screenbuffer
 
 
 class Scrollable(Widget):
@@ -149,15 +149,18 @@ class Scrollable(Widget):
 		if super().mouse_event(button, button_state, position):
 			return True
 		
+		if self.scrollable() is False:
+			return False
+		
 		match button:
 			case ti.Mouse_button.SCROLL_UP:
-				self._scroll(-1, self.VERTICAL)
+				self._scroll(-1, Scrollable.VERTICAL)
 			case ti.Mouse_button.SCROLL_DOWN:
-				self._scroll(+1, self.VERTICAL)
+				self._scroll(+1, Scrollable.VERTICAL)
 			case ti.Mouse_button.SCROLL_LEFT:
-				self._scroll(-1, self.HORIZONTAL)
+				self._scroll(-1, Scrollable.HORIZONTAL)
 			case ti.Mouse_button.SCROLL_RIGHT:
-				self._scroll(+1, self.HORIZONTAL)
+				self._scroll(+1, Scrollable.HORIZONTAL)
 			case _:
 				return False
 		
