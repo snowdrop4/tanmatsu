@@ -12,7 +12,8 @@ class Style:
 	:param bold: Whether the text ought to be bold or not
 	"""
 	
-	def __init__(self,
+	def __init__(
+		self,
 		foreground: tuple[int, int, int] | None = None,
 		background: tuple[int, int, int] | None = None,
 		bold: bool | None = None

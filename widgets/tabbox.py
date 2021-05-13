@@ -98,7 +98,7 @@ class TabBox(Container):
 			
 			draw_pillar("╮")
 		
-		self.__active_tab.draw(s, clip=clip.overlap_rectangle(self._Widget__available_space))
+		self.__active_tab.draw(s, clip=clip & self._Widget__available_space)
 	
 	def left(self):
 		"""Switches tab to the left."""

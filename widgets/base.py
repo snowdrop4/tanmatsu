@@ -79,7 +79,7 @@ class Widget():
 		   clip to them when drawing.
 		   
 		   The widget must pass `self._Widget__available_space` to the
-		   :meth:`geometry.Rectangle.overlap_rectangle` method of the clip it
+		   :meth:`geometry.Rectangle.__and__` method of the clip it
 		   receives, and then pass the resulting clip to the child widget when
 		   calling :meth:`draw` on it, so that the clips correctly combine and
 		   propogate down the chain.

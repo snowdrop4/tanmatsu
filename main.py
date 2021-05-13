@@ -13,7 +13,7 @@ def cancel_c():
 	debug.print("cancel")
 
 
-class ButtonContainer(widgets.FlexBox):
+class ButtonBox(widgets.FlexBox):
 	okay = widgets.Button(label="Okay", callback=okay_c)
 	cancel = widgets.Button(label="Cancel", callback=cancel_c)
 	
@@ -25,10 +25,27 @@ class ButtonContainer(widgets.FlexBox):
 		h = size.FixedInteger(7)
 
 
+# class ButtonList(widgets.List):
+# 	test = 6
+# 	
+# 	class Meta:
+# 		items = [
+# 			widgets.Button(label="Okay", callback=okay_c),
+# 			widgets.Button(label="Cancel", callback=cancel_c)
+# 		]
+# 		item_height = 7
+
+
+buttons = [
+	widgets.Button(label="Okay", callback=okay_c),
+	widgets.Button(label="Cancel", callback=cancel_c)
+]
+
+
 class RootWidget(widgets.FlexBox):
 	textbox = widgets.TextBox()
 	textlog = widgets.TextLog()
-	buttonbox = ButtonContainer()
+	buttonlist = widgets.List(buttons, 7)
 	
 	class Meta:
 		flex_direction = widgets.FlexBox.HORIZONTAL
@@ -44,6 +61,7 @@ with tanmatsu.Tanmatsu() as t:
 	t.set_root_widget(f)
 	
 	f.textbox.set_text(test.random_prose())
+	f.buttonlist.cursor = 1
 	debug.set_output_widget(f.textlog)
 	
 	t.loop()

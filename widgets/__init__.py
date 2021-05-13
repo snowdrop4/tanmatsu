@@ -7,5 +7,6 @@ from .textbox import TextBox
 from .textlog import TextLog
 from .flexbox import FlexBox
 from .tabbox import TabBox
+from .list import List
 
 from .button import Button

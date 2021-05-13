@@ -10,6 +10,7 @@ Widgets
    widgets/button
    widgets/container
    widgets/flexbox
+   widgets/list
    widgets/scrollable
    widgets/tabbox
    widgets/textbox

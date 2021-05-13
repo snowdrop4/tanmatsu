@@ -1,7 +1,7 @@
 from tri_declarative import with_meta
 
-from .container import Container
 from .box import Box
+from .container import Container
 from .scrollable import Scrollable
 from geometry import Rectangle, Dimensions, Point
 from screenbuffer import Screenbuffer
@@ -89,4 +89,4 @@ class FlexBox(Container, Box, Scrollable):
 		super().draw(s, clip=clip)
 		
 		for (k, v) in self.children.items():
-			v.draw(s, clip=clip.overlap_rectangle(self._Widget__available_space))
+			v.draw(s, clip=clip & self._Widget__available_space)
