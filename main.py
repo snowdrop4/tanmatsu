@@ -60,8 +60,9 @@ with tanmatsu.Tanmatsu() as t:
 	f = RootWidget()
 	t.set_root_widget(f)
 	
-	f.textbox.set_text(test.random_prose())
+	f.textbox.text = test.random_prose()
 	f.buttonlist.cursor = 1
+	f.buttonlist.items[0].callback = lambda: f.textbox.set_text(test.random_prose())
 	debug.set_output_widget(f.textlog)
 	
 	t.loop()

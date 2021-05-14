@@ -28,6 +28,10 @@ class Scrollable(Widget):
 		
 		self.__scroll_position = Point(0, 0)
 	
+	@property
+	def foo(self):
+		return self._foo
+	
 	def layout(self, *args, **kwargs):
 		super().layout(*args, **kwargs)
 		
@@ -144,6 +148,13 @@ class Scrollable(Widget):
 			self.__scroll_position.x = scroll_position
 			self.__horizontal_scrollbar_handle_length = scrollbar_handle_length
 			self.__horizontal_scroll_percent = scroll_percent
+		
+		self.viewport = Rectangle(
+			self._Widget__available_space.x + self.__scroll_position.x,
+			self._Widget__available_space.y + self.__scroll_position.y,
+			self._Widget__available_space.w,
+			self._Widget__available_space.h
+		)
 	
 	def mouse_event(self, button: ti.Mouse_button, button_state: ti.Mouse_state, position: Point) -> bool:
 		if super().mouse_event(button, button_state, position):

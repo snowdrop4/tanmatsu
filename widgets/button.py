@@ -12,6 +12,9 @@ class Button(Box):
 	
 	:param label: The text to show on the button.
 	:param callback: The function the button should call when activated.
+	
+	:ivar label: The text to show on the button.
+	:ivar callback: The function the button should call when activated.
 	"""
 	
 	def __init__(self, *args, label: str = "Button", callback: Callable, **kwargs):

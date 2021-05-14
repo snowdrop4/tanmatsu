@@ -76,28 +76,92 @@ class TextBox(Box, Scrollable):
 	
 	:param text: The text the TextBox should contain.
 	:param editable: Whether the TextBox should be editable or not.
+	
+	:ivar cursor: The position of the cursor.
+	:vartype cursor: int
+	
+	:ivar text: The text the TextBox should contain.
+	:vartype text: str
+	
+	:ivar editable: Whether the TextBox should be editable or not.
+	:vartype editable: bool
 	"""
 	
 	def __init__(self, *args, text: str = "", editable: bool = True, **kwargs):
 		super().__init__(*args, **kwargs)
 		
-		self.cursor = 0
-		self.text = text
+		self._cursor = 0
+		self._text = text
 		self.editable = editable
+		
+		self.__cached_text = text
+		self.__cached_wrap_width = 0
+	
+	@property
+	def cursor(self):
+		return self._cursor
+	
+	@cursor.setter
+	def cursor(self, value: int):
+		self._cursor = value
+		
+		# Scroll the widget until the cursor is in view.
+		# 
+		# This assumes the widget has a size, as we need to be able to
+		# know what is in view or not.
+		if self._Widget__available_space is not None:
+			# Find what line the cursor is on:
+			characters_seen = 0
+			cursor_line = 0
+			
+			for (i, v) in enumerate(map(lambda x: len(x[0]), self.wrapped)):
+				if characters_seen + v > self._cursor:
+					break
+				cursor_line += 1
+				characters_seen += v
+			
+			# Find the extent of the lines visible on the screen:
+			start_line = self._Scrollable__scroll_position.y
+			end_line   = self._Scrollable__scroll_position.y + self._Widget__available_space.h - 1
+			
+			# Work out the positive or negative difference between the line the
+			# line the cursor is on, and the topmost or bottommost visible line:
+			delta_y = 0
+			
+			if cursor_line < start_line:
+				delta_y = cursor_line - start_line
+			
+			if cursor_line > end_line:
+				delta_y = cursor_line - end_line
+			
+			content_size = Dimensions(self._Widget__available_space.w, len(self.wrapped))
+			self.scroll(content_size, delta_y=delta_y)
+	
+	@property
+	def text(self):
+		return self._text
+	
+	@text.setter
+	def text(self, value: str):
+		self._text = value
+		self.cursor = min(self.cursor, len(self._text))
 	
 	@property
 	def wrap_width(self):
 		return self._Widget__available_space.w - 1
 	
-	def get_text(self) -> str:
-		"""Return the current contents of the TextBox."""
-		return self.text
-	
-	def set_text(self, text: str):
-		"""Set the contents of the TextBox."""
-		self.text = text
+	@property
+	def wrapped(self):
+		# Optimisation: only re-wrap the text when it's actually necessary:
+		if (
+			   self.__cached_text       != self.text
+			or self.__cached_wrap_width != self.wrap_width
+		):
+			self._wrapped = list(wrap(self.text, self.wrap_width))
+			self.__cached_text = self.text
+			self.__cached_wrap_width = self.wrap_width
 		
-		self.cursor = min(self.cursor, len(self.text))
+		return self._wrapped
 	
 	def curr_line(self) -> tuple[int, int]:
 		start = self.text.rfind("\n", 0, self.cursor)
@@ -256,13 +320,11 @@ class TextBox(Box, Scrollable):
 				self.character(c)
 			case _:
 				return False
-			
+		
 		return True
 	
 	def layout(self, *args, **kwargs):
 		super().layout(*args, **kwargs)
-		
-		self.wrapped = list(wrap(self.text, self.wrap_width))
 		
 		content_size = Dimensions(self._Widget__available_space.w, len(self.wrapped))
 		self.scroll(content_size)
@@ -292,8 +354,9 @@ class TextBox(Box, Scrollable):
 				x = self._Widget__available_space.x + j
 				
 				# If we attempt to draw this character, it screws up the screen.
-				# Just turn it into a space, since it's meant to not be visible,
-				# but it is nevertheless a valid space for the cursor to occupy.
+				# Turn it into a space character instead, as although both \n
+				# and ' ' are non-visible, this position in the text box is
+				# a potentially valid space for the cursor to occupy.
 				if character == "\n":
 					character = " "
 				
