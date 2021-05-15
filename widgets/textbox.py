@@ -290,39 +290,6 @@ class TextBox(Box, Scrollable):
 		if self.cursor < len(self.text):
 			self.text = self.text[:self.cursor] + self.text[self.cursor + 1:]
 	
-	def keyboard_event(self, key: ti.Keyboard_key, modifier: int) -> bool:
-		if super().keyboard_event(key, modifier):
-			return True
-		
-		if self.editable is False:
-			return False
-		
-		match key:
-			case ti.Keyboard_key.ENTER:
-				self.character("\n")
-			case ti.Keyboard_key.BACKSPACE:
-				self.backspace()
-			case ti.Keyboard_key.DELETE:
-				self.delete()
-			case ti.Keyboard_key.UP_ARROW:
-				self.up()
-			case ti.Keyboard_key.DOWN_ARROW:
-				self.down()
-			case ti.Keyboard_key.LEFT_ARROW:
-				self.left()
-			case ti.Keyboard_key.RIGHT_ARROW:
-				self.right()
-			case ti.Keyboard_key.HOME:
-				self.home()
-			case ti.Keyboard_key.END:
-				self.end()
-			case c if not isinstance(c, ti.Keyboard_key):
-				self.character(c)
-			case _:
-				return False
-		
-		return True
-	
 	def layout(self, *args, **kwargs):
 		super().layout(*args, **kwargs)
 		
@@ -378,3 +345,40 @@ class TextBox(Box, Scrollable):
 				clip=clip,
 				style=None
 			)
+	
+	def keyboard_event(
+		self,
+		key: ti.Keyboard_key,
+		modifier: ti.Keyboard_modifier
+	) -> bool:
+		if super().keyboard_event(key, modifier):
+			return True
+		
+		if self.editable is False:
+			return False
+		
+		match key:
+			case ti.Keyboard_key.ENTER:
+				self.character("\n")
+			case ti.Keyboard_key.BACKSPACE:
+				self.backspace()
+			case ti.Keyboard_key.DELETE:
+				self.delete()
+			case ti.Keyboard_key.UP_ARROW:
+				self.up()
+			case ti.Keyboard_key.DOWN_ARROW:
+				self.down()
+			case ti.Keyboard_key.LEFT_ARROW:
+				self.left()
+			case ti.Keyboard_key.RIGHT_ARROW:
+				self.right()
+			case ti.Keyboard_key.HOME:
+				self.home()
+			case ti.Keyboard_key.END:
+				self.end()
+			case c if not isinstance(c, ti.Keyboard_key):
+				self.character(c)
+			case _:
+				return False
+		
+		return True

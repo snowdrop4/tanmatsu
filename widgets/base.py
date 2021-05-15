@@ -40,7 +40,11 @@ class Widget():
 		"""
 		return Dimensions(self.w.max(parent_size.w), self.h.max(parent_size.h))
 	
-	def get_actual_size(self, parent_size: Dimensions, requested_size: Dimensions) -> Dimensions:
+	def get_actual_size(
+		self,
+		parent_size: Dimensions,
+		requested_size: Dimensions
+	) -> Dimensions:
 		"""
 		Returns the actual size that the widget will resolve to
 		when :meth:`layout` is called.
@@ -50,7 +54,12 @@ class Widget():
 			self.h.resolve(parent_size.h, requested_size.h),
 		)
 	
-	def layout(self, position: Point, parent_size: Dimensions, requested_size: Dimensions):
+	def layout(
+		self,
+		position: Point,
+		parent_size: Dimensions,
+		requested_size: Dimensions
+	):
 		"""
 		Calculates the widget layout. Will be called before every :meth:`draw`.
 		
@@ -86,7 +95,13 @@ class Widget():
 		"""
 		pass
 	
-	def mouse_event(self, button: ti.Mouse_button, button_state: ti.Mouse_state, position: Point) -> bool:
+	def mouse_event(
+		self,
+		button: ti.Mouse_button,
+		modifier: ti.Mouse_modifier,
+		state: ti.Mouse_state,
+		position: Point
+	) -> bool:
 		"""
 		Process a mouse event.
 		
@@ -99,7 +114,11 @@ class Widget():
 		"""
 		return False
 	
-	def keyboard_event(self, key: ti.Keyboard_key, modifier: ti.Keyboard_modifier) -> bool:
+	def keyboard_event(
+		self,
+		key: ti.Keyboard_key,
+		modifier: ti.Keyboard_modifier
+	) -> bool:
 		"""
 		Process a keyboard event.
 		

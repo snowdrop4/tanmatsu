@@ -1,3 +1,4 @@
+import debug
 import draw
 import terminal.input as ti
 from .base import Widget
@@ -93,7 +94,8 @@ class Scrollable(Widget):
 		
 		:param content_size: The dimensions of the content to be scrolled.
 		"""
-		self.__content_size = content_size
+		if content_size is not None:
+			self.__content_size = content_size
 		
 		if self.__scroll_direction & Scrollable.HORIZONTAL:
 			self._scroll(delta_x, Scrollable.HORIZONTAL)
@@ -156,22 +158,32 @@ class Scrollable(Widget):
 			self._Widget__available_space.h
 		)
 	
-	def mouse_event(self, button: ti.Mouse_button, button_state: ti.Mouse_state, position: Point) -> bool:
-		if super().mouse_event(button, button_state, position):
+	def mouse_event(
+		self,
+		button: ti.Mouse_button,
+		modifier: ti.Mouse_modifier,
+		state: ti.Mouse_state,
+		position: Point
+	) -> bool:
+		if super().mouse_event(button, modifier, state, position):
 			return True
 		
 		if self.scrollable() is False:
 			return False
 		
-		match button:
-			case ti.Mouse_button.SCROLL_UP:
-				self._scroll(-1, Scrollable.VERTICAL)
-			case ti.Mouse_button.SCROLL_DOWN:
-				self._scroll(+1, Scrollable.VERTICAL)
-			case ti.Mouse_button.SCROLL_LEFT:
-				self._scroll(-1, Scrollable.HORIZONTAL)
-			case ti.Mouse_button.SCROLL_RIGHT:
-				self._scroll(+1, Scrollable.HORIZONTAL)
+		match button, modifier:
+			case ti.Mouse_button.SCROLL_UP,    ti.Mouse_modifier.NONE:
+				self.scroll(None, delta_y=-1)
+			case ti.Mouse_button.SCROLL_DOWN,  ti.Mouse_modifier.NONE:
+				self.scroll(None, delta_y=+1)
+			case ti.Mouse_button.SCROLL_LEFT,  ti.Mouse_modifier.NONE:
+				self.scroll(None, delta_x=-1)
+			case ti.Mouse_button.SCROLL_RIGHT, ti.Mouse_modifier.NONE:
+				self.scroll(None, delta_x=+1)
+			case ti.Mouse_button.SCROLL_UP,    ti.Mouse_modifier.SHIFT:
+				self.scroll(None, delta_x=-1)
+			case ti.Mouse_button.SCROLL_DOWN,  ti.Mouse_modifier.SHIFT:
+				self.scroll(None, delta_x=+1)
 			case _:
 				return False
 		

@@ -15,9 +15,9 @@ new_termios[3] = new_termios[3] & ~termios.ICANON & ~termios.ECHO
 
 termios.tcsetattr(stdin, termios.TCSADRAIN, new_termios)
 
-to.set_mode_alternate_screenbuffer(tt.HIGH)
-to.set_mode_mouse_up_down_tracking(tt.HIGH)
-to.set_mode_mouse_report_format_digits(tt.HIGH)
+to.set_mode_alternate_screenbuffer(to.HIGH)
+to.set_mode_mouse_up_down_tracking(to.HIGH)
+to.set_mode_mouse_report_format_digits(to.HIGH)
 
 while True:
 	k = os.read(stdin, 1024)
@@ -28,6 +28,6 @@ while True:
 
 termios.tcsetattr(stdin, termios.TCSADRAIN, old_termios)
 
-to.set_mode_alternate_screenbuffer(tt.LOW)
-to.set_mode_mouse_up_down_tracking(tt.LOW)
-to.set_mode_mouse_report_format_digits(tt.LOW)
+to.set_mode_alternate_screenbuffer(to.LOW)
+to.set_mode_mouse_up_down_tracking(to.LOW)
+to.set_mode_mouse_report_format_digits(to.LOW)

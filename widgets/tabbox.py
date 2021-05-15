@@ -119,7 +119,11 @@ class TabBox(Container):
 		if self.focused_child is not None:
 			self.focused_child = self.__active_tab
 	
-	def keyboard_event(self, key: ti.Keyboard_key, modifier: int) -> bool:
+	def keyboard_event(
+		self,
+		key: ti.Keyboard_key,
+		modifier: ti.Keyboard_modifier
+	) -> bool:
 		if super().keyboard_event(key, modifier):
 			return True
 		

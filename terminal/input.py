@@ -1,5 +1,5 @@
 import re
-from enum import (Enum, auto)
+from enum import (Enum, auto, IntFlag)
 
 from parsy import (generate, string, regex, test_char, char_from, any_char, fail, index)
 
@@ -20,6 +20,19 @@ class Event_type(Enum):
 # ==============================================================================
 # Mouse
 # ==============================================================================
+class Mouse_modifier(IntFlag):
+	"""
+	The modifier key held at the same time the mouse button was pressed.
+	
+	The members of this enum may be bitmasked together.
+	"""
+	
+	NONE  = 0b00000000
+	SHIFT = 0b00000100
+	ALT   = 0b00001000
+	CTRL  = 0b00010000
+
+
 class Mouse_state(Enum):
 	"""The state of the mouse button."""
 	
@@ -56,7 +69,7 @@ mouse_button_lookup = {
 def mouse_sequence():
 	yield string(b"\x1B[<")
 	
-	button = yield regex(re.compile(rb"[0-9]+")).map(int)
+	raw_code = yield regex(re.compile(rb"[0-9]+")).map(int)
 	yield string(b";")
 	x = yield regex(re.compile(rb"[0-9]+")).map(int)
 	yield string(b";")
@@ -65,18 +78,20 @@ def mouse_sequence():
 	pressed  = string(b"M").result(Mouse_state.PRESSED)
 	released = string(b"m").result(Mouse_state.RELEASED)
 	
-	button = mouse_button_lookup[button]
-	button_state = yield pressed | released
+	button = mouse_button_lookup[raw_code & 0b1000011]  # peek at bits 1, 2, and 7
+	modifier_bitmask = raw_code & 0b0111100  # peek at the remaining bits
+	
+	state = yield pressed | released
 	position = Point(x, y)
-	return (Event_type.MOUSE, (button, button_state, position))
+	return (Event_type.MOUSE, (button, modifier_bitmask, state, position))
 
 
 # ==============================================================================
 # Keyboard
 # ==============================================================================
-class Keyboard_modifier(Enum):
+class Keyboard_modifier(IntFlag):
 	"""
-	The modifier key pressed at the same time as the keyboard key.
+	The modifier key held at the same time the keyboard key was pressed.
 	
 	The members of this enum may be bitmasked together.
 	"""

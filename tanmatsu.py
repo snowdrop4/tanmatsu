@@ -176,14 +176,14 @@ class Tanmatsu:
 			key.data()  # call the handler function we stored in the data field
 	
 	def handle_mouse_event(self, data):
-		(button, button_state, position) = data
+		(button, modifier, state, position) = data
 		
 		# Start at the bottom of the focus chain (i.e., the currently focused
 		# widget), and go up until we find a widget that consumes the event.
 		focus_chain = self.get_current_focus_chain()
 		
 		for i in reversed(focus_chain):
-			if i.mouse_event(button, button_state, position):
+			if i.mouse_event(button, modifier, state, position):
 				return
 	
 	def handle_keyboard_event(self, data):

@@ -22,7 +22,8 @@ class ButtonBox(widgets.FlexBox):
 		scroll_direction = widgets.Scrollable.NONE
 		border = True
 		
-		h = size.FixedInteger(7)
+		h = size.FixedInteger(50)
+		w = size.FixedInteger(50)
 
 
 # class ButtonList(widgets.List):
@@ -45,11 +46,12 @@ buttons = [
 class RootWidget(widgets.FlexBox):
 	textbox = widgets.TextBox()
 	textlog = widgets.TextLog()
-	buttonlist = widgets.List(buttons, 7)
+	bb = ButtonBox()
+	# buttonlist = widgets.List(buttons, 7)
 	
 	class Meta:
 		flex_direction = widgets.FlexBox.HORIZONTAL
-		scroll_direction = widgets.Scrollable.NONE
+		scroll_direction = widgets.Scrollable.HORIZONTAL | widgets.Scrollable.VERTICAL
 		border = True
 		
 		w = size.ParentRequested()
@@ -61,8 +63,8 @@ with tanmatsu.Tanmatsu() as t:
 	t.set_root_widget(f)
 	
 	f.textbox.text = test.random_prose()
-	f.buttonlist.cursor = 1
-	f.buttonlist.items[0].callback = lambda: f.textbox.set_text(test.random_prose())
+	# f.buttonlist.cursor = 1
+	# f.buttonlist.items[0].callback = lambda: f.textbox.set_text(test.random_prose())
 	debug.set_output_widget(f.textlog)
 	
 	t.loop()
