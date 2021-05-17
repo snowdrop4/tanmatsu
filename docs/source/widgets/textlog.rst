@@ -1,5 +1,5 @@
 TextLog
 =======
 
-.. autoclass:: widgets.TextLog
+.. autoclass:: tanmatsu.widgets.TextLog
    :members:

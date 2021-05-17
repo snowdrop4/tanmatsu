@@ -1,13 +1,11 @@
 from tri_declarative import with_meta
 
-import draw
-import theme
-import terminal.input as ti
-import debug
-from geometry import Rectangle, Dimensions, Point
-from screenbuffer import Screenbuffer
-from .container import Container
+import tanmatsu.input as ti
+from tanmatsu import draw, theme, debug
+from tanmatsu.screenbuffer import Screenbuffer
+from tanmatsu.geometry import Rectangle, Dimensions, Point
 from .base import Widget
+from .container import Container
 
 
 @with_meta

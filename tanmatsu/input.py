@@ -3,8 +3,7 @@ from enum import (Enum, auto, IntFlag)
 
 from parsy import (generate, string, regex, test_char, char_from, any_char, fail, index)
 
-import terminal as tt
-from geometry import Point
+from tanmatsu.geometry import Point
 
 
 # ==============================================================================
@@ -20,26 +19,6 @@ class Event_type(Enum):
 # ==============================================================================
 # Mouse
 # ==============================================================================
-class Mouse_modifier(IntFlag):
-	"""
-	The modifier key held at the same time the mouse button was pressed.
-	
-	The members of this enum may be bitmasked together.
-	"""
-	
-	NONE  = 0b00000000
-	SHIFT = 0b00000100
-	ALT   = 0b00001000
-	CTRL  = 0b00010000
-
-
-class Mouse_state(Enum):
-	"""The state of the mouse button."""
-	
-	PRESSED  = auto()
-	RELEASED = auto()
-
-
 class Mouse_button(Enum):
 	"""The mouse button."""
 	
@@ -63,6 +42,26 @@ mouse_button_lookup = {
 	66: Mouse_button.SCROLL_LEFT,
 	67: Mouse_button.SCROLL_RIGHT,
 }
+
+
+class Mouse_modifier(IntFlag):
+	"""
+	The modifier key held at the same time the mouse button was pressed.
+	
+	The members of this enum may be bitmasked together.
+	"""
+	
+	NONE  = 0b00000000
+	SHIFT = 0b00000100
+	ALT   = 0b00001000
+	CTRL  = 0b00010000
+
+
+class Mouse_state(Enum):
+	"""The state of the mouse button."""
+	
+	PRESSED  = auto()
+	RELEASED = auto()
 
 
 @generate
@@ -89,19 +88,6 @@ def mouse_sequence():
 # ==============================================================================
 # Keyboard
 # ==============================================================================
-class Keyboard_modifier(IntFlag):
-	"""
-	The modifier key held at the same time the keyboard key was pressed.
-	
-	The members of this enum may be bitmasked together.
-	"""
-	
-	NONE  = 0b0000
-	SHIFT = 0b0001
-	ALT   = 0b0010
-	CTRL  = 0b0100
-
-
 class Keyboard_key(Enum):
 	"""The keyboard key."""
 	
@@ -136,6 +122,19 @@ class Keyboard_key(Enum):
 	RIGHT_ARROW = auto()
 
 
+class Keyboard_modifier(IntFlag):
+	"""
+	The modifier key held at the same time the keyboard key was pressed.
+	
+	The members of this enum may be bitmasked together.
+	"""
+	
+	NONE  = 0b0000
+	SHIFT = 0b0001
+	ALT   = 0b0010
+	CTRL  = 0b0100
+
+
 # Keycodes encountered after \x1B[
 keyboard_keycode_lookup = {
 	b"2": Keyboard_key.INSERT,
@@ -152,6 +151,7 @@ keyboard_keycode_lookup = {
 	b"23": Keyboard_key.F11,  # skips 22, too.
 	b"24": Keyboard_key.F12,
 }
+
 
 # Special keycodes encountered all on their own.
 special_keyboard_keycode_lookup = {
@@ -375,10 +375,6 @@ keyboard_t = tuple[Keyboard_key | str, Keyboard_modifier]
 
 
 def parse_input(input: bytes) -> list[tuple[Event_type, mouse_t | keyboard_t ]]:
-	"""
-	Parse raw bytes from stdin.
-	"""
-	
 	parser = mouse_sequence \
 		| key_sequence \
 		| legacy_f1_to_f4 \

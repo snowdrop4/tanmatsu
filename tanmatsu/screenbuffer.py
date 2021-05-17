@@ -1,7 +1,7 @@
-import terminal.output as to
-import theme
-from geometry import Rectangle, Point
-from style import Style
+import tanmatsu.output as to
+from tanmatsu import theme
+from tanmatsu.style import Style
+from tanmatsu.geometry import Rectangle, Point
 
 
 class Screenbuffer:

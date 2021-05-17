@@ -3,13 +3,12 @@ import itertools
 
 from tri_declarative import with_meta
 
-import terminal.input as ti
-import theme
-import debug
+import tanmatsu.input as ti
+from tanmatsu import theme, debug
+from tanmatsu.geometry import Rectangle, Dimensions, Point
+from tanmatsu.screenbuffer import Screenbuffer
 from .box import Box
 from .scrollable import Scrollable
-from geometry import Rectangle, Dimensions, Point
-from screenbuffer import Screenbuffer
 
 
 # Given a string, generates a series of tuples of type (str, str).

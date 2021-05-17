@@ -1,8 +1,8 @@
 from typing import Generator
 
+from tanmatsu.geometry import Rectangle
+from tanmatsu.screenbuffer import Screenbuffer
 from .box import Box
-from screenbuffer import Screenbuffer
-from geometry import Rectangle
 
 
 def lines_to_wrap(string_length: int, line_length: int) -> int:

@@ -1,6 +1,6 @@
 FlexBox
 =======
 
-.. autoclass:: widgets.FlexBox
+.. autoclass:: tanmatsu.widgets.FlexBox
    :members:
    :exclude-members: get_meta

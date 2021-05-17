@@ -1,9 +1,9 @@
 from typing import Callable
 
-import terminal.input as ti
+import tanmatsu.input as ti
+from tanmatsu.geometry import Rectangle
+from tanmatsu.screenbuffer import Screenbuffer
 from .box import Box
-from screenbuffer import Screenbuffer
-from geometry import Rectangle
 
 
 class Button(Box):

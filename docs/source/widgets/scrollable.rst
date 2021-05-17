@@ -1,5 +1,5 @@
 Scrollable
 ==========
 
-.. autoclass:: widgets.Scrollable
+.. autoclass:: tanmatsu.widgets.Scrollable
    :members:

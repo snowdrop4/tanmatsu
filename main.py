@@ -1,8 +1,6 @@
 import tanmatsu
-import widgets
-import size
-import test.utils as test
-import debug
+from tanmatsu import widgets, size, debug
+import tests.utils as test
 
 
 def okay_c():

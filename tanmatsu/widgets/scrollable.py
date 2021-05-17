@@ -1,9 +1,8 @@
-import debug
-import draw
-import terminal.input as ti
+import tanmatsu.input as ti
+from tanmatsu import draw, debug
+from tanmatsu.screenbuffer import Screenbuffer
+from tanmatsu.geometry import Rectangle, Dimensions, Point
 from .base import Widget
-from geometry import Rectangle, Dimensions, Point
-from screenbuffer import Screenbuffer
 
 
 class Scrollable(Widget):
@@ -180,10 +179,12 @@ class Scrollable(Widget):
 				self.scroll(None, delta_x=-1)
 			case ti.Mouse_button.SCROLL_RIGHT, ti.Mouse_modifier.NONE:
 				self.scroll(None, delta_x=+1)
+			
 			case ti.Mouse_button.SCROLL_UP,    ti.Mouse_modifier.SHIFT:
 				self.scroll(None, delta_x=-1)
 			case ti.Mouse_button.SCROLL_DOWN,  ti.Mouse_modifier.SHIFT:
 				self.scroll(None, delta_x=+1)
+			
 			case _:
 				return False
 		

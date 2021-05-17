@@ -6,12 +6,11 @@ import shutil
 import termios
 import selectors
 
-import debug
-import terminal.input as ti
-import terminal.output as to
-import screenbuffer
-from widgets.base import Widget
-from geometry import Rectangle, Dimensions, Point
+import tanmatsu.input as ti
+import tanmatsu.output as to
+from tanmatsu import screenbuffer, debug
+from tanmatsu.widgets.base import Widget
+from tanmatsu.geometry import Rectangle, Dimensions, Point
 
 
 def exhaust_file_descriptor(fd):

@@ -1,5 +1,5 @@
 Size
 ====
 
-.. automodule:: size
+.. automodule:: tanmatsu.size
    :members:

@@ -1,4 +1,4 @@
-from style import Style
+from tanmatsu.style import Style
 
 
 class Theme:

@@ -1,6 +1,6 @@
 import copy
 
-import terminal.output as to
+import tanmatsu.output as to
 
 
 class Style:

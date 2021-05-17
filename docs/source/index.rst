@@ -10,14 +10,14 @@ Welcome to tanmatsu's documentation!
    :maxdepth: 2
    :caption: Contents:
    
-   terminal
-   widgets
    geometry
+   input
    screenbuffer
    size
    style
    tanmatsu
    theme
+   widgets
 
 
 Indices and tables

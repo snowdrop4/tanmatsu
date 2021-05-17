@@ -1,5 +1,5 @@
 Base
 ====
 
-.. autoclass:: widgets.Widget
+.. autoclass:: tanmatsu.widgets.Widget
    :members:

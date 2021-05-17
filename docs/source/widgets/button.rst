@@ -1,5 +1,5 @@
 Button
 ======
 
-.. autoclass:: widgets.Button
+.. autoclass:: tanmatsu.widgets.Button
    :members:

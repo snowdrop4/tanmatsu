@@ -1,5 +1,5 @@
 Theme
 =====
 
-.. automodule:: theme
+.. automodule:: tanmatsu.theme
    :members:

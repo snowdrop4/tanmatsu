@@ -1,8 +1,7 @@
-import draw
-import theme
+from tanmatsu import draw, theme
+from tanmatsu.geometry import Rectangle
+from tanmatsu.screenbuffer import Screenbuffer
 from .base import Widget
-from screenbuffer import Screenbuffer
-from geometry import Rectangle
 
 
 class Box(Widget):

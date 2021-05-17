@@ -1,6 +1,4 @@
-import geometry
-import screenbuffer
-import widgets
+from tanmatsu import geometry, screenbuffer, widgets
 
 
 def rectangle(

@@ -1,7 +1,7 @@
 import unittest
 
 import tanmatsu
-import widgets
+from tanmatsu import widgets
 
 
 class ChildWidget(widgets.TextBox):

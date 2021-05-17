@@ -1,10 +1,10 @@
 from tri_declarative import with_meta
 
+from tanmatsu.screenbuffer import Screenbuffer
+from tanmatsu.geometry import Rectangle, Dimensions, Point
 from .box import Box
 from .container import Container
 from .scrollable import Scrollable
-from geometry import Rectangle, Dimensions, Point
-from screenbuffer import Screenbuffer
 
 
 @with_meta

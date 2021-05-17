@@ -1,8 +1,7 @@
-import size
-import theme
-import terminal.input as ti
-from geometry import Rectangle, Dimensions, Point
-from screenbuffer import Screenbuffer
+import tanmatsu.input as ti
+from tanmatsu import size, theme
+from tanmatsu.screenbuffer import Screenbuffer
+from tanmatsu.geometry import Rectangle, Dimensions, Point
 
 
 class Widget():
