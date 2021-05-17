@@ -68,7 +68,7 @@ class TabBox(Container):
 		super().draw(s, clip=clip)
 		
 		if self.focused:
-			style = theme.DefaultTheme.highlight
+			style = theme.DefaultTheme.focused
 		else:
 			style = None
 		
@@ -82,9 +82,9 @@ class TabBox(Container):
 		current_x = self.__tab_rectangle.x
 		for i, (k, v) in enumerate(self.children.items()):
 			if self.__active_tab is v:
-				style = theme.DefaultTheme.tab_active
+				style = theme.DefaultTheme.active
 			else:
-				style = theme.DefaultTheme.tab_inactive
+				style = theme.DefaultTheme.inactive
 			
 			current_x += 1
 			draw_pillar("╭")

@@ -4,7 +4,43 @@ import terminal.output as to
 
 
 class Style:
-	def inherit(other, **kwargs):
+	"""
+	Represents the styling available to an invididual character in the terminal.
+	
+	:param foreground: The foreground (text) colour
+	:param background: The background colour
+	:param bold: Whether the text ought to be bold or not
+	"""
+	
+	def __init__(self,
+		foreground: tuple[int, int, int] | None = None,
+		background: tuple[int, int, int] | None = None,
+		bold: bool | None = None
+	):
+		self.foreground = foreground
+		self.background = background
+		self.bold = bold
+	
+	def inherit(other: Style, **kwargs):
+		"""
+		Create a copy of `other`, and then apply the values specified in
+		`**kwargs` to the copy of `other`.
+		
+		For example, assuming we have the base style:
+		
+		.. code-block:: python
+		   
+		   base = Style(forground=(255, 255, 255), background=(0, 0, 0))
+		
+		we can do:
+		
+		.. code-block:: python
+		   
+		   red = Style.inherit(base, foreground=(255, 0, 0))
+		
+		to create a clone of the base style, except with a red foreground.
+		"""
+		
 		s = copy.deepcopy(other)
 		
 		for (k, v) in kwargs.items():
@@ -14,11 +50,6 @@ class Style:
 				raise TypeError(f"Style.inherit() got an unexpected keyword argument '{k}'")
 		
 		return s
-	
-	def __init__(self, foreground=None, background=None, bold=None):
-		self.foreground = foreground
-		self.background = background
-		self.bold = bold
 	
 	def __str__(self):
 		return f"{self.foreground} - {self.background} - {self.bold}"

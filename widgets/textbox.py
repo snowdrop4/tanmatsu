@@ -300,7 +300,7 @@ class TextBox(Box, Scrollable):
 				# If we're on the character the cursor occupies,
 				# set the theme appropriately.
 				if self.editable and self.cursor == characters_seen:
-					style = theme.DefaultTheme.textbox_cursor
+					style = theme.DefaultTheme.cursor
 				else:
 					style = None
 				

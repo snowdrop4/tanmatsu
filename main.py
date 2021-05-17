@@ -1,5 +1,4 @@
 import tanmatsu
-import terminal
 import widgets
 import size
 import test.utils as test

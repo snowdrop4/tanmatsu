@@ -1,8 +1,8 @@
-from geometry import Rectangle, Dimensions, Point
-import theme
 import size
-from screenbuffer import Screenbuffer
+import theme
 import terminal.input as ti
+from geometry import Rectangle, Dimensions, Point
+from screenbuffer import Screenbuffer
 
 
 class Widget():

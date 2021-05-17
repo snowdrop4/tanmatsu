@@ -33,7 +33,7 @@ class Box(Widget):
 		
 		if self.__border:
 			if self.focused:
-				style = theme.DefaultTheme.highlight
+				style = theme.DefaultTheme.focused
 			else:
 				style = None
 			
