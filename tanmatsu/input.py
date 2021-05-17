@@ -350,21 +350,25 @@ def unicode_codepoint():
 	if codepoint == 0x1B:
 		return (Event_type.KEYBOARD, (Keyboard_key.ESCAPE, Keyboard_modifier.NONE))
 	
-	match codepoint & 0b11110000:
-		case 0b11000000:
-			bytes_left = 1
-		case 0b11100000:
-			bytes_left = 2
-		case 0b11110000:
-			bytes_left = 3
-		case _:
-			bytes_left = 0
+	if   (codepoint & 0b11100000) == 0b11000000:
+		bytes_left = 1
+	elif (codepoint & 0b11110000) == 0b11100000:
+		bytes_left = 2
+	elif (codepoint & 0b11111000) == 0b11110000:
+		bytes_left = 3
+	else:
+		bytes_left = 0
 	
-	for i in range(0, bytes_left):
+	uni = bytearray(1 + bytes_left)
+	uni[0] = codepoint
+	
+	for i in range(1, bytes_left + 1):
 		byte = yield any_char
-		codepoint = codepoint | byte << (i + 1) * 8  # concat the bytes together
+		uni[i] = byte
 	
-	return (Event_type.KEYBOARD, (chr(codepoint), Keyboard_modifier.NONE))
+	scalar = uni.decode("utf-8")
+	
+	return (Event_type.KEYBOARD, (scalar, Keyboard_modifier.NONE))
 
 
 # ==============================================================================
