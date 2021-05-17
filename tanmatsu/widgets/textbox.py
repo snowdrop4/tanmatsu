@@ -21,9 +21,9 @@ from .scrollable import Scrollable
 # Will be at most `max_width` long. If it is not the last line, it will contain
 # a \n at the end. The last line may or may not have a \n at the end.
 # 
-# Adds an blank line containing a single space character after the last line
-# if the last line ends in a \n. If it doesn't end in an \n, adds a single space
-# character to the end of it instead.
+# If the last line ends in a \n, or if the last line doesn't end in a \n but is
+# the exact wrap width, adds an line containing a single space character after
+# the last line.
 # 
 # We need to guarantee that there's space for the cursor to inhabit after the
 # last line. Adding a space character makes drawing the cursor vastly more
@@ -42,26 +42,30 @@ from .scrollable import Scrollable
 # If the line is wrapped, the gutter character will be set to "⮷".
 # If the line isn't wrapped, the gutter character will be " ".
 def wrap(text: str, max_width: int) -> typing.Generator[(str, str), None, None]:
+	if len(text) == 0:
+		yield (" ", " ")
+		return
+	
 	i = 0
 	
 	while i < len(text):
 		newline = text.find("\n", i, i + max_width)
 		
 		if newline == -1:
-			if i + max_width == len(text):  # last line not ending with a "\n"
+			if i + max_width == len(text):  # last line ending at the wrap width but not with a "\n"
 				yield (text[i:], "⮷")
-				yield (" ", " ")  # the cursor needs to be able to occupy the next line as this line is the exact wrap width
+				yield (" ", " ")  # cursor needs to be able to occupy the next line as this line is the exact wrap width
 				break
-			if i + max_width > len(text):  # last line not ending with a "\n"
+			if i + max_width > len(text):  # last line ending before the wrap width but not with a "\n"
 				yield (text[i:] + " ", " ")
 				break
 			else:  # normal wrapped line
 				yield (text[i:i + max_width], "⮷")
 				i += max_width
 		else:
-			if newline + 1 == len(text):  # last line ending with a "\n"
+			if newline + 1 == len(text):  # last line ending at the wrap width with a "\n"
 				yield (text[i:newline + 1], " ")
-				yield (" ", " ")  # cursor needs to be able to occupy the next line as this line ends in a "\n"
+				yield (" ", " ")  # cursor needs to be able to occupy the next line as this line is the exact wrap width
 				break
 			else:  # normal line ending with a "\n"
 				yield (text[i:newline + 1], " ")
@@ -143,7 +147,7 @@ class TextBox(Box, Scrollable):
 	@text.setter
 	def text(self, value: str):
 		self._text = value
-		self.cursor = min(self.cursor, len(self._text))
+		self.cursor = min(self.cursor, len(self._text) + 1)
 	
 	@property
 	def wrap_width(self):
