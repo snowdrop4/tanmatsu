@@ -5,7 +5,7 @@ from tri_declarative import with_meta
 
 import tanmatsu.input as ti
 from tanmatsu import theme, debug
-from tanmatsu.wctools import wcslice, wcfind
+from tanmatsu.wctools import wcslice, wcfind, wcoffset_to_column, wccolumn_to_offset
 from tanmatsu.geometry import Rectangle, Dimensions, Point
 from tanmatsu.screenbuffer import Screenbuffer
 from .box import Box
@@ -214,11 +214,15 @@ class TextBox(Box, Scrollable):
 	def up(self):
 		(c1, c2) = self.curr_line()
 		
+		# Raw, unwrapped line:
 		c_length = c2 - c1 - 1  # length of current line
 		c_offset = self.cursor - c1  # offset of the cursor relative to the start of the current line
+		
+		# Wrapped line:
 		c_wrapped_line_count = c_length // self.wrap_width  # number of lines the current line was wrapped into
-		c_depth_into_wrapped_lines = c_offset // self.wrap_width  # our line position inside the wrapped lines
+		c_depth_into_wrapped_lines = c_offset // self.wrap_width  # the line number we are on, inside the wrapped lines
 		c_wrapped_offset = c_offset % self.wrap_width  # offset of the cursor relative to the start of the wrapped line the cursor is on
+		c_wrapped_column = wcoffset_to_column(self.text[c1:c2], c_wrapped_offset)
 		
 		# If we're in a wrapped line, move inside the line:
 		if c_depth_into_wrapped_lines > 0:
@@ -232,19 +236,25 @@ class TextBox(Box, Scrollable):
 			p_length = p2 - p1 - 1
 			p_wrapped_line_count = p_length // self.wrap_width
 			
+			target_offset = wccolumn_to_offset(self.text[p1:p2], c_wrapped_column)
+			
 			self.cursor = min(
-				p1 + (p_wrapped_line_count * self.wrap_width) + c_wrapped_offset,
+				p1 + (p_wrapped_line_count * self.wrap_width) + target_offset,
 				p2 - 1  # -1 since p2 indicates the character after the last
 			)
 	
 	def down(self):
 		(c1, c2) = self.curr_line()
 		
+		# Raw, unwrapped line:
 		c_length = c2 - c1 - 1  # length of current line
 		c_offset = self.cursor - c1  # offset of the cursor relative to the start of the current line
+		
+		# Wrapped line:
 		c_wrapped_line_count = c_length // self.wrap_width  # number of lines the current line was wrapped into
-		c_depth_into_wrapped_lines = c_offset // self.wrap_width  # our line position inside the wrapped lines
+		c_depth_into_wrapped_lines = c_offset // self.wrap_width  # the line number we are on, inside the wrapped lines
 		c_wrapped_offset = c_offset % self.wrap_width  # offset of the cursor relative to the start of the wrapped line the cursor is on
+		c_wrapped_column = wcoffset_to_column(self.text[c1:c2], c_wrapped_offset)
 		
 		# If we're in a wrapped line, move inside the line:
 		if c_depth_into_wrapped_lines < c_wrapped_line_count:
@@ -258,8 +268,11 @@ class TextBox(Box, Scrollable):
 		# Else move into the next line:
 		else:
 			(n1, n2) = self.next_line()
+			
+			target_offset = wccolumn_to_offset(self.text[n1:n2], c_wrapped_column)
+			
 			self.cursor = min(
-				n1 + c_wrapped_offset,
+				n1 + target_offset,
 				n2 - 1  # -1 since n2 indicates the character after the last
 			)
 	
