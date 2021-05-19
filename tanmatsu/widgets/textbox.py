@@ -1,10 +1,11 @@
-import typing
+from typing import Generator
 import itertools
 
 from tri_declarative import with_meta
 
 import tanmatsu.input as ti
 from tanmatsu import theme, debug
+from tanmatsu.wctools import wcslice, wcfind
 from tanmatsu.geometry import Rectangle, Dimensions, Point
 from tanmatsu.screenbuffer import Screenbuffer
 from .box import Box
@@ -41,7 +42,7 @@ from .scrollable import Scrollable
 #
 # If the line is wrapped, the gutter character will be set to "⮷".
 # If the line isn't wrapped, the gutter character will be " ".
-def wrap(text: str, max_width: int) -> typing.Generator[(str, str), None, None]:
+def wrap(text: str, max_width: int) -> Generator[(str, str), None, None]:
 	if len(text) == 0:
 		yield (" ", " ")
 		return
@@ -49,22 +50,22 @@ def wrap(text: str, max_width: int) -> typing.Generator[(str, str), None, None]:
 	i = 0
 	
 	while i < len(text):
-		newline = text.find("\n", i, i + max_width)
+		newline = wcfind(text, "\n", i, i + max_width)
 		
 		if newline == -1:
-			if i + max_width == len(text):  # last line ending at the wrap width but not with a "\n"
+			if i + max_width == len(text):  # last line ending exactly at the wrap width, with no "\n"
 				yield (text[i:], "⮷")
 				yield (" ", " ")  # cursor needs to be able to occupy the next line as this line is the exact wrap width
 				break
-			if i + max_width > len(text):  # last line ending before the wrap width but not with a "\n"
+			if i + max_width > len(text):  # last line ending before the wrap width, with no "\n"
 				yield (text[i:] + " ", " ")
 				break
 			else:  # normal wrapped line
-				yield (text[i:i + max_width], "⮷")
+				yield (wcslice(text[i:], max_width), "⮷")
 				i += max_width
 		else:
-			if newline + 1 == len(text):  # last line ending at the wrap width with a "\n"
-				yield (text[i:newline + 1], " ")
+			if newline + 1 == len(text):  # last line ending exactly at the wrap width, with a "\n"
+				yield (text[i:], " ")
 				yield (" ", " ")  # cursor needs to be able to occupy the next line as this line is the exact wrap width
 				break
 			else:  # normal line ending with a "\n"
@@ -320,27 +321,35 @@ class TextBox(Box, Scrollable):
 				characters_seen += len(line)
 				continue
 			
-			for (j, character) in enumerate(line):
-				x = self._Widget__available_space.x + j
-				
+			# Draw the line
+			x_offset = 0
+			for character in line:
 				# If we attempt to draw this character, it screws up the screen.
-				# Turn it into a space character instead, as although both \n
-				# and ' ' are non-visible, this position in the text box is
-				# a potentially valid space for the cursor to occupy.
+				# Turn it into a space character instead of skipping this
+				# character entirely, as although both \n and ' ' are
+				# non-visible, this position in the text box is a potentially
+				# valid space for the cursor to occupy.
 				if character == "\n":
 					character = " "
 				
-				# If we're on the character the cursor occupies,
+				# If we're on the character the cursor is currently occupying,
 				# set the theme appropriately.
 				if self.editable and self.cursor == characters_seen:
 					style = theme.DefaultTheme.cursor
 				else:
 					style = None
 				
-				s.set(x, y, character, clip=clip, style=style)
+				x_offset += s.set(
+					self._Widget__available_space.x + x_offset,
+					y,
+					character,
+					clip=clip,
+					style=style
+				)
 				
 				characters_seen += 1
 			
+			# Draw the gutter character
 			s.set(
 				self._Widget__available_space.x2,
 				y,

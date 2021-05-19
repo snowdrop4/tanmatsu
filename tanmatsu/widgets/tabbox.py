@@ -1,7 +1,9 @@
 from tri_declarative import with_meta
+from wcwidth import wcswidth
 
 import tanmatsu.input as ti
 from tanmatsu import draw, theme, debug
+from tanmatsu.wctools import wcslice
 from tanmatsu.screenbuffer import Screenbuffer
 from tanmatsu.geometry import Rectangle, Dimensions, Point
 from .base import Widget
@@ -23,29 +25,31 @@ class TabBox(Container):
 			k, v = list(self.children.items())[0]
 			self.__active_tab = v
 			self.focusable_children = { k: v }
+		
+		self.tab_min_label_width = 10
+		self.tab_decoration_width = 2
+		self.tab_min_width = self.tab_min_label_width + self.tab_decoration_width
 	
 	def layout(self, *args, **kwargs):
 		super().layout(*args, **kwargs)
 		
+		# Work out how much space we get for each tab:
 		tab_count = len(self.children)
-		min_tab_width = 5
-		total_decoration_length = tab_count * 2
 		available_space = self._Widget__available_space.w - 2
-		self.__tab_width = (tab_count * min_tab_width) + total_decoration_length
 		
-		if self.__tab_width <= available_space:
-			self.__tab_width = int((available_space - total_decoration_length) / tab_count)
+		if tab_count * self.tab_min_width < available_space:
+			self.__tab_width = available_space // tab_count
+		else:
+			self.__tab_width = self.tab_min_width
 		
-		self.__tab_rectangle = geometry.Rectangle(
-			self._Widget__available_space.x,
-			self._Widget__available_space.y,
-			self.__tab_width * tab_count,
-			2
-		)
+		# Mark out room for the tab bar:
+		self.__tab_bar_rectangle = self._Widget__available_space.duplicate()
+		self.__tab_bar_rectangle.h = 2
 		
 		self._Widget__available_space.y += 2
 		self._Widget__available_space.h -= 2
 		
+		# Mark out room for the box attached to the bottom of the tab bar:
 		self.__border_rectangle = self._Widget__available_space.duplicate()
 		
 		self._Widget__available_space.x += 1
@@ -53,13 +57,11 @@ class TabBox(Container):
 		self._Widget__available_space.w -= 2
 		self._Widget__available_space.h -= 2
 		
+		# Layout the active tab:
 		self.__active_tab.layout(
-			self._Widget__available_space.x,
-			self._Widget__available_space.y,
-			self._Widget__available_space.w,
-			self._Widget__available_space.h,
-			self._Widget__available_space.w,
-			self._Widget__available_space.h
+			self._Widget__available_space.origin_point(),
+			self._Widget__available_space.dimensions(),
+			self._Widget__available_space.dimensions()
 		)
 	
 	def draw(self, s: Screenbuffer, clip: Rectangle | None = None):
@@ -71,32 +73,61 @@ class TabBox(Container):
 			style = None
 		
 		draw.rectangle(s, self.__border_rectangle, clip=clip, style=style)
+		self.__active_tab.draw(s, clip=clip & self._Widget__available_space)
 		
-		def draw_pillar(top):
-			s.set(current_x, self.__tab_rectangle.y,     top, clip=clip, style=style)
-			s.set(current_x, self.__tab_rectangle.y + 1, "│", clip=clip, style=style)
-			s.set(current_x, self.__tab_rectangle.y + 2, "╧", clip=clip, style=style)
-		
-		current_x = self.__tab_rectangle.x
-		for i, (k, v) in enumerate(self.children.items()):
-			if self.__active_tab is v:
+		for (i, (label, tab)) in enumerate(self.children.items()):
+			if tab is self.__active_tab:
 				style = theme.DefaultTheme.active
 			else:
 				style = theme.DefaultTheme.inactive
 			
-			current_x += 1
-			draw_pillar("╭")
-			current_x += 1
+			tab_rectangle = Rectangle(
+				self.__tab_bar_rectangle.x + (i * self.__tab_width) + 1,
+				self.__tab_bar_rectangle.y,
+				self.__tab_width,
+				2
+			)
 			
-			for j in range(min(self.__tab_width, len(k))):
-				s.set(current_x, self.__tab_rectangle.y,      "─", clip=clip, style=style)
-				s.set(current_x, self.__tab_rectangle.y + 1, k[j], clip=clip, style=style)
-				s.set_style(current_x, self.__tab_rectangle.y + 2, style, clip=clip)
-				current_x += 1
-			
-			draw_pillar("╮")
+			self.draw_tab(s, tab_rectangle, label, clip, style)
+	
+	def draw_tab(self, s, tab_rectangle, label, clip, style):
+		def draw_pillar(x, top):
+			s.set(x, tab_rectangle.y + 0, top, clip=clip, style=style)
+			s.set(x, tab_rectangle.y + 1, "│", clip=clip, style=style)
+			s.set(x, tab_rectangle.y + 2, "╧", clip=clip, style=style)
 		
-		self.__active_tab.draw(s, clip=clip & self._Widget__available_space)
+		# Draw the tab borders:
+		draw_pillar(tab_rectangle.x1, "╭")
+		draw_pillar(tab_rectangle.x2, "╮")
+		
+		for i in range(tab_rectangle.x1 + 1, tab_rectangle.x2):
+			s.set      (i, tab_rectangle.y + 0, "─", clip=clip, style=style)
+			s.set_style(i, tab_rectangle.y + 2, style, clip=clip)
+		
+		# Draw the tab labels:
+		
+		space_for_label = tab_rectangle.w - self.tab_decoration_width
+		cropped_label = wcslice(label, space_for_label)
+		
+		# Did the label get cropped?
+		if len(cropped_label) < len(label):
+			# If there's one column of space at the end of the cropped label,
+			# append the elision indicator to the end:
+			if wcswidth(cropped_label) == tab_rectangle.w - space_for_label - 1:
+				cropped_label = cropped_label + "…"
+			# Otherwise, change the last character to the elision indicator:
+			else:
+				cropped_label = cropped_label[:-1] + "…"
+		
+		x_offset = 0
+		for character in cropped_label:
+			x_offset += s.set(
+				tab_rectangle.x1 + 1 + x_offset,
+				tab_rectangle.y + 1,
+				character,
+				clip=clip,
+				style=style
+			)
 	
 	def left(self):
 		"""Switches tab to the left."""

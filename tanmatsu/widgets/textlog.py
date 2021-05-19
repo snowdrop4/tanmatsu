@@ -1,20 +1,17 @@
 from typing import Generator
 
+from tanmatsu.wctools import wcslice
 from tanmatsu.geometry import Rectangle
 from tanmatsu.screenbuffer import Screenbuffer
 from .box import Box
 
 
-def lines_to_wrap(string_length: int, line_length: int) -> int:
-	return (string_length // line_length) + (1 if string_length % line_length else 0)
-
-
-def chunks(text: str, line_length: int) -> Generator[str]:
-	if text == "":
-		yield ""
-	else:
-		for i in range(0, len(text), line_length):
-			yield text[i:i + line_length]
+def chunks(text: str, line_length: int) -> Generator[str, None, None]:
+	i = 0
+	while i < len(text):
+		chunk = wcslice(text[i:], line_length)
+		i += len(chunk)
+		yield chunk
 
 
 class TextLog(Box):
@@ -65,9 +62,10 @@ class TextLog(Box):
 				if drawn_lines + i >= self._Widget__available_space.h:
 					return
 				
-				for j, character in enumerate(chunk):
-					s.set(
-						self._Widget__available_space.x + j,
+				x_offset = 0
+				for character in chunk:
+					x_offset += s.set(
+						self._Widget__available_space.x + x_offset,
 						self._Widget__available_space.y2 - i - drawn_lines,
 						character,
 						clip=clip,
