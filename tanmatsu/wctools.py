@@ -1,4 +1,4 @@
-from wcwidth import wcwidth
+from wcwidth import wcwidth, wcswidth
 
 
 # Returns the substring that is `prefix_length` columns long, starting from the
@@ -44,3 +44,18 @@ def wcfind(s: str, c: str, start: int, end: int) -> int:
 			return start + i
 	
 	return -1
+
+
+def wcoffset_to_column(s: str, o: int) -> int:
+	return wcswidth(s[:o + 1])
+
+
+def wccolumn_to_offset(s: str, c: int) -> int:
+	total_width = 0
+	for (i, v) in enumerate(s):
+		char_width = wcwidth(v)
+		if total_width + char_width > c:
+			return i
+		else:
+			total_width += char_width
+	return i

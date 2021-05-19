@@ -212,23 +212,23 @@ class TextBox(Box, Scrollable):
 		return (start + 1, end + 1)
 	
 	def up(self):
-		c = (c1, c2) = self.curr_line()
+		(c1, c2) = self.curr_line()
 		
 		c_length = c2 - c1 - 1  # length of current line
 		c_offset = self.cursor - c1  # offset of the cursor relative to the start of the current line
 		c_wrapped_line_count = c_length // self.wrap_width  # number of lines the current line was wrapped into
-		c_depth_into_wrapped_line = c_offset // self.wrap_width  # our position inside the wrapped line
-		c_wrapped_offset = c_offset - (c_depth_into_wrapped_line * self.wrap_width)  # offset of the cursor relative to the start of the current wrapped line
+		c_depth_into_wrapped_lines = c_offset // self.wrap_width  # our line position inside the wrapped lines
+		c_wrapped_offset = c_offset % self.wrap_width  # offset of the cursor relative to the start of the wrapped line the cursor is on
 		
 		# If we're in a wrapped line, move inside the line:
-		if c_depth_into_wrapped_line > 0:
+		if c_depth_into_wrapped_lines > 0:
 			self.cursor -= self.wrap_width
 		# If we're on the first line, move the cursor to the start:
 		elif c1 == 0:
 			self.cursor = 0
 		# Else move into the previous line:
 		else:
-			p = (p1, p2) = self.prev_line()
+			(p1, p2) = self.prev_line()
 			p_length = p2 - p1 - 1
 			p_wrapped_line_count = p_length // self.wrap_width
 			
@@ -238,16 +238,16 @@ class TextBox(Box, Scrollable):
 			)
 	
 	def down(self):
-		c = (c1, c2) = self.curr_line()
+		(c1, c2) = self.curr_line()
 		
 		c_length = c2 - c1 - 1  # length of current line
 		c_offset = self.cursor - c1  # offset of the cursor relative to the start of the current line
 		c_wrapped_line_count = c_length // self.wrap_width  # number of lines the current line was wrapped into
-		c_depth_into_wrapped_line = c_offset // self.wrap_width  # our position inside the wrapped line
-		c_wrapped_offset = c_offset - (c_depth_into_wrapped_line * self.wrap_width)  # offset of the cursor relative to the start of the current wrapped line
+		c_depth_into_wrapped_lines = c_offset // self.wrap_width  # our line position inside the wrapped lines
+		c_wrapped_offset = c_offset % self.wrap_width  # offset of the cursor relative to the start of the wrapped line the cursor is on
 		
 		# If we're in a wrapped line, move inside the line:
-		if c_depth_into_wrapped_line < c_wrapped_line_count:
+		if c_depth_into_wrapped_lines < c_wrapped_line_count:
 			self.cursor = min(
 				self.cursor + self.wrap_width,
 				c2 - 1  # -1 since c2 indicates the character after the last
@@ -257,7 +257,7 @@ class TextBox(Box, Scrollable):
 			self.cursor = c2
 		# Else move into the next line:
 		else:
-			n = (n1, n2) = self.next_line()
+			(n1, n2) = self.next_line()
 			self.cursor = min(
 				n1 + c_wrapped_offset,
 				n2 - 1  # -1 since n2 indicates the character after the last
