@@ -1,4 +1,4 @@
-Theme
+theme
 =====
 
 .. automodule:: tanmatsu.theme

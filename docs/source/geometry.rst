@@ -1,4 +1,4 @@
-Geometry
+geometry
 ========
 
 Point

@@ -1,4 +1,4 @@
-Size
+size
 ====
 
 .. automodule:: tanmatsu.size

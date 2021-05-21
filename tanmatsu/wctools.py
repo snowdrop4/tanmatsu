@@ -1,9 +1,12 @@
 from wcwidth import wcwidth, wcswidth
 
 
-# Returns the substring that is `prefix_length` columns long, starting from the
-# beginning of string `s`.
 def wcslice(s: str, prefix_length: int) -> str:
+	"""
+	Returns the substring that is `prefix_length` columns long, starting from the
+	beginning of string `s`.
+	"""
+	
 	i = 0
 	total_width = 0
 	
@@ -19,21 +22,24 @@ def wcslice(s: str, prefix_length: int) -> str:
 	return s[:i]
 
 
-# Find `c` in `s`, in range `start` to `end`.
-# 
-# `start` and `end` are offsets in string `s`. The return value of this function
-# is also an offset in string `s`, or -1 if `c` cannot be found.
-# 
-# This function is character width aware, meaning that it counts the total
-# width of the characters encountered against `end`, rather than the total
-# number of characters encountered, when determining whether `end` has been
-# reached and the search should thus be terminated.
-# 
-# wcfind("いろaは", "a", 0, 3) == -1, because "a" is outside the search range.
-# 
-# wcfind("いろaは", "a", 0, 5) ==  3, because "a" is inside the search range,
-#                                    and 3 is the character offset in the string of "a".
 def wcfind(s: str, c: str, start: int, end: int) -> int:
+	"""
+	Find `c` in `s`, in range `start` to `end`.
+	
+	`start` and `end` are offsets in string `s`. The return value of this function
+	is also an offset in string `s`, or -1 if `c` cannot be found.
+	
+	This function is character width aware, meaning that it counts the total
+	width of the characters encountered against `end`, rather than the total
+	number of characters encountered, when determining whether `end` has been
+	reached and the search should thus be terminated.
+	
+	wcfind("いろaは", "a", 0, 3) == -1, because "a" is outside the search range.
+	
+	wcfind("いろaは", "a", 0, 5) ==  3, because "a" is inside the search range,
+	                                   and 3 is the character offset in the string of "a".
+	"""
+	
 	total_width = 0
 	
 	for (i, v) in enumerate(s[start:]):
@@ -47,10 +53,19 @@ def wcfind(s: str, c: str, start: int, end: int) -> int:
 
 
 def wcoffset_to_column(s: str, o: int) -> int:
+	"""
+	Given offset `o` in string `s`, returns the column corresponding to
+	that offset.
+	"""
 	return wcswidth(s[:o + 1])
 
 
 def wccolumn_to_offset(s: str, c: int) -> int:
+	"""
+	Given column `c` in string `s`, returns the offset corresponding to that
+	column.
+	"""
+	
 	total_width = 0
 	for (i, v) in enumerate(s):
 		char_width = wcwidth(v)
@@ -61,9 +76,12 @@ def wccolumn_to_offset(s: str, c: int) -> int:
 	return i
 
 
-# Returns string `s` cropped to `length`. The last character in the returned
-# string will be "…" if a crop took place.
 def wccrop(s: str, length: int) -> str:
+	"""
+	Returns string `s` cropped to `length`. The last character in the returned
+	string will be "…" if a crop took place.
+	"""
+	
 	cropped = wcslice(s, length)
 	
 	# Did the label get cropped?

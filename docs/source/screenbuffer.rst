@@ -1,5 +1,5 @@
 Screenbuffer
 ============
 
-.. autoclass:: tanmatsu.screenbuffer.Screenbuffer
+.. autoclass:: tanmatsu.Screenbuffer
    :members:

@@ -1,5 +1,5 @@
 Style
 =====
 
-.. autoclass:: tanmatsu.style.Style
+.. autoclass:: tanmatsu.Style
    :members:

@@ -8,16 +8,22 @@ Welcome to tanmatsu's documentation!
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
+   :caption: Submodules:
    
    geometry
    input
-   screenbuffer
    size
-   style
-   tanmatsu
    theme
    widgets
+   wctools
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Classes:
+   
+   screenbuffer
+   style
+   tanmatsu
 
 
 Indices and tables
