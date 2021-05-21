@@ -117,13 +117,22 @@ class Rectangle():
 		
 		return a and b and c and d
 	
-	def contains(self, other: Point) -> bool:
+	def containsp(self, other: Point) -> bool:
 		"""Whether this rectangle contains point `other`."""
 		
 		a = self.x <= other.x <= self.x2
 		b = self.y <= other.y <= self.y2
 		
 		return a and b
+	
+	def containsr(self, other: Rectangle) -> bool:
+		"""Whether this rectangle contains rectangle `other`."""
+		a = self.x1 <= other.x1
+		b = self.y1 <= other.y1
+		c = self.x2 >= other.x2
+		d = self.y2 >= other.y2
+		
+		return a and b and c and d
 	
 	def duplicate(self) -> Rectangle:
 		"""Returns a copy of this rectangle."""

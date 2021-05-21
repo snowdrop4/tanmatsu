@@ -3,6 +3,7 @@ from tri_declarative import with_meta
 import tanmatsu.input as ti
 from tanmatsu.screenbuffer import Screenbuffer
 from tanmatsu.geometry import Rectangle, Dimensions, Point
+from .base import Widget
 from .box import Box
 from .scrollable import Scrollable
 
@@ -18,13 +19,16 @@ class List(Box, Scrollable):
 	
 	:ivar cursor: Cursor position.
 	:vartype cursor: int
+	
+	:ivar active_item: The item currently selected by the cursor in the list.
+	:vartype active_item: Widget
 	"""
 	
-	def __init__(self, items: list, item_height: int, *args, **kwargs):
+	def __init__(self, items: list[Widget], item_height: int, *args, **kwargs):
 		super().__init__(*args, **kwargs)
 		
 		self._items = items
-		self._cursor = 0
+		self.cursor = 0
 		
 		self.item_height = item_height
 	
@@ -40,6 +44,19 @@ class List(Box, Scrollable):
 		
 		self.focused_child = self.items[self.cursor]
 		self.focusable_children = { "_": self.focused_child }
+		
+		if self._Widget__available_space is not None:
+			active_item_y1 = self._Widget__available_space.y1 +  self.cursor      * self.item_height
+			active_item_y2 = self._Widget__available_space.y1 + (self.cursor + 1) * self.item_height
+			
+			delta_y = 0
+			
+			if active_item_y1 < self.viewport.y1:
+				delta_y = active_item_y1 - self.viewport.y1
+			if active_item_y2 > self.viewport.y2:
+				delta_y = active_item_y2 - self.viewport.y2 - 1
+			
+			self.scroll(None, delta_y=delta_y)
 	
 	@property
 	def items(self):
@@ -49,6 +66,10 @@ class List(Box, Scrollable):
 	def items(self, value):
 		self._items = value
 		self.cursor = min(self.cursor, len(value))
+	
+	@property
+	def active_item(self) -> Widget:
+		return self.items[self.cursor]
 	
 	def up(self):
 		self.cursor = max(self.cursor - 1, 0)
@@ -60,8 +81,9 @@ class List(Box, Scrollable):
 		super().layout(*args, **kwargs)
 		
 		# Reserve space for a gutter in order to draw the cursor there.
+		# 
 		# First, record the space we want the gutter to occupy (to be used as a
-		# clip when drawing), and then modify `self._Widget__available_space`
+		# clip when drawing). Second, modify `self._Widget__available_space`
 		# to compensate.
 		self.gutter = Rectangle(
 			self._Widget__available_space.x,
@@ -87,10 +109,12 @@ class List(Box, Scrollable):
 			
 			v.layout(position, size, size)
 		
-		self.scroll(Dimensions(
-			self._Widget__available_space.w,
-			len(self.items) * self.item_height
-		))
+		self.scroll(
+			Dimensions(
+				self._Widget__available_space.w,
+				len(self.items) * self.item_height,
+			)
+		)
 	
 	def draw(self, s: Screenbuffer, clip: Rectangle | None = None):
 		super().draw(s, clip)

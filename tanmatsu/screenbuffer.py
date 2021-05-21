@@ -71,7 +71,7 @@ class Screenbuffer:
 			raise ValueError("Screenbuffer.set: cannot set to an empty string")
 		
 		# Exit if we're outside the clip zone.
-		if (clip and not clip.contains(Point(x, y))):
+		if (clip and not clip.containsp(Point(x, y))):
 			return 0
 		
 		try:
@@ -94,7 +94,7 @@ class Screenbuffer:
 		if v is None:
 			return
 		
-		if (clip and not clip.contains(Point(x, y))):
+		if (clip and not clip.containsp(Point(x, y))):
 			return
 		
 		try:

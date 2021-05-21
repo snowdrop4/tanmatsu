@@ -59,8 +59,8 @@ class FlexBox(Container, Box, Scrollable):
 			w_per_child = self._Widget__available_space.w
 		size_per_child = Dimensions(w_per_child, h_per_child)
 		
-		curr_pos = self._Widget__available_space.origin_point()  # keep track of the current curr_pos for drawing
-		total_size = Dimensions(0, 0)  # keep track of the width/height for calculating scroll curr_pos
+		curr_pos = self._Widget__available_space.origin_point()  # keep track of the current position for drawing
+		total_size = Dimensions(0, 0)  # keep track of the width/height for calculating scroll position
 		
 		for (k, v) in self.children.items():
 			widget_pos = Point(

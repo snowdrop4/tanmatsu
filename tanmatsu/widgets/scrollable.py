@@ -28,10 +28,6 @@ class Scrollable(Widget):
 		
 		self.__scroll_position = Point(0, 0)
 	
-	@property
-	def foo(self):
-		return self._foo
-	
 	def layout(self, *args, **kwargs):
 		super().layout(*args, **kwargs)
 		
