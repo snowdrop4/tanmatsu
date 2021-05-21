@@ -1,8 +1,11 @@
 from typing import Callable
 
+from wcwidth import wcswidth
+
 import tanmatsu.input as ti
 from tanmatsu.geometry import Rectangle
 from tanmatsu.screenbuffer import Screenbuffer
+from tanmatsu.wctools import wccrop
 from .box import Box
 
 
@@ -26,26 +29,26 @@ class Button(Box):
 	def draw(self, s: Screenbuffer, clip: Rectangle | None = None):
 		super().draw(s, clip=clip)
 		
-		widget_midpoint = self._Widget__available_space.w // 2
-		label_midpoint = len(self.label) // 2
+		label = wccrop(self.label, self._Widget__available_space.w)
 		
-		x_offset = max(0, widget_midpoint - label_midpoint)
+		widget_midpoint = self._Widget__available_space.w // 2
+		label_midpoint = wcswidth(self.label) // 2
+		
+		centering_offset = max(0, widget_midpoint - label_midpoint)
+		
 		y = self._Widget__available_space.y + self._Widget__available_space.h // 2
 		
-		for (i, character) in enumerate(self.label):
-			x = self._Widget__available_space.x + x_offset + i
+		wc_offset = 0
+		for character in label:
+			x = self._Widget__available_space.x + centering_offset + wc_offset
 			
-			# If the label is overflowing, break the loop
-			if x >= self._Widget__available_space.x2:
-				break
-			else:
-				s.set(
-					x,
-					y,
-					character,
-					clip=clip,
-					style=None
-				)
+			wc_offset += s.set(
+				x,
+				y,
+				character,
+				clip=clip,
+				style=None
+			)
 	
 	def keyboard_event(
 		self,

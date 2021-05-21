@@ -59,3 +59,21 @@ def wccolumn_to_offset(s: str, c: int) -> int:
 		else:
 			total_width += char_width
 	return i
+
+
+# Returns string `s` cropped to `length`. The last character in the returned
+# string will be "…" if a crop took place.
+def wccrop(s: str, length: int) -> str:
+	cropped = wcslice(s, length)
+	
+	# Did the label get cropped?
+	if len(cropped) < len(s):
+		# If there's one column of space at the end of the cropped label,
+		# append the elision indicator to the end:
+		if wcswidth(cropped) == length - 1:
+			cropped = cropped + "…"
+		# Otherwise, change the last character to the elision indicator:
+		else:
+			cropped = cropped[:-1] + "…"
+	
+	return cropped

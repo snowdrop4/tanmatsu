@@ -335,7 +335,7 @@ class TextBox(Box, Scrollable):
 				continue
 			
 			# Draw the line
-			x_offset = 0
+			wc_offset = 0
 			for character in line:
 				# If we attempt to draw this character, it screws up the screen.
 				# Turn it into a space character instead of skipping this
@@ -352,8 +352,8 @@ class TextBox(Box, Scrollable):
 				else:
 					style = None
 				
-				x_offset += s.set(
-					self._Widget__available_space.x + x_offset,
+				wc_offset += s.set(
+					self._Widget__available_space.x + wc_offset,
 					y,
 					character,
 					clip=clip,

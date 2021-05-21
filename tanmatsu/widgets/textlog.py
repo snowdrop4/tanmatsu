@@ -62,10 +62,10 @@ class TextLog(Box):
 				if drawn_lines + i >= self._Widget__available_space.h:
 					return
 				
-				x_offset = 0
+				wc_offset = 0
 				for character in chunk:
-					x_offset += s.set(
-						self._Widget__available_space.x + x_offset,
+					wc_offset += s.set(
+						self._Widget__available_space.x + wc_offset,
 						self._Widget__available_space.y2 - i - drawn_lines,
 						character,
 						clip=clip,

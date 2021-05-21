@@ -3,7 +3,7 @@ from wcwidth import wcswidth
 
 import tanmatsu.input as ti
 from tanmatsu import draw, theme, debug
-from tanmatsu.wctools import wcslice
+from tanmatsu.wctools import wccrop
 from tanmatsu.screenbuffer import Screenbuffer
 from tanmatsu.geometry import Rectangle, Dimensions, Point
 from .base import Widget
@@ -105,24 +105,13 @@ class TabBox(Container):
 			s.set_style(i, tab_rectangle.y + 2, style, clip=clip)
 		
 		# Draw the tab labels:
-		
 		space_for_label = tab_rectangle.w - self.tab_decoration_width
-		cropped_label = wcslice(label, space_for_label)
+		cropped_label = wccrop(label, space_for_label)
 		
-		# Did the label get cropped?
-		if len(cropped_label) < len(label):
-			# If there's one column of space at the end of the cropped label,
-			# append the elision indicator to the end:
-			if wcswidth(cropped_label) == tab_rectangle.w - space_for_label - 1:
-				cropped_label = cropped_label + "…"
-			# Otherwise, change the last character to the elision indicator:
-			else:
-				cropped_label = cropped_label[:-1] + "…"
-		
-		x_offset = 0
+		wc_offset = 0
 		for character in cropped_label:
-			x_offset += s.set(
-				tab_rectangle.x1 + 1 + x_offset,
+			wc_offset += s.set(
+				tab_rectangle.x1 + 1 + wc_offset,
 				tab_rectangle.y + 1,
 				character,
 				clip=clip,

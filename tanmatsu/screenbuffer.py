@@ -52,8 +52,8 @@ class Screenbuffer:
 		.. code-block:: python
 		   
 		   for character in line:
-		       x_offset += s.set(
-		           x + x_offset,
+		       wc_offset += s.set(
+		           x + wc_offset,
 		           y,
 		           character,
 		           clip=clip,
