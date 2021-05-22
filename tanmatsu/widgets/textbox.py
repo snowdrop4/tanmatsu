@@ -5,7 +5,7 @@ from tri_declarative import with_meta
 
 import tanmatsu.input as ti
 from tanmatsu import theme, debug
-from tanmatsu.wctools import wcslice, wcfind, wcoffset_to_column, wccolumn_to_offset
+from tanmatsu.wctools import wcslice, wcfind, wcoffset_to_column, wccolumn_to_offset, wcwrap, wcchunks
 from tanmatsu.geometry import Rectangle, Dimensions, Point
 from tanmatsu.screenbuffer import Screenbuffer
 from .box import Box
@@ -73,6 +73,7 @@ def wrap(text: str, max_width: int) -> Generator[(str, str), None, None]:
 				i = newline + 1
 
 
+
 @with_meta
 class TextBox(Box, Scrollable):
 	"""
@@ -107,12 +108,13 @@ class TextBox(Box, Scrollable):
 	
 	@cursor.setter
 	def cursor(self, value: int):
+		value = max(0, value)
+		value = min(len(self.text), value)
+		
+		diff = value - self._cursor
 		self._cursor = value
 		
-		# Scroll the widget until the cursor is in view.
-		# 
-		# This assumes the widget has a size, as we need to be able to
-		# know what is in view or not.
+		# Scroll the widget until the cursor is in view:
 		if self._Widget__available_space is not None:
 			# Find what line the cursor is on:
 			characters_seen = 0
@@ -138,8 +140,7 @@ class TextBox(Box, Scrollable):
 			if cursor_line > end_line:
 				delta_y = cursor_line - end_line
 			
-			content_size = Dimensions(self._Widget__available_space.w, len(self.wrapped))
-			self.scroll(content_size, delta_y=delta_y)
+			self.scroll(None, delta_y=delta_y)
 	
 	@property
 	def text(self):
@@ -148,7 +149,7 @@ class TextBox(Box, Scrollable):
 	@text.setter
 	def text(self, value: str):
 		self._text = value
-		self.cursor = min(self.cursor, len(self._text) + 1)
+		self.cursor = min(self.cursor, len(self.text))
 	
 	@property
 	def wrap_width(self):
@@ -211,70 +212,71 @@ class TextBox(Box, Scrollable):
 		# it includes the matched "\n"
 		return (start + 1, end + 1)
 	
+	def line_wrap_info(self, c1: int, c2: int) -> tuple[[str], int, int]:
+		# Wrap the line we're given. Add a " " on the end if it's the last line
+		# and doesn't end in a "\n", like the `wrap` function does.
+		if c2 == len(self.text) and self.text[-1] != "\n":
+			wrapped = list(wcchunks(self.text[c1:c2] + " ", self.wrap_width))
+		else:
+			wrapped = list(wcchunks(self.text[c1:c2], self.wrap_width))
+		
+		# Find which subline we're on, and the start of that subline.
+		line_start = c1
+		subline_num = 0
+		for (subline_num, line_length) in enumerate(map(len, wrapped)):
+			if self.cursor >= line_start and self.cursor < line_start + line_length:
+				break
+			line_start += line_length
+		
+		subline_offset = self.cursor - line_start
+		
+		return (wrapped, subline_num, subline_offset)
+	
 	def up(self):
 		(c1, c2) = self.curr_line()
-		
-		# Raw, unwrapped line:
-		c_length = c2 - c1 - 1  # length of current line
-		c_offset = self.cursor - c1  # offset of the cursor relative to the start of the current line
-		
-		# Wrapped line:
-		c_wrapped_line_count = c_length // self.wrap_width  # number of lines the current line was wrapped into
-		c_depth_into_wrapped_lines = c_offset // self.wrap_width  # the line number we are on, inside the wrapped lines
-		c_wrapped_offset = c_offset % self.wrap_width  # offset of the cursor relative to the start of the wrapped line the cursor is on
-		c_wrapped_column = wcoffset_to_column(self.text[c1:c2], c_wrapped_offset)
+		(c_wrapped, c_subline_num, c_subline_offset) = self.line_wrap_info(c1, c2)
 		
 		# If we're in a wrapped line, move inside the line:
-		if c_depth_into_wrapped_lines > 0:
-			self.cursor -= self.wrap_width
+		if c_subline_num > 0:
+			column = wcoffset_to_column(c_wrapped[c_subline_num],     c_subline_offset)
+			offset = wccolumn_to_offset(c_wrapped[c_subline_num - 1], column)
+			
+			self.cursor = self.cursor - c_subline_offset - len(c_wrapped[c_subline_num - 1]) + offset
 		# If we're on the first line, move the cursor to the start:
 		elif c1 == 0:
 			self.cursor = 0
 		# Else move into the previous line:
 		else:
 			(p1, p2) = self.prev_line()
-			p_length = p2 - p1 - 1
-			p_wrapped_line_count = p_length // self.wrap_width
+			(p_wrapped, p_subline_num, p_subline_offset) = self.line_wrap_info(p1, p2)
 			
-			target_offset = wccolumn_to_offset(self.text[p1:p2], c_wrapped_column)
+			column = wcoffset_to_column(c_wrapped[c_subline_num], c_subline_offset)
+			offset = wccolumn_to_offset(p_wrapped[-1], column)
 			
-			self.cursor = min(
-				p1 + (p_wrapped_line_count * self.wrap_width) + target_offset,
-				p2 - 1  # -1 since p2 indicates the character after the last
-			)
+			self.cursor = self.cursor - c_subline_offset - len(p_wrapped[-1]) + offset
 	
 	def down(self):
 		(c1, c2) = self.curr_line()
-		
-		# Raw, unwrapped line:
-		c_length = c2 - c1 - 1  # length of current line
-		c_offset = self.cursor - c1  # offset of the cursor relative to the start of the current line
-		
-		# Wrapped line:
-		c_wrapped_line_count = c_length // self.wrap_width  # number of lines the current line was wrapped into
-		c_depth_into_wrapped_lines = c_offset // self.wrap_width  # the line number we are on, inside the wrapped lines
-		c_wrapped_offset = c_offset % self.wrap_width  # offset of the cursor relative to the start of the wrapped line the cursor is on
-		c_wrapped_column = wcoffset_to_column(self.text[c1:c2], c_wrapped_offset)
+		(c_wrapped, c_subline_num, c_subline_offset) = self.line_wrap_info(c1, c2)
 		
 		# If we're in a wrapped line, move inside the line:
-		if c_depth_into_wrapped_lines < c_wrapped_line_count:
-			self.cursor = min(
-				self.cursor + self.wrap_width,
-				c2 - 1  # -1 since c2 indicates the character after the last
-			)
+		if c_subline_num < len(c_wrapped) - 1:
+			column = wcoffset_to_column(c_wrapped[c_subline_num],     c_subline_offset)
+			offset = wccolumn_to_offset(c_wrapped[c_subline_num + 1], column)
+			
+			self.cursor = self.cursor - c_subline_offset + len(c_wrapped[c_subline_num]) + offset
 		# If we're on the last line, move the cursor to the end:
 		elif c2 == len(self.text):
 			self.cursor = c2
 		# Else move into the next line:
 		else:
 			(n1, n2) = self.next_line()
+			(n_wrapped, n_subline_num, n_subline_offset) = self.line_wrap_info(n1, n2)
 			
-			target_offset = wccolumn_to_offset(self.text[n1:n2], c_wrapped_column)
+			column = wcoffset_to_column(c_wrapped[c_subline_num], c_subline_offset)
+			offset = wccolumn_to_offset(n_wrapped[0], column)
 			
-			self.cursor = min(
-				n1 + target_offset,
-				n2 - 1  # -1 since n2 indicates the character after the last
-			)
+			self.cursor = self.cursor - c_subline_offset + len(c_wrapped[c_subline_num]) + offset
 	
 	def left(self):
 		self.cursor = max(self.cursor - 1, 0)
@@ -370,6 +372,7 @@ class TextBox(Box, Scrollable):
 				clip=clip,
 				style=None
 			)
+
 	
 	def keyboard_event(
 		self,
