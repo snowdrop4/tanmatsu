@@ -36,7 +36,7 @@ class FlexBox(Container, Box, Scrollable):
 	def set_flex_direction(self, flex_direction: int):
 		if flex_direction != FlexBox.VERTICAL and flex_direction != FlexBox.HORIZONTAL:
 			raise ValueError(
-				"Invalid value for `flex_direction`. \
+				"FlexBox.set_flex_direction(): Invalid value for `flex_direction`. \
 					Must equal either `FlexBox.VERTICAL` or `FlexBox.HORIZONTAL`."
 			)
 		

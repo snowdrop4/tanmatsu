@@ -6,7 +6,7 @@ from .base import Widget
 @declarative(Widget, 'children')
 class Container(Widget):
 	"""
-	A widget that can have children widgets. Doesn't do much on its own.
+	A widget that can have children widgets. Abstract base class.
 	
 	:param children: Dictionary containing child widgets. Keys are `str` (the
 	  names of the widgets) and values are `Widget` objects (the children).

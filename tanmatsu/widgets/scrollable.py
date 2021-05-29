@@ -7,7 +7,7 @@ from .base import Widget
 
 class Scrollable(Widget):
 	"""
-	A widget that can scroll.
+	A widget that can scroll. Abstract base class.
 	
 	:param scroll_direction: Must be either :attr:`NONE`, :attr:`VERTICAL`,
 	  or :attr:`HORIZONTAL`. Defaults to :attr:`VERTICAL`.
@@ -77,17 +77,20 @@ class Scrollable(Widget):
 	def set_scroll_direction(self, scroll_direction: int):
 		"""Set the scroll direction to `scroll_direction`."""
 		if scroll_direction > 0b11 or scroll_direction < 0b00:
-			raise ValueError("`scroll_direction` is a bitmask and must be equal to \
+			raise ValueError("Scrollable.set_scroll_direction(): \
+				`scroll_direction` is a bitmask and must be equal to \
 				`Scrollable.NONE`, `Scrollable.VERTICAL`, or `Scrollable.HORIZONTAL`, \
 				or a combination thereof.")
 		
 		self.__scroll_direction = scroll_direction
 	
-	def scroll(self, content_size: Dimensions, delta_x: int = 0, delta_y: int = 0):
+	def scroll(self, content_size: Dimensions | None, delta_x: int = 0, delta_y: int = 0):
 		"""
 		Scroll the widget by the specified deltas.
 		
 		:param content_size: The dimensions of the content to be scrolled.
+		  This parameter may be `None` if the dimensions of the content has not
+		  changed since the last time this method was called.
 		"""
 		if content_size is not None:
 			self.__content_size = content_size

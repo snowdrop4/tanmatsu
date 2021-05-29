@@ -6,7 +6,7 @@ from tanmatsu.geometry import Rectangle, Dimensions, Point
 
 class Widget():
 	"""
-	Base widget class. Doesn't do much on its own. Parent class of all widgets.
+	Abstract base class. Parent class of all widgets.
 	"""
 	
 	def __init__(

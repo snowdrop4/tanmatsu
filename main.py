@@ -3,7 +3,7 @@ from tanmatsu import widgets, size, debug
 import tests.utils as test
 
 
-buttons = [ widgets.Button(label=f"ボタンボタンボタンボタンボタンボタンボタンボタンボタン{i}123", callback=lambda: 0) for i in range(0,10)]
+buttons = [ widgets.Button(label=f"ボタン{i}", callback=lambda: 0) for i in range(0, 10)]
 
 
 class Split(widgets.FlexBox):
@@ -12,6 +12,7 @@ class Split(widgets.FlexBox):
 	
 	class Meta:
 		flex_direction = widgets.FlexBox.HORIZONTAL
+		border_label = "hello! really really looooooooooooooooooooong label xd たたふたた asdasd"
 
 
 class RootWidget(widgets.TabBox):

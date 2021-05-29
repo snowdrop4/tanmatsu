@@ -1,17 +1,7 @@
-from typing import Generator
-
-from tanmatsu.wctools import wcslice
+from tanmatsu.wctools import wcchunks
 from tanmatsu.geometry import Rectangle
 from tanmatsu.screenbuffer import Screenbuffer
 from .box import Box
-
-
-def chunks(text: str, line_length: int) -> Generator[str, None, None]:
-	i = 0
-	while i < len(text):
-		chunk = wcslice(text[i:], line_length)
-		i += len(chunk)
-		yield chunk
 
 
 class TextLog(Box):
@@ -54,7 +44,7 @@ class TextLog(Box):
 		# We thus reverse the list of lines, and then reverse the list of chunks
 		# for each line.
 		for line in reversed(self.lines):
-			line_chunks = list(chunks(line, self._Widget__available_space.w))
+			line_chunks = list(wcchunks(line, self._Widget__available_space.w))
 			number_of_chunks = len(line_chunks)
 			
 			for i, chunk in enumerate(reversed(line_chunks)):

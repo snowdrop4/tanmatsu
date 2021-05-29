@@ -39,7 +39,7 @@ def scrollbar(
 			sbr = geometry.Rectangle(r.x1, r.y2, r.w, 1)
 		case _:
 			raise ValueError(
-				"Invalid value for `direction`. \
+				"draw.scrollbar(): Invalid value for `direction`. \
 				Must equal either `Scrollable.VERTICAL`, or `Scrollable.HORIZONTAL`."
 			)
 	

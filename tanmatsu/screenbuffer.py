@@ -28,15 +28,15 @@ class Screenbuffer:
 				self.buffer[i][j] = ' '
 				self.style_buffer[i][j] = theme.DefaultTheme.default
 	
-	def set(self, 
+	def set(self,
 		x: int,
 		y: int,
-		v: str,
+		character: str,
 		clip: Rectangle | None = None,
 		style: Style | None = None
 	) -> int:
 		"""
-		Set the value at the given `x`, `y` to `v`. If `style` is given,
+		Set the value at the given `x`, `y` to `character`. If `style` is given,
 		the style of said value will be set to `style` as well.
 		
 		This function does nothing if `clip` is given and `x`, `y` is outside
@@ -45,9 +45,10 @@ class Screenbuffer:
 		:return: The delta between the given `x` and the next valid column
 		  in the row. When looping over a string containing arbitrary text,
 		  the return value of this function should be used as a cumulative offset
-		  on the starting `x` value when making further calls to this function. 
+		  on the starting `x` value when making further calls to this function.
 		  Any given character may have a width between 0 and 2 columns in the
 		  terminal, so it is important to account for this in subsequent calls.
+		:rtype: int
 		
 		.. code-block:: python
 		   
@@ -60,30 +61,35 @@ class Screenbuffer:
 		           style=style
 		       )
 		
-		:raises ValueError: If `v` is an empty string.
+		:raises ValueError: If `character` is an empty string.
 		"""
 		
 		# Make sure we don't get an empty string. Empty space in the
 		# screenbuffer is represented by space characters, so an empty string
 		# making its way into the screenbuffer screws up alignment for the line
 		# it's in.
-		if v == "":
-			raise ValueError("Screenbuffer.set: cannot set to an empty string")
+		if character == "":
+			raise ValueError("Screenbuffer.set(): cannot set to an empty string")
 		
 		# Exit if we're outside the clip zone.
 		if (clip and not clip.containsp(Point(x, y))):
 			return 0
 		
 		try:
-			self.buffer[y][x] = v
+			self.buffer[y][x] = character
 		except IndexError:
 			return 0
 		
 		self.set_style(x, y, style, clip=clip)
 		
-		return wcswidth(v)
+		return wcswidth(character)
 	
-	def set_style(self, x: int, y: int, v: Style | None, clip: Rectangle | None = None):
+	def set_style(self,
+		x: int,
+		y: int,
+		style: Style | None,
+		clip: Rectangle | None = None
+	):
 		"""
 		Set the style of the character at the given `x`, `y` to `style`.
 		
@@ -91,16 +97,43 @@ class Screenbuffer:
 		the clip.
 		"""
 		
-		if v is None:
+		if style is None:
 			return
 		
 		if (clip and not clip.containsp(Point(x, y))):
 			return
 		
 		try:
-			self.style_buffer[y][x] = v
+			self.style_buffer[y][x] = style
 		except IndexError:
 			return
+	
+	def set_string(self,
+		x: int,
+		y: int,
+		string: str,
+		style: Style | None = None,
+		clip: Rectangle | None = None
+	) -> int:
+		"""
+		Convenience function. Works the same way as :meth:`set`, but writes
+		an entire string, starting at `x`, `y`, rather than a single character.
+		
+		:return: The delta between the given `x` and the next valid column
+		  in the row, after all characters have been set.
+		:rtype: int
+		"""
+		
+		x_offset = 0
+		for character in string:
+			x_offset += self.set(
+				x + x_offset,
+				y,
+				character,
+				clip=clip,
+				style=style
+			)
+		return x_offset
 	
 	def write(self):
 		last_seen_style = None

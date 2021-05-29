@@ -48,7 +48,7 @@ class Style:
 			if k in vars(s):
 				setattr(s, k, v)
 			else:
-				raise TypeError(f"Style.inherit() got an unexpected keyword argument '{k}'")
+				raise TypeError(f"Style.inherit(): unexpected keyword argument '{k}'")
 		
 		return s
 	

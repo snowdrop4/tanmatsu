@@ -63,7 +63,7 @@ def wcfind(s: str, c: str, start: int, end: int) -> int:
 	This function is character width aware, meaning that it counts the total
 	width of the characters encountered against `end`, rather than the total
 	number of characters encountered, when determining whether `end` has been
-	reached and the search should thus be terminated.
+	reached and thus whether the search should be terminated.
 	
 	wcfind("いろaは", "a", 0, 3) == -1, because "a" is outside the search range.
 	

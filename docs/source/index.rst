@@ -3,8 +3,20 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to tanmatsu's documentation!
-====================================
+tanmatsu documentation
+======================
+
+Contents
+--------
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Classes:
+   
+   screenbuffer
+   style
+   tanmatsu
+
 
 .. toctree::
    :maxdepth: 2
@@ -17,17 +29,9 @@ Welcome to tanmatsu's documentation!
    widgets
    wctools
 
-.. toctree::
-   :maxdepth: 2
-   :caption: Classes:
-   
-   screenbuffer
-   style
-   tanmatsu
-
 
 Indices and tables
-==================
+------------------
 
 * :ref:`genindex`
 * :ref:`modindex`
