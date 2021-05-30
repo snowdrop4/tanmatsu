@@ -14,20 +14,17 @@ class List(Box, Scrollable):
 	Widget that holds a number of widgets of a uniform height, with
 	a cursor to navigate between them.
 	
-	:ivar items: Child widgets.
-	:vartype items: list[Widget]
+	:ivar children: Child widgets.
+	:vartype children: list[Widget]
 	
 	:ivar cursor: Cursor position.
 	:vartype cursor: int
-	
-	:ivar active_item: The item currently selected by the cursor in the list.
-	:vartype active_item: Widget
 	"""
 	
-	def __init__(self, items: list[Widget], item_height: int, *args, **kwargs):
+	def __init__(self, children: list[Widget], item_height: int, *args, **kwargs):
 		super().__init__(*args, **kwargs)
 		
-		self._items = items
+		self._children = children
 		self.cursor = 0
 		
 		self.item_height = item_height
@@ -39,10 +36,10 @@ class List(Box, Scrollable):
 	@cursor.setter
 	def cursor(self, value):
 		value = max(value, 0)
-		value = min(value, len(self.items))
+		value = min(value, len(self.children))
 		self._cursor = value
 		
-		self.focused_child = self.items[self.cursor]
+		self.focused_child = self.children[self.cursor]
 		self.focusable_children = { "_": self.focused_child }
 		
 		if self._Widget__available_space is not None:
@@ -59,23 +56,26 @@ class List(Box, Scrollable):
 			self.scroll(None, delta_y=delta_y)
 	
 	@property
-	def items(self):
-		return self._items
+	def children(self):
+		return self._children
 	
-	@items.setter
-	def items(self, value):
-		self._items = value
+	@children.setter
+	def children(self, value):
+		self._children = value
 		self.cursor = min(self.cursor, len(value))
 	
-	@property
-	def active_item(self) -> Widget:
-		return self.items[self.cursor]
+	def active_child(self) -> Widget:
+		"""
+		Return the currently active child widget (i.e., the widget that
+		the cursor is currently pointing to).
+		"""
+		return self.children[self.cursor]
 	
 	def up(self):
 		self.cursor = max(self.cursor - 1, 0)
 	
 	def down(self):
-		self.cursor = min(self.cursor + 1, len(self.items) - 1)
+		self.cursor = min(self.cursor + 1, len(self.children) - 1)
 	
 	def layout(self, *args, **kwargs):
 		super().layout(*args, **kwargs)
@@ -95,8 +95,8 @@ class List(Box, Scrollable):
 		self._Widget__available_space.x += 1
 		self._Widget__available_space.w -= 1
 		
-		# Layout the items
-		for (i, v) in enumerate(self.items):
+		# Layout the children
+		for (i, v) in enumerate(self.children):
 			position = Point(
 				self._Widget__available_space.x - self._Scrollable__scroll_position.x,
 				self._Widget__available_space.y - self._Scrollable__scroll_position.y + (i * self.item_height)
@@ -112,14 +112,14 @@ class List(Box, Scrollable):
 		self.scroll(
 			Dimensions(
 				self._Widget__available_space.w,
-				len(self.items) * self.item_height,
+				len(self.children) * self.item_height,
 			)
 		)
 	
 	def draw(self, s: Screenbuffer, clip: Rectangle | None = None):
 		super().draw(s, clip)
 		
-		for (i, v) in enumerate(self.items):
+		for (i, v) in enumerate(self.children):
 			item_clip = Rectangle(
 				self._Widget__available_space.x - self._Scrollable__scroll_position.x,
 				self._Widget__available_space.y - self._Scrollable__scroll_position.y + (i * self.item_height),

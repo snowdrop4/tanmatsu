@@ -1,9 +1,12 @@
+from tri_declarative import with_meta
+
 from tanmatsu.wctools import wcchunks
 from tanmatsu.geometry import Rectangle
 from tanmatsu.screenbuffer import Screenbuffer
 from .box import Box
 
 
+@with_meta
 class TextLog(Box):
 	"""
 	A widget that displays multiple lines of text, with new lines being added

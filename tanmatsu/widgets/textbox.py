@@ -73,7 +73,6 @@ def wrap(text: str, max_width: int) -> Generator[(str, str), None, None]:
 				i = newline + 1
 
 
-
 @with_meta
 class TextBox(Box, Scrollable):
 	"""

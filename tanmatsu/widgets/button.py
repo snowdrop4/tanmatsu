@@ -1,3 +1,4 @@
+from tri_declarative import with_meta
 from typing import Callable
 
 from wcwidth import wcswidth
@@ -9,6 +10,7 @@ from tanmatsu.wctools import wccrop
 from .box import Box
 
 
+@with_meta
 class Button(Box):
 	"""
 	A button widget. Calls the callback when activated.
@@ -20,7 +22,7 @@ class Button(Box):
 	:ivar callback: The function the button should call when activated.
 	"""
 	
-	def __init__(self, *args, label: str = "Button", callback: Callable, **kwargs):
+	def __init__(self, *args, label: str = "Button", callback: Callable | None, **kwargs):
 		super().__init__(*args, **kwargs)
 		
 		self.label = label
@@ -33,22 +35,15 @@ class Button(Box):
 		
 		widget_midpoint = self._Widget__available_space.w // 2
 		label_midpoint = wcswidth(self.label) // 2
+		x_centering_offset = max(0, widget_midpoint - label_midpoint)
 		
-		centering_offset = max(0, widget_midpoint - label_midpoint)
-		
-		y = self._Widget__available_space.y + self._Widget__available_space.h // 2
-		
-		wc_offset = 0
-		for character in label:
-			x = self._Widget__available_space.x + centering_offset + wc_offset
-			
-			wc_offset += s.set(
-				x,
-				y,
-				character,
-				clip=clip,
-				style=None
-			)
+		s.set_string(
+			self._Widget__available_space.x + x_centering_offset,
+			self._Widget__available_space.y + self._Widget__available_space.h // 2,
+			label,
+			style=None,
+			clip=clip
+		)
 	
 	def keyboard_event(
 		self,
@@ -59,7 +54,8 @@ class Button(Box):
 			return True
 		
 		if key == ti.Keyboard_key.ENTER:
-			self.callback()
+			if self.callback:
+				self.callback()
 			return True
 		
 		return False

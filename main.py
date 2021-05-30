@@ -3,7 +3,10 @@ from tanmatsu import widgets, size, debug
 import tests.utils as test
 
 
-buttons = [ widgets.Button(label=f"ボタン{i}", callback=lambda: 0) for i in range(0, 10)]
+class ButtonList(widgets.List):
+	class Meta:
+		children = [ widgets.Button(label="Delete tab", callback=None) ]
+		item_height = 10
 
 
 class Split(widgets.FlexBox):
@@ -17,12 +20,14 @@ class Split(widgets.FlexBox):
 
 class RootWidget(widgets.TabBox):
 	split = Split()
-	list = widgets.List(buttons, 10)
+	list = ButtonList()
 
 
 with tanmatsu.Tanmatsu() as t:
 	f = RootWidget()
 	t.set_root_widget(f)
+	
+	f.list.children[0].callback = lambda: f.del_tab_by_label("list")
 	
 	f.split.text_box.text = test.random_prose()
 	debug.set_output_widget(f.split.text_log)
