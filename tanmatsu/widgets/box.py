@@ -7,7 +7,8 @@ from .base import Widget
 
 class Box(Widget):
 	"""
-	A widget that can draw a border around itself. Abstract base class.
+	A widget that can draw a border around itself. Does nothing else.
+	Widgets that need a border should inherit from this class.
 	
 	:param border: Whether the border should be drawn or not.
 	:type border: bool

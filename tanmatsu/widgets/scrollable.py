@@ -7,7 +7,8 @@ from .base import Widget
 
 class Scrollable(Widget):
 	"""
-	A widget that can scroll. Abstract base class.
+	A widget that can scroll. Does nothing else.
+	Widgets that need to scroll should inherit from this class.
 	
 	:param scroll_direction: Must be either :attr:`NONE`, :attr:`VERTICAL`,
 	  or :attr:`HORIZONTAL`. Defaults to :attr:`VERTICAL`.

@@ -1,4 +1,7 @@
-class SizeResolver():
+from abc import ABC, abstractmethod
+
+
+class SizeResolver(ABC):
 	"""
 	Abstract base class. Used in :class:`widgets.Widget` and descendants
 	for calculating widget size.
@@ -7,20 +10,23 @@ class SizeResolver():
 	def __init__(self):
 		pass
 	
+	@abstractmethod
 	def min(self, parent_size: int) -> int:
 		"""
 		Return the minimum possible size :meth:`resolve` could resolve to,
 		given the parent's size.
 		"""
-		raise NotImplementedError
+		pass
 	
+	@abstractmethod
 	def max(self, parent_size: int) -> int:
 		"""
 		Return the maximum possible size :meth:`resolve` could resolve to,
 		given the parent's size.
 		"""
-		raise NotImplementedError
+		pass
 	
+	@abstractmethod
 	def resolve(self, parent_size: int, requested_size: int) -> int:
 		"""
 		Resolve the actual size we request to be allocated by the parent widget,
@@ -32,23 +38,7 @@ class SizeResolver():
 		:param parent_size: The size of the parent.
 		:param requested_size: The size the parent requests of us.
 		"""
-		raise NotImplementedError
-
-
-class ParentRequested(SizeResolver):
-	"""Always resolve to the parent's requested size."""
-	
-	def __init__(self):
 		pass
-	
-	def min(self, parent_size: int) -> int:
-		return 1
-	
-	def max(self, parent_size: int) -> int:
-		return parent_size
-	
-	def resolve(self, parent_size: int, requested_size: int) -> int:
-		return requested_size
 
 
 class FixedInteger(SizeResolver):
@@ -65,6 +55,22 @@ class FixedInteger(SizeResolver):
 	
 	def resolve(self, parent_size: int, requested_size: int) -> int:
 		return self.actual
+
+
+class ParentRequested(SizeResolver):
+	"""Always resolve to the parent's requested size."""
+	
+	def __init__(self):
+		pass
+	
+	def min(self, parent_size: int) -> int:
+		return 1
+	
+	def max(self, parent_size: int) -> int:
+		return parent_size
+	
+	def resolve(self, parent_size: int, requested_size: int) -> int:
+		return requested_size
 
 
 class ParentPercent(SizeResolver):

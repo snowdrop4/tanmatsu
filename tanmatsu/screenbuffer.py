@@ -43,25 +43,34 @@ class Screenbuffer:
 		the clip.
 		
 		:return: The delta between the given `x` and the next valid column
-		  in the row. When looping over a string containing arbitrary text,
-		  the return value of this function should be used as a cumulative offset
-		  on the starting `x` value when making further calls to this function.
-		  Any given character may have a width between 0 and 2 columns in the
-		  terminal, so it is important to account for this in subsequent calls.
+		  in the row. In other words, the width of `character`.
 		:rtype: int
+		
+		:raises ValueError: If `character` is an empty string.
+		
+		When looping over a string containing arbitrary text, the return
+		value of this function should be used as a cumulative offset
+		on the `x` argument in subsequent calls to this function.
+		
+		Failure to account for the fact that any given character may have
+		a width between 0 and 2 columns in the terminal may result in
+		malformed output.
+		
+		For example:
 		
 		.. code-block:: python
 		   
+		   line = 'Hello! こんにちは！'
+		   x_offset = 0
+		   
 		   for character in line:
-		       wc_offset += s.set(
-		           x + wc_offset,
+		       x_offset += s.set(
+		           x + x_offset,
 		           y,
 		           character,
 		           clip=clip,
 		           style=style
 		       )
-		
-		:raises ValueError: If `character` is an empty string.
 		"""
 		
 		# Make sure we don't get an empty string. Empty space in the
@@ -120,7 +129,7 @@ class Screenbuffer:
 		an entire string, starting at `x`, `y`, rather than a single character.
 		
 		:return: The delta between the given `x` and the next valid column
-		  in the row, after all characters have been set.
+		  in the row, after all characters in `string` have been set.
 		:rtype: int
 		"""
 		

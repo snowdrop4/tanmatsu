@@ -23,10 +23,13 @@ class Style:
 		self.background = background
 		self.bold = bold
 	
+	@staticmethod
 	def inherit(other: Style, **kwargs):
 		"""
+		:param other: other `Style` object to copy.
+		
 		Create a copy of `other`, and then apply the values specified in
-		`**kwargs` to the copy of `other`.
+		`**kwargs` to this copy.
 		
 		For example, assuming we have the base style:
 		

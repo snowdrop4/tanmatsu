@@ -1,10 +1,12 @@
+from abc import ABC, abstractmethod
+
 import tanmatsu.input as ti
 from tanmatsu import size, theme
 from tanmatsu.screenbuffer import Screenbuffer
 from tanmatsu.geometry import Rectangle, Dimensions, Point
 
 
-class Widget():
+class Widget(ABC):
 	"""
 	Abstract base class. Parent class of all widgets.
 	"""
@@ -78,6 +80,7 @@ class Widget():
 		# like scrollbars or borders.
 		self.__available_space = Rectangle(position.x, position.y, size.w, size.h)
 	
+	@abstractmethod
 	def draw(self, s: Screenbuffer, clip: Rectangle | None = None):
 		"""
 		Draws the widget to the given screenbuffer.

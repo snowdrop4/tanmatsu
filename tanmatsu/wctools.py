@@ -169,4 +169,3 @@ def wcwrap(s: str, wrap_width: int) -> Generator[list[str], None, None]:
 	
 	if last[-1][-1] == "\n":
 		yield [" "]
-

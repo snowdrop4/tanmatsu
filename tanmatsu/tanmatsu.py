@@ -41,8 +41,11 @@ class Tanmatsu:
 	
 	.. code-block:: python
 	   
+	   from tanmatsu import Tanmatsu
+	   from tanmatsu.widgets import TextBox
+	   
 	   with Tanmatsu() as t:
-	       t.set_root_widget(MyRootWidget())
+	       t.set_root_widget(TextBox(text="Hello! こんにちは！"))
 	       t.loop()
 	"""
 	
@@ -369,7 +372,8 @@ class Tanmatsu:
 	
 	def loop(self):
 		"""
-		Enter the main TUI loop.
+		Enter the main TUI loop—drawing to the screen,
+		processing input, and redrawing.
 		"""
 		while True:
 			self.draw()

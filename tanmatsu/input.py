@@ -222,7 +222,7 @@ def legacy_f1_to_f4():
 	return (Event_type.KEYBOARD, (key, Keyboard_modifier.NONE))
 
 
-# Arrow, home, and end keys.
+# Arrow, home, and end keys, as well as the Shift+Tab combination.
 @generate
 def legacy_key_sequence():
 	yield string(b"\x1B[")
@@ -241,7 +241,7 @@ def legacy_key_sequence():
 	return (Event_type.KEYBOARD, (key, modifier_bitmask))
 
 
-# F1-F1, arrow, home, and end keys with a modifier key pressed.
+# F1-F4, arrow, home, and end keys with a modifier key pressed.
 @generate
 def legacy_key_sequence_with_modifier():
 	yield string(b"\x1B[1;")
@@ -309,8 +309,7 @@ def select_keys_with_alt():
 	yield string(b"\x1B")
 	
 	# Special case: If the user is holding down CTRL as well as SHIFT,
-	# it will produce \x1B and then a keycode matched by
-	# `select_keys_with_ctrl`.
+	# it will produce \x1B and then a keycode matched by `select_keys_with_ctrl`.
 	with_ctrl = yield select_keys_with_ctrl.optional()
 	if with_ctrl is not None:
 		(_, (key, _)) = with_ctrl
@@ -378,7 +377,7 @@ mouse_t    = tuple[Mouse_button, Mouse_state, Point]
 keyboard_t = tuple[Keyboard_key | str, Keyboard_modifier]
 
 
-def parse_input(input: bytes) -> list[tuple[Event_type, mouse_t | keyboard_t ]]:
+def parse_input(input: bytes) -> list[tuple[Event_type, mouse_t | keyboard_t]]:
 	parser = mouse_sequence \
 		| key_sequence \
 		| legacy_f1_to_f4 \

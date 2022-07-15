@@ -27,7 +27,6 @@ Contents
    size
    theme
    widgets
-   wctools
 
 
 Indices and tables

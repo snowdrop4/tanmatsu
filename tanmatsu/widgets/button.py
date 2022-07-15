@@ -1,6 +1,6 @@
-from tri_declarative import with_meta
 from typing import Callable
 
+from tri_declarative import with_meta
 from wcwidth import wcswidth
 
 import tanmatsu.input as ti
