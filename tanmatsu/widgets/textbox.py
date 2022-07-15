@@ -16,7 +16,7 @@ from .scrollable import Scrollable
 # 
 # 
 # First string in the tuple:
-# 
+# ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
 # A wrapped line.
 # 
 # Will be at most `max_width` long. If it is not the last line, it will contain
@@ -37,12 +37,12 @@ from .scrollable import Scrollable
 # 
 # 
 # Second string in the tuple:
-# 
+# ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
 # The gutter character corresponding to the wrapped line.
 #
 # If the line is wrapped, the gutter character will be set to "⮷".
 # If the line isn't wrapped, the gutter character will be " ".
-def wrap(text: str, max_width: int) -> Generator[(str, str), None, None]:
+def wrap(text: str, max_width: int) -> Generator[tuple[str, str], None, None]:
 	if len(text) == 0:
 		yield (" ", " ")
 		return

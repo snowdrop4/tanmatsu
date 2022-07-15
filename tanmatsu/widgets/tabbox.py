@@ -6,6 +6,7 @@ from tanmatsu import draw, theme, debug
 from tanmatsu.wctools import wccrop
 from tanmatsu.screenbuffer import Screenbuffer
 from tanmatsu.geometry import Rectangle, Dimensions, Point
+from tanmatsu.style import Style
 from .base import Widget
 from .container import Container
 

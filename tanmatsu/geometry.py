@@ -1,3 +1,6 @@
+from __future__ import annotations
+
+
 class Point():
 	"""
 	Coordinates on a 2D plane.
@@ -18,7 +21,7 @@ class Point():
 		self.x = x
 		self.y = y
 	
-	def duplicate(self) -> Point:
+	def duplicate(self) -> Self:
 		"""Returns a copy of the coordinates."""
 		return Point(self.x, self.y)
 	
@@ -51,7 +54,7 @@ class Dimensions():
 		self.w = w
 		self.h = h
 	
-	def duplicate(self) -> Dimensions:
+	def duplicate(self) -> Self:
 		"""Returns a copy of the dimensions."""
 		return Dimensions(self.w, self.h)
 	
@@ -134,7 +137,7 @@ class Rectangle():
 		
 		return a and b and c and d
 	
-	def duplicate(self) -> Rectangle:
+	def duplicate(self) -> Self:
 		"""Returns a copy of this rectangle."""
 		
 		return Rectangle(self.x, self.y, self.w, self.h)
