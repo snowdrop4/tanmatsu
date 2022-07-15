@@ -211,7 +211,20 @@ class TextBox(Box, Scrollable):
 		# it includes the matched "\n"
 		return (start + 1, end + 1)
 	
-	def line_wrap_info(self, c1: int, c2: int) -> tuple[[str], int, int]:
+	# Arguments:
+	# ‾‾‾‾‾‾‾‾‾‾
+	# c1 = start of a line
+	# c2 = end of a line
+	# 
+	# Returns:
+	# ‾‾‾‾‾‾‾‾
+	# # wrapped = A list of strings, representing the given line as it is wrapped in
+	#             the text box. An unwrapped line would be a list containing one string;
+	#             a line wrapped into two sub-lines would be a list containing
+	#             two strings; and so on.
+	# subline_num = The wrapped sub-line we are current on; an index in `c_wrapped`
+	# subline_offset = The cursor's position inside the wrapped subline
+	def line_wrap_info(self, c1: int, c2: int) -> tuple[list[str], int | None, int | None]:
 		# Wrap the line we're given. Add a " " on the end if it's the last line
 		# and doesn't end in a "\n", like the `wrap` function does.
 		if c2 == len(self.text) and self.text[-1] != "\n":
@@ -220,14 +233,18 @@ class TextBox(Box, Scrollable):
 			wrapped = list(wcchunks(self.text[c1:c2], self.wrap_width))
 		
 		# Find which subline we're on, and the start of that subline.
-		line_start = c1
-		subline_num = 0
-		for (subline_num, line_length) in enumerate(map(len, wrapped)):
-			if self.cursor >= line_start and self.cursor < line_start + line_length:
-				break
-			line_start += line_length
-		
-		subline_offset = self.cursor - line_start
+		if self.cursor < c1 or self.cursor > c2:
+			subline_num = None
+			subline_offset = None
+		else:
+			line_start = c1
+			subline_num = 0
+			for (subline_num, line_length) in enumerate(map(len, wrapped)):
+				if self.cursor >= line_start and self.cursor < line_start + line_length:
+					break
+				line_start += line_length
+			
+			subline_offset = self.cursor - line_start
 		
 		return (wrapped, subline_num, subline_offset)
 	
@@ -244,12 +261,18 @@ class TextBox(Box, Scrollable):
 		# If we're on the first line, move the cursor to the start:
 		elif c1 == 0:
 			self.cursor = 0
-		# Else move into the previous line:
+		# Else, move into the previous line:
 		else:
 			(p1, p2) = self.prev_line()
-			(p_wrapped, p_subline_num, p_subline_offset) = self.line_wrap_info(p1, p2)
+			(p_wrapped, _, _) = self.line_wrap_info(p1, p2)
 			
-			column = wcoffset_to_column(c_wrapped[c_subline_num], c_subline_offset)
+			# Find what column we're on:
+			if c1 == c2:  # If we're on an empty line at the very end, where c_wrapped = []:
+				column = 0  # we can only be at column 0.
+			else:  # Otherwise, when c_wrapped contains a list of strings:
+				# Work out what column we're in based on the current sub-line the cursor is in:
+				column = wcoffset_to_column(c_wrapped[c_subline_num], c_subline_offset)
+			
 			offset = wccolumn_to_offset(p_wrapped[-1], column)
 			
 			self.cursor = self.cursor - c_subline_offset - len(p_wrapped[-1]) + offset
@@ -267,10 +290,10 @@ class TextBox(Box, Scrollable):
 		# If we're on the last line, move the cursor to the end:
 		elif c2 == len(self.text):
 			self.cursor = c2
-		# Else move into the next line:
+		# Else, move into the next line:
 		else:
 			(n1, n2) = self.next_line()
-			(n_wrapped, n_subline_num, n_subline_offset) = self.line_wrap_info(n1, n2)
+			(n_wrapped, _, _) = self.line_wrap_info(n1, n2)
 			
 			column = wcoffset_to_column(c_wrapped[c_subline_num], c_subline_offset)
 			offset = wccolumn_to_offset(n_wrapped[0], column)
@@ -371,7 +394,6 @@ class TextBox(Box, Scrollable):
 				clip=clip,
 				style=None
 			)
-
 	
 	def keyboard_event(
 		self,
@@ -407,5 +429,12 @@ class TextBox(Box, Scrollable):
 				self.character(c)
 			case _:
 				return False
+		
+		# # Debug
+		# (c1, c2) = self.curr_line()
+		# (c_wrapped, c_subline_num, c_subline_offset) = self.line_wrap_info(c1, c2)
+		
+		# debug.print(f"Current line: start={c1}, end={c2}")
+		# debug.print(f"c_wrapped={c_wrapped}, c_subline_num={c_subline_num}, c_subline_offset={c_subline_offset}")
 		
 		return True
