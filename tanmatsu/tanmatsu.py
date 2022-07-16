@@ -53,23 +53,34 @@ class Tanmatsu:
 		(w, h) = shutil.get_terminal_size()
 		self.screenbuffer = screenbuffer.Screenbuffer(w, h)
 		
-		self.__setup_terminal()  # Set the proper terminal emulator/stdin/stdout modes
+		self.__setup_stdinout()  # Set the proper stdin/stdout modes
+		self.__setup_terminal()  # Set the proper terminal emulator modes
 		self.__setup_selector()  # Set up input handling
 	
-	def __setup_terminal(self):
+	def __setup_stdinout(self):
 		# Normally stdin and stdout are set to the same file descriptor.
-		# This doesn't work, as we need stdin to be nonblocking and stdout
-		# to be blocking.
+		# This doesn't work, as we need to set stdin and stdout to different modes.
 		# 
 		# Manually open two separate file descriptors for stdin and stdout:
 		sys.stdin  = open("/dev/stdin",  "r")
 		sys.stdout = open("/dev/stdout", "w")
 		
-		os.set_blocking(sys.stdin.fileno(),  False)
-		os.set_blocking(sys.stdout.fileno(), True)
+		# Set up blocking and non-blocking bitmasks for stdin:
+		self.stdin_fcntl_initial     = fcntl.fcntl(sys.stdin.fileno(), fcntl.F_GETFL)
+		self.stdin_fcntl_nonblocking = self.stdin_fcntl_initial |  os.O_NONBLOCK
+		self.stdin_fcntl_blocking    = self.stdin_fcntl_initial & ~os.O_NONBLOCK
+		# ... and do the same for stdout:
+		self.stdout_fcntl_initial     = fcntl.fcntl(sys.stdout.fileno(), fcntl.F_GETFL)
+		self.stdout_fcntl_nonblocking = self.stdout_fcntl_initial |  os.O_NONBLOCK
+		self.stdout_fcntl_blocking    = self.stdout_fcntl_initial & ~os.O_NONBLOCK
+		
+		# And then set stdin to be non-blocking and stdout to be blocking:
+		fcntl.fcntl(sys.stdin.fileno(),  fcntl.F_SETFL, self.stdin_fcntl_nonblocking)
+		fcntl.fcntl(sys.stdout.fileno(), fcntl.F_SETFL, self.stdout_fcntl_blocking)
 		
 		# Fiddle with the control modes for stdin:
-		STDIN_TERMIOS = termios.tcgetattr(sys.stdin.fileno())
+		self.stdin_termios_initial        = termios.tcgetattr(sys.stdin.fileno())
+		self.stdin_termios_no_buffer_echo = termios.tcgetattr(sys.stdin.fileno())
 		
 		# Configure the `c_cflag` bitmask inside the `termios` struct that
 		# contains the control modes.
@@ -78,10 +89,18 @@ class Tanmatsu:
 		# 
 		# termios.ICANON = False: do not buffer input until the enter button is pressed
 		# termios.ECHO   = False: do not echo keys pressed to the screen
-		STDIN_TERMIOS[3] = STDIN_TERMIOS[3] & ~termios.ICANON & ~termios.ECHO
+		self.stdin_termios_no_buffer_echo[3] &= ~termios.ICANON
+		self.stdin_termios_no_buffer_echo[3] &= ~termios.ECHO
 		
-		termios.tcsetattr(sys.stdin.fileno(), termios.TCSADRAIN, STDIN_TERMIOS)
+		termios.tcsetattr(sys.stdin.fileno(), termios.TCSADRAIN, self.stdin_termios_no_buffer_echo)
+	
+	def __teardown_stdinout(self):
+		fcntl.fcntl(sys.stdin.fileno(),  fcntl.F_SETFL, self.stdin_fcntl_initial)
+		fcntl.fcntl(sys.stdout.fileno(), fcntl.F_SETFL, self.stdout_fcntl_initial)
 		
+		termios.tcsetattr(sys.stdin.fileno(), termios.TCSADRAIN, self.stdin_termios_initial)
+	
+	def __setup_terminal(self):
 		# Fiddle with the terminal emulator options:
 		self.terminal_modes = []
 		
@@ -107,6 +126,10 @@ class Tanmatsu:
 		
 		for f in self.terminal_modes:
 			f(to.HIGH)
+	
+	def __teardown_terminal(self):
+		for f in self.terminal_modes:
+			f(to.LOW)
 	
 	def __setup_selector(self):
 		# Terminal resizes are notified through signals, but if we act on the
@@ -138,22 +161,21 @@ class Tanmatsu:
 		self.selector.register(sys.stdin,          selectors.EVENT_READ, self.process_stdin_input)
 		self.selector.register(self.resize_pipe_r, selectors.EVENT_READ, self.process_resize_input)
 	
+	def __teardown_selector(self):
+		os.close(self.resize_pipe_r)
+		os.close(self.resize_pipe_w)
+		
+		self.selector.close()
+	
 	def __enter__(self):
 		return self
 	
 	def __exit__(self, exception_type, exception_value, traceback):
-		self.selector.close()
-		
-		os.close(self.resize_pipe_r)
-		os.close(self.resize_pipe_w)
-		
-		for f in self.terminal_modes:
-			f(to.LOW)
+		self.__teardown_stdinout()
+		self.__teardown_terminal()
+		self.__teardown_selector()
 		
 		debug.flush_print_buffer()
-		
-		sys.stdin.close()
-		sys.stdout.close()
 		
 		return False
 	
