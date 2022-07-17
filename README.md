@@ -9,3 +9,7 @@ Declarative TUI (Terminal User Interface) library, with layout features modelled
 # Running/Testing
 
 Install `pipenv` with `pip3 install pipenv` and then run `pipenv install` to set up a virtual environment with the necessary python version and packages.
+
+# License
+
+MIT
