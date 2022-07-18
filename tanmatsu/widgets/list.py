@@ -21,7 +21,7 @@ class List(Box, Scrollable):
 	:vartype cursor: int
 	"""
 	
-	def __init__(self, children: list[Widget], item_height: int, *args, **kwargs):
+	def __init__(self,  *args, children: list[Widget], item_height: int, **kwargs):
 		super().__init__(*args, **kwargs)
 		
 		self._children = children

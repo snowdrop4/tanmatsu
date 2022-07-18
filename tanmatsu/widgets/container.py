@@ -12,7 +12,7 @@ class Container(Widget):
 	  names of the widgets) and values are `Widget` objects (the children).
 	"""
 	
-	def __init__(self, children: dict[str, Widget], *args, **kwargs):
+	def __init__(self, *args, children: dict[str, Widget], **kwargs):
 		super(Container, self).__init__(*args, **kwargs)
 		
 		self.children = children
