@@ -4,6 +4,7 @@ from enum import (Enum, auto)
 from parsy import (generate, string, regex, test_char, char_from, any_char, fail, index)
 
 import terminal as tt
+from geometry import Point
 
 
 # ==============================================================================
@@ -58,10 +59,10 @@ def mouse_sequence():
 	pressed  = string(b"M").result(Mouse_state.PRESSED)
 	released = string(b"m").result(Mouse_state.RELEASED)
 	
-	state = yield pressed | released
-	
 	button = mouse_button_lookup[button]
-	return (Event_type.MOUSE, (button, x, y, state))
+	button_state = yield pressed | released
+	position = Point(x, y)
+	return (Event_type.MOUSE, (button, button_state, position))
 
 
 # ==============================================================================

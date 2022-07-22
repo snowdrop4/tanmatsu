@@ -22,8 +22,8 @@ class TabBox(Container):
 			self.__active_tab = v
 			self.focusable_children = { k: v }
 	
-	def layout(self, x, y, parent_w, parent_h, requested_w, requested_h):
-		super().layout(x, y, parent_w, parent_h, requested_w, requested_h)
+	def layout(self, *args, **kwargs):
+		super().layout(*args, **kwargs)
 		
 		tab_count = len(self.children)
 		min_tab_width = 5

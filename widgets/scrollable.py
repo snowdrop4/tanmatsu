@@ -127,8 +127,8 @@ class Scrollable(Widget):
 			self.__horizontal_scrollbar_handle_length = scrollbar_handle_length
 			self.__horizontal_scroll_percent = scroll_percent
 	
-	def mouse_event(self, button, x, y, button_state):
-		if super().mouse_event(button, x, y, button_state):
+	def mouse_event(self, button, button_state, position):
+		if super().mouse_event(button, button_state, position):
 			return True
 		
 		match button:

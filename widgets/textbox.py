@@ -246,6 +246,16 @@ class TextBox(Box, Scrollable):
 			
 		return True
 	
+	def layout(self, *args, **kwargs):
+		super().layout(*args, **kwargs)
+		
+		self.wrapped = list(wrap(self.text, self.wrap_width))
+		
+		self._Scrollable__total_content_size.w = self._Widget__available_space.w
+		self._Scrollable__total_content_size.h = len(self.wrapped)
+		
+		self.scroll()
+	
 	def draw(self, s, clip=None):
 		super().draw(s, clip=clip)
 		
@@ -289,13 +299,3 @@ class TextBox(Box, Scrollable):
 				clip=clip,
 				style=None
 			)
-	
-	def layout(self, x, y, parent_w, parent_h, requested_w, requested_h):
-		super().layout(x, y, parent_w, parent_h, requested_w, requested_h)
-		
-		self.wrapped = list(wrap(self.text, self.wrap_width))
-		
-		self._Scrollable__total_content_size.w = self._Widget__available_space.w
-		self._Scrollable__total_content_size.h = len(self.wrapped)
-		
-		self.scroll()

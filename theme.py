@@ -1,10 +1,20 @@
 from style import Style
 
 
+class Theme:
+	default = None
+	highlight = None
+	
+	tab_active = None
+	tab_inactive = None
+	
+	textbox_cursor = None
+
+
 class DefaultTheme:
 	FOREGROUND = (241, 242, 246)
 	BACKGROUND = ( 47,  53,  66)
-	HIGHLIGHT = (255,  71,  87)
+	HIGHLIGHT  = (255,  71,  87)
 	
 	default = Style(foreground=FOREGROUND, background=BACKGROUND, bold=False)
 	highlight = Style.inherit(default, foreground=HIGHLIGHT)

@@ -98,13 +98,13 @@ class Rectangle():
 	def duplicate(self):
 		return Rectangle(self.x, self.y, self.w, self.h)
 	
-	def duplicate_origin_point(self):
+	def origin_point(self):
 		return Point(self.x1, self.y1)
 	
-	def duplicate_end_point(self):
+	def end_point(self):
 		return Point(self.x2, self.y2)
 	
-	def duplicate_dimensions(self):
+	def dimensions(self):
 		return Dimensions(self.w, self.h)
 	
 	def __str__(self):

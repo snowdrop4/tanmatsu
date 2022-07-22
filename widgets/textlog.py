@@ -26,9 +26,6 @@ class TextLog(Box):
 	def add_line(self, line):
 		self.lines.append(line)
 	
-	def layout(self, *args, **kwargs):
-		super().layout(*args, **kwargs)
-	
 	def draw(self, s, clip=None):
 		super().draw(s, clip=clip)
 		

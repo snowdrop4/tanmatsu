@@ -1,6 +1,6 @@
 from tri_declarative import with_meta
 
-import geometry
+from geometry import Rectangle, Dimensions, Point
 from .container import Container
 from .box import Box
 from .scrollable import Scrollable
@@ -26,42 +26,44 @@ class FlexBox(Container, Box, Scrollable):
 		
 		self.flex_direction = flex_direction
 	
-	def layout(self, x, y, parent_w, parent_h, requested_w, requested_h):
-		super().layout(x, y, parent_w, parent_h, requested_w, requested_h)
+	def layout(self, *args, **kwargs):
+		super().layout(*args, **kwargs)
 		
 		# No children? Nothing to do.
 		if len(self.children) == 0:
 			return
 		
+		# Work out how much space we have for each child, supposing that it was
+		# shared equally between them.
 		if self.flex_direction == FlexBox.HORIZONTAL:
 			w_per_child = int(self._Widget__available_space.w / len(self.children))
 			h_per_child = self._Widget__available_space.h
 		else:
 			h_per_child = int(self._Widget__available_space.h / len(self.children))
 			w_per_child = self._Widget__available_space.w
+		size_per_child = Dimensions(w_per_child, h_per_child)
 		
-		position = self._Widget__available_space.duplicate_origin_point()  # keep track of the current position for drawing
-		total_size = geometry.Dimensions(0, 0)  # keep track of the width/height for calculating scroll position
-		
-		position.x = self._Widget__available_space.x
-		position.y = self._Widget__available_space.y
+		curr_pos = self._Widget__available_space.origin_point()  # keep track of the current curr_pos for drawing
+		total_size = Dimensions(0, 0)  # keep track of the width/height for calculating scroll curr_pos
 		
 		for (k, v) in self.children.items():
+			widget_pos = Point(
+				curr_pos.x - self._Scrollable__scroll_position.x,
+				curr_pos.y - self._Scrollable__scroll_position.y
+			)
+			
 			v.layout(
-				position.x - self._Scrollable__scroll_position.x,
-				position.y - self._Scrollable__scroll_position.y,
-				self._Widget__available_space.w,
-				self._Widget__available_space.h,
-				w_per_child,
-				h_per_child,
+				widget_pos,
+				self._Widget__available_space.dimensions(),
+				size_per_child
 			)
 			
 			if self.flex_direction == FlexBox.HORIZONTAL:
-				position.x += v._Widget__calculated_size.w  # increment the current `x` by the width of the widget
+				curr_pos.x += v._Widget__calculated_size.w  # increment the current `x` by the width of the widget
 				total_size.w += v._Widget__calculated_size.w  # do the same with the maximum `w`
 				total_size.h = max(total_size.h, v._Widget__calculated_size.h)  # set a new maximum `h` if needed
 			else:
-				position.y += v._Widget__calculated_size.h
+				curr_pos.y += v._Widget__calculated_size.h
 				total_size.w = max(total_size.w, v._Widget__calculated_size.w)
 				total_size.h += v._Widget__calculated_size.h
 		

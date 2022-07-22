@@ -1,4 +1,18 @@
-class ParentRequested():
+class SizeResolver():
+	def __init__(self):
+		pass
+	
+	def min(self, parent_dimension):
+		raise NotImplementedError
+	
+	def max(self, parent_dimension):
+		raise NotImplementedError
+	
+	def resolve(self, parent_dimension, requested_dimension):
+		raise NotImplementedError
+
+
+class ParentRequested:
 	def __init__(self):
 		pass
 	
@@ -12,7 +26,7 @@ class ParentRequested():
 		return requested_dimension
 
 
-class FixedInteger():
+class FixedInteger:
 	def __init__(self, actual):
 		self.actual = actual
 	
@@ -26,7 +40,7 @@ class FixedInteger():
 		return self.actual
 
 
-class ParentPercent():
+class ParentPercent:
 	def __init__(self, actual):
 		self.actual = actual
 	
@@ -40,7 +54,7 @@ class ParentPercent():
 		return int((self.actual * parent_dimension) / 100)
 
 
-class Clamp():
+class Clamp:
 	def __init__(self, minv, actual, maxv):
 		self.min    = minv
 		self.actual = actual

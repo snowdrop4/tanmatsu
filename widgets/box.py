@@ -1,11 +1,18 @@
 import draw
 import theme
 from .base import Widget
+from screenbuffer import Screenbuffer
+from geometry import Rectangle
 
 
-# A widget that can draw a border around itself.
 class Box(Widget):
-	def __init__(self, *args, border=True, **kwargs):
+	"""
+	A widget that can draw a border around itself.
+	
+	:param border: Whether the border should be drawn or not.
+	"""
+	
+	def __init__(self, *args, border: bool = True, **kwargs):
 		super().__init__(*args, **kwargs)
 		
 		self.__border = border
@@ -21,7 +28,7 @@ class Box(Widget):
 			self._Widget__available_space.w -= 2
 			self._Widget__available_space.h -= 2
 	
-	def draw(self, s, clip=None):
+	def draw(self, s: Screenbuffer, clip: Rectangle | None = None):
 		super().draw(s, clip=clip)
 		
 		if self.__border:
