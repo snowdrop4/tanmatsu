@@ -30,14 +30,14 @@ class Widget(ABC):
 	def get_min_size(self, parent_size: Dimensions) -> Dimensions:
 		"""
 		Returns the minimum possible size that the widget could resolve to
-		when :meth:`layout` is called.
+		  when :meth:`layout` is called.
 		"""
 		return Dimensions(self.w.min(parent_size.w), self.h.min(parent_size.h))
 	
 	def get_max_size(self, parent_size: Dimensions) -> Dimensions:
 		"""
 		Returns the maximum possible size that the widget could resolve to
-		when :meth:`layout` is called.
+		  when :meth:`layout` is called.
 		"""
 		return Dimensions(self.w.max(parent_size.w), self.h.max(parent_size.h))
 	
@@ -48,7 +48,7 @@ class Widget(ABC):
 	) -> Dimensions:
 		"""
 		Returns the actual size that the widget will resolve to
-		when :meth:`layout` is called.
+		  when :meth:`layout` is called.
 		"""
 		return Dimensions(
 			self.w.resolve(parent_size.w, requested_size.w),
@@ -77,7 +77,7 @@ class Widget(ABC):
 		self.__calculated_size = Rectangle(position.x, position.y, size.w, size.h)
 		
 		# The remaining space after subtracting decorations,
-		# like scrollbars or borders.
+		#   like scrollbars or borders.
 		self.__available_space = Rectangle(position.x, position.y, size.w, size.h)
 	
 	@abstractmethod

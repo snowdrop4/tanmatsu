@@ -72,19 +72,28 @@ class List(Box, Scrollable):
 		return self.children[self.cursor]
 	
 	def up(self):
+		"""
+		Move the cursor up.
+		"""
 		self.cursor = max(self.cursor - 1, 0)
 	
 	def down(self):
+		"""
+		Move the cursor down.
+		"""
 		self.cursor = min(self.cursor + 1, len(self.children) - 1)
 	
 	def layout(self, *args, **kwargs):
 		super().layout(*args, **kwargs)
 		
+		# Gutter
+		# ‾‾‾‾‾‾
+		
 		# Reserve space for a gutter in order to draw the cursor there.
 		# 
 		# First, record the space we want the gutter to occupy (to be used as a
-		# clip when drawing). Second, modify `self._Widget__available_space`
-		# to compensate.
+		#   clip when drawing said gutter later).
+		# Second, modify `self._Widget__available_space` to compensate.
 		self.gutter = Rectangle(
 			self._Widget__available_space.x,
 			self._Widget__available_space.y,
@@ -95,26 +104,34 @@ class List(Box, Scrollable):
 		self._Widget__available_space.x += 1
 		self._Widget__available_space.w -= 1
 		
-		# Layout the children
+		# Calculating usable space
+		# ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
+		content_size = Dimensions(
+			self._Widget__available_space.w - 1,
+			len(self.children) * self.item_height
+		)
+		
+		usable_space = self.get_scrollable_area(content_size)
+		
+		# Children
+		# ‾‾‾‾‾‾‾‾
 		for (i, v) in enumerate(self.children):
 			position = Point(
-				self._Widget__available_space.x - self._Scrollable__scroll_position.x,
-				self._Widget__available_space.y - self._Scrollable__scroll_position.y + (i * self.item_height)
+				usable_space.x - self._Scrollable__scroll_position.x,
+				usable_space.y - self._Scrollable__scroll_position.y + (i * self.item_height)
 			)
 			
 			size = Dimensions(
-				self._Widget__available_space.w,
+				usable_space.w,
 				self.item_height,
 			)
 			
 			v.layout(position, size, size)
 		
-		self.scroll(
-			Dimensions(
-				self._Widget__available_space.w,
-				len(self.children) * self.item_height,
-			)
-		)
+		# Scroll bar
+		# ‾‾‾‾‾‾‾‾‾‾
+		self.layout_scrollbar(content_size)
+		self.scroll()
 	
 	def draw(self, s: Screenbuffer, clip: Rectangle | None = None):
 		super().draw(s, clip)
@@ -134,7 +151,7 @@ class List(Box, Scrollable):
 					s.set(
 						self.gutter.x,
 						item_clip.y + j,
-						"*",
+						">",
 						clip=clip & self.gutter
 					)
 	

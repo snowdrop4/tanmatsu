@@ -1,12 +1,11 @@
 from typing import Generator
-import itertools
 
 from tri_declarative import with_meta
 
 import tanmatsu.input as ti
-from tanmatsu import theme, debug
-from tanmatsu.wctools import wcslice, wcfind, wcoffset_to_column, wccolumn_to_offset, wcwrap, wcchunks
-from tanmatsu.geometry import Rectangle, Dimensions, Point
+from tanmatsu import theme
+from tanmatsu.wctools import wcslice, wcfind, wcoffset_to_column, wccolumn_to_offset, wcchunks
+from tanmatsu.geometry import Rectangle, Dimensions
 from tanmatsu.screenbuffer import Screenbuffer
 from .box import Box
 from .scrollable import Scrollable
@@ -130,7 +129,7 @@ class TextBox(Box, Scrollable):
 			end_line   = self._Scrollable__scroll_position.y + self._Widget__available_space.h - 1
 			
 			# Work out the positive or negative difference between the line the
-			# line the cursor is on, and the topmost or bottommost visible line:
+			#   line the cursor is on, and the topmost or bottommost visible line:
 			delta_y = 0
 			
 			if cursor_line < start_line:
@@ -139,7 +138,7 @@ class TextBox(Box, Scrollable):
 			if cursor_line > end_line:
 				delta_y = cursor_line - end_line
 			
-			self.scroll(None, delta_y=delta_y)
+			self.scroll(delta_y=delta_y)
 	
 	@property
 	def text(self):
@@ -208,7 +207,7 @@ class TextBox(Box, Scrollable):
 		start = self.text.rfind("\n", 0, end)
 		
 		# +1 to the start so it excludes the matched "\n", and +1 to the end so
-		# it includes the matched "\n"
+		#   it includes the matched "\n".
 		return (start + 1, end + 1)
 	
 	# Arguments:
@@ -335,7 +334,8 @@ class TextBox(Box, Scrollable):
 		super().layout(*args, **kwargs)
 		
 		content_size = Dimensions(self._Widget__available_space.w, len(self.wrapped))
-		self.scroll(content_size)
+		self.layout_scrollbar(content_size)
+		self.scroll()
 	
 	def draw(self, s: Screenbuffer, clip: Rectangle | None = None):
 		super().draw(s, clip=clip)
@@ -344,7 +344,7 @@ class TextBox(Box, Scrollable):
 		end_line   = self._Scrollable__scroll_position.y + self._Widget__available_space.h
 		
 		# We need to keep track of all characters, skipped or not, so we know
-		# where the cursor is.
+		#   where the cursor is.
 		characters_seen = sum(map(lambda x: len(x[0]), self.wrapped[:start_line]))
 		
 		for (i, (line, gutter)) in enumerate(self.wrapped[start_line:end_line]):
@@ -363,14 +363,14 @@ class TextBox(Box, Scrollable):
 			for character in line:
 				# If we attempt to draw this character, it screws up the screen.
 				# Turn it into a space character instead of skipping this
-				# character entirely, as although both \n and ' ' are
-				# non-visible, this position in the text box is a potentially
-				# valid space for the cursor to occupy.
+				#   character entirely, as although both \n and ' ' are
+				#   non-visible, this position in the text box is a potentially
+				#   valid space for the cursor to occupy.
 				if character == "\n":
 					character = " "
 				
 				# If we're on the character the cursor is currently occupying,
-				# set the theme appropriately.
+				#   set the theme appropriately.
 				if self.editable and self.cursor == characters_seen:
 					style = theme.DefaultTheme.cursor
 				else:

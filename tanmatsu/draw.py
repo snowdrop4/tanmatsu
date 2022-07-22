@@ -38,10 +38,10 @@ def scrollbar(
 		case widgets.Scrollable.HORIZONTAL:
 			sbr = geometry.Rectangle(r.x1, r.y2, r.w, 1)
 		case _:
-			raise ValueError(
-				"draw.scrollbar(): Invalid value for `direction`. \
-				Must equal either `Scrollable.VERTICAL`, or `Scrollable.HORIZONTAL`."
-			)
+			raise ValueError((
+				"draw.scrollbar(): Invalid value for `direction`. "
+				"Must equal either `Scrollable.VERTICAL`, or `Scrollable.HORIZONTAL`."
+			))
 	
 	if clip and not sbr.intersects(clip):
 		return

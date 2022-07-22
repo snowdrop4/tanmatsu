@@ -1,5 +1,5 @@
 import tanmatsu.input as ti
-from tanmatsu import draw, debug
+from tanmatsu import draw
 from tanmatsu.screenbuffer import Screenbuffer
 from tanmatsu.geometry import Rectangle, Dimensions, Point
 from .base import Widget
@@ -12,6 +12,17 @@ class Scrollable(Widget):
 	
 	:param scroll_direction: Must be either :attr:`NONE`, :attr:`VERTICAL`,
 	  or :attr:`HORIZONTAL`. Defaults to :attr:`VERTICAL`.
+	
+	The layout function of a descendant of this widget should contain:
+		
+		.. code-block:: python
+		   super().layout(*args, **kwargs)
+		   
+		   <calculate content size>
+		   
+		   self.set_scroll_content_size(content_size)
+		   self.layout_scrollbar()
+		   self.scroll()
 	"""
 	
 	NONE       = 0b00
@@ -23,34 +34,71 @@ class Scrollable(Widget):
 	HORIZONTAL = 0b10
 	"""Scrollable horizontally."""
 	
+	BOTH       = 0b11
+	"""Scrollable in both directions."""
+	
 	def __init__(self, *args, scroll_direction: int = VERTICAL, **kwargs):
 		super().__init__(*args, **kwargs)
 		self.set_scroll_direction(scroll_direction)
 		
 		self.__scroll_position = Point(0, 0)
+		self.__content_size = Dimensions(0, 0)
 	
 	def layout(self, *args, **kwargs):
 		super().layout(*args, **kwargs)
+	
+	def __get_scrollable_area_and_directions(self, content_size: Dimensions) -> tuple[Rectangle, bool, bool]:
+		scrollable_area = self._Widget__available_space.duplicate()
 		
-		if self.__scroll_direction != Scrollable.NONE:
-			if self.__scroll_direction & Scrollable.VERTICAL:
-				self.__vertical_scrollbar_rectangle = self._Widget__available_space.duplicate()
-				self._Widget__available_space.w -= 1
-			
-			if self.__scroll_direction & Scrollable.HORIZONTAL:
-				self.__horizontal_scrollbar_rectangle = self._Widget__available_space.duplicate()
-				self._Widget__available_space.h -= 1
-			
-			# Shorten both scrollbars if scrolling along both
-			# directions is turned on.
-			if self.__scroll_direction == (Scrollable.VERTICAL | Scrollable.HORIZONTAL):
-				self.__vertical_scrollbar_rectangle.h   -= 1
-				self.__horizontal_scrollbar_rectangle.w -= 1
+		h_scroll_required = content_size.w > scrollable_area.w
+		v_scroll_required = content_size.h > scrollable_area.h
+		
+		if h_scroll_required:
+			scrollable_area.h -= 1
+			if content_size.h > scrollable_area.h:
+				scrollable_area.w -= 1
+				v_scroll_required = True
+		elif v_scroll_required:
+			scrollable_area.w -= 1
+			if content_size.w > scrollable_area.w:
+				scrollable_area.h -= 1
+				h_scroll_required = True
+		
+		return (scrollable_area, h_scroll_required, v_scroll_required)
+	
+	def get_scrollable_area(self, content_size: Dimensions) -> Rectangle:
+		(scrollable_area, _, _) = self.__get_scrollable_area_and_directions(content_size)
+		return scrollable_area
+
+	def layout_scrollbar(self, content_size: Dimensions):
+		"""
+		Layout the scrollbar. Must be called before :meth:`scroll`.
+		"""
+		self.__content_size = content_size
+		
+		self.__vertical_scrollbar_rectangle   = self._Widget__available_space.duplicate()
+		self.__horizontal_scrollbar_rectangle = self._Widget__available_space.duplicate()
+		
+		(scrollable_area,
+		 h_scroll_required,
+		 v_scroll_required) = self.__get_scrollable_area_and_directions(self.__content_size)
+		self._Widget__available_space = scrollable_area
+		
+		match (h_scroll_required, v_scroll_required, self.__scroll_direction):
+			case (True, False, Scrollable.HORIZONTAL) | (True, False, Scrollable.BOTH):
+				self.__vertical_scrollbar_rectangle   = Rectangle(0,0,0,0)
+			case (False, True, Scrollable.VERTICAL  ) | (False, True, Scrollable.BOTH):
+				self.__horizontal_scrollbar_rectangle = Rectangle(0,0,0,0)
+			case (True, True, Scrollable.BOTH):
+				pass
+			case (_, _, _):
+				self.__horizontal_scrollbar_rectangle = Rectangle(0,0,0,0)
+				self.__vertical_scrollbar_rectangle   = Rectangle(0,0,0,0)
 	
 	def draw(self, s: Screenbuffer, clip: Rectangle | None = None):
 		super().draw(s, clip=clip)
 		
-		if self.__scroll_direction != Scrollable.NONE:
+		if (self.__scroll_direction != Scrollable.NONE):
 			if self.__scroll_direction & Scrollable.VERTICAL:
 				draw.scrollbar(
 					s,
@@ -75,34 +123,31 @@ class Scrollable(Widget):
 		"""Whether the widget is scrollable or not."""
 		return self.__scroll_direction != Scrollable.NONE
 	
+	def get_scroll_direction(self) -> int:
+		return self.__scroll_direction
+	
 	def set_scroll_direction(self, scroll_direction: int):
 		"""Set the scroll direction to `scroll_direction`."""
 		if scroll_direction > 0b11 or scroll_direction < 0b00:
-			raise ValueError("Scrollable.set_scroll_direction(): \
-				`scroll_direction` is a bitmask and must be equal to \
-				`Scrollable.NONE`, `Scrollable.VERTICAL`, or `Scrollable.HORIZONTAL`, \
-				or a combination thereof.")
+			raise ValueError(("Scrollable.set_scroll_direction(): "
+				"`scroll_direction` is a bitmask and must be equal to "
+				"`Scrollable.NONE`, `Scrollable.VERTICAL`, or `Scrollable.HORIZONTAL`, "
+				"or a combination thereof."
+			))
 		
 		self.__scroll_direction = scroll_direction
 	
-	def scroll(self, content_size: Dimensions | None, delta_x: int = 0, delta_y: int = 0):
+	def scroll(self, delta_x: int = 0, delta_y: int = 0):
 		"""
 		Scroll the widget by the specified deltas.
-		
-		:param content_size: The dimensions of the content to be scrolled.
-		  This parameter may be `None` if the dimensions of the content has not
-		  changed since the last time this method was called.
 		"""
-		if content_size is not None:
-			self.__content_size = content_size
-		
 		if self.__scroll_direction & Scrollable.HORIZONTAL:
-			self._scroll(delta_x, Scrollable.HORIZONTAL)
+			self.__scroll(delta_x, Scrollable.HORIZONTAL)
 		
 		if self.__scroll_direction & Scrollable.VERTICAL:
-			self._scroll(delta_y, Scrollable.VERTICAL)
+			self.__scroll(delta_y, Scrollable.VERTICAL)
 	
-	def _scroll(self, scroll_delta: int, direction: int):
+	def __scroll(self, scroll_delta: int, direction: int):
 		if direction == Scrollable.VERTICAL:
 			content_length   = self.__content_size.h
 			available_space  = self._Widget__available_space.h
@@ -113,14 +158,18 @@ class Scrollable(Widget):
 			available_space  = self._Widget__available_space.w
 			scroll_position  = self.__scroll_position.x
 			scrollbar_length = self.__horizontal_scrollbar_rectangle.w - 2
+		else:
+			raise ValueError(("Scrollable._scroll(): Invalid value for `direction`. "
+				"Must equal either `Scrollable.VERTICAL`, or `Scrollable.HORIZONTAL`"
+			))
 		
 		# Make it so that the scrolling bottoms out when the bottom of the
-		# content is at the bottom of the screen rather than when the bottom 
-		# of the content is at the top of the screen.
+		#   content is at the bottom of the screen rather than when the bottom
+		#   of the content is at the top of the screen.
 		# 
 		# Clamp this value at, or above, 0 for cases where the content is
-		# smaller than the screen (scrolling into negative space doesn't
-		# make sense).
+		#   smaller than the screen (scrolling into negative space doesn't
+		#   make sense).
 		max_scroll_position = max(0, content_length - available_space)
 		
 		# Clamp the scroll position between 0 and the maximum scroll position
@@ -128,8 +177,8 @@ class Scrollable(Widget):
 		scroll_position = min(max_scroll_position, scroll_position)
 		
 		# Clamp this value at, or above, 1 for cases where the
-		# content is smaller than the screen (it can't ever
-		# take less than 1 screen to display the content).
+		#   content is smaller than the screen (it can't ever
+		#   take less than 1 screen to display the content).
 		screens_to_display_content = content_length / max(1, available_space)
 		screens_to_display_content = max(1, screens_to_display_content)
 		
@@ -171,6 +220,7 @@ class Scrollable(Widget):
 			return False
 		
 		match button, modifier:
+			# Mouse wheel
 			case ti.Mouse_button.SCROLL_UP,    ti.Mouse_modifier.NONE:
 				self.scroll(None, delta_y=-1)
 			case ti.Mouse_button.SCROLL_DOWN,  ti.Mouse_modifier.NONE:
@@ -179,12 +229,12 @@ class Scrollable(Widget):
 				self.scroll(None, delta_x=-1)
 			case ti.Mouse_button.SCROLL_RIGHT, ti.Mouse_modifier.NONE:
 				self.scroll(None, delta_x=+1)
-			
+			# Mouse wheel + shift
 			case ti.Mouse_button.SCROLL_UP,    ti.Mouse_modifier.SHIFT:
 				self.scroll(None, delta_x=-1)
 			case ti.Mouse_button.SCROLL_DOWN,  ti.Mouse_modifier.SHIFT:
 				self.scroll(None, delta_x=+1)
-			
+			# Fallthrough
 			case _:
 				return False
 		
