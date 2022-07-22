@@ -59,8 +59,44 @@ class Dimensions():
 		return Dimensions(self.w, self.h)
 	
 	def __eq__(self, other: Dimensions) -> bool:
-		"""Whether these dimensions are equal to dimensions `other` (compare-by-value)."""
-		return self.w == other.w and self.h == other.h
+		"""
+		Whether the width and height of this dimensions object
+		is equal to the width and height of the dimensions object `other`.
+		"""
+		return self.w == other.w\
+		   and self.h == other.h
+	
+	def __lt__(self, other: Rectangle | Dimensions) -> bool:
+		"""
+		Whether the width and height of this dimensions object are both
+		less than the width and height of object `other`.
+		"""
+		return self.w < other.w\
+		   and self.h < other.h
+	
+	def __le__(self, other: Rectangle | Dimensions) -> bool:
+		"""
+		Whether the width and height of this dimensions object are both
+		less than or equal to the width and height of object `other`.
+		"""
+		return self.w <= other.w\
+		   and self.h <= other.h
+	
+	def __gt__(self, other: Rectangle | Dimensions) -> bool:
+		"""
+		Whether the width and height of this dimensions object are both
+		greater than the width and height of object `other`.
+		"""
+		return self.w > other.w\
+		   and self.h > other.h
+	
+	def __ge__(self, other: Rectangle | Dimensions) -> bool:
+		"""
+		Whether the width and height of this dimensions object are both
+		greater than or equal to the width and height of object `other`.
+		"""
+		return self.w >= other.w\
+		   and self.h >= other.h
 	
 	def __str__(self) -> str:
 		"""Returns a string representation of the dimensions."""
@@ -112,34 +148,25 @@ class Rectangle():
 	
 	def intersects(self, other: Rectangle) -> bool:
 		"""Whether this rectangle intersects with rectangle `other`."""
-		
-		a = self.x1 <= other.x2
-		b = self.x2 >= other.x1
-		c = self.y1 <= other.y2
-		d = self.y2 >= other.y1
-		
-		return a and b and c and d
+		return self.x1 <= other.x2\
+		   and self.x2 >= other.x1\
+		   and self.y1 <= other.y2\
+		   and self.y2 >= other.y1
 	
 	def containsp(self, other: Point) -> bool:
 		"""Whether this rectangle contains point `other`."""
-		
-		a = self.x <= other.x <= self.x2
-		b = self.y <= other.y <= self.y2
-		
-		return a and b
+		return self.x <= other.x <= self.x2\
+		   and self.y <= other.y <= self.y2
 	
 	def containsr(self, other: Rectangle) -> bool:
 		"""Whether this rectangle contains rectangle `other`."""
-		a = self.x1 <= other.x1
-		b = self.y1 <= other.y1
-		c = self.x2 >= other.x2
-		d = self.y2 >= other.y2
-		
-		return a and b and c and d
+		return self.x1 <= other.x1\
+		   and self.y1 <= other.y1\
+		   and self.x2 >= other.x2\
+		   and self.y2 >= other.y2
 	
 	def duplicate(self) -> Self:
 		"""Returns a copy of this rectangle."""
-		
 		return Rectangle(self.x, self.y, self.w, self.h)
 	
 	def origin_point(self) -> Point:
@@ -162,15 +189,45 @@ class Rectangle():
 	
 	def __eq__(self, other: Rectangle) -> bool:
 		"""
-		Whether this rectangle is equal to rectangle `other`
-		(compare-by-value).
+		Whether this rectangle's position in space and dimensions
+		are equal to rectangle `other`.
 		"""
-		(x, y, w, h) = other
-		
 		return self.x == other.x\
 		   and self.y == other.y\
 		   and self.w == other.w\
 		   and self.h == other.h
+	
+	def __lt__(self, other: Rectangle | Dimensions) -> bool:
+		"""
+		Whether this rectangle's width and height are both
+		less than the width and height of object `other`.
+		"""
+		return self.w < other.w\
+		   and self.h < other.h
+	
+	def __le__(self, other: Rectangle | Dimensions) -> bool:
+		"""
+		Whether this rectangle's width and height are both
+		less than or equal to the width and height of object `other`.
+		"""
+		return self.w <= other.w\
+		   and self.h <= other.h
+	
+	def __gt__(self, other: Rectangle | Dimensions) -> bool:
+		"""
+		Whether this rectangle's width and height are both
+		greater than the width and height of object `other`.
+		"""
+		return self.w > other.w\
+		   and self.h > other.h
+	
+	def __gt__(self, other: Rectangle | Dimensions) -> bool:
+		"""
+		Whether this rectangle's width and height are both
+		greater than or equal to the width and height of object `other`.
+		"""
+		return self.w >= other.w\
+		   and self.h >= other.h
 	
 	def __and__(self, other: Rectangle) -> Rectangle:
 		"""
