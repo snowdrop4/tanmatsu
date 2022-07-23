@@ -13,24 +13,29 @@ class TextLog(Box):
 	to the bottom and old ones scrolling upwards. Like a traditional terminal.
 	
 	:param lines: The lines the TextLog should contain.
+	:paramtype lines: list[str]
 	"""
 	
 	def __init__(self, *args, lines: list[str] = [], **kwargs):
 		super().__init__(*args, **kwargs)
 		
-		self.lines = lines
+		self.__lines = lines
 	
 	def append_line(self, line):
 		"""Append a line to the TextLog."""
-		self.lines.append(line)
+		self.__lines.append(line)
 	
-	def get_lines(self) -> list[str]:
-		"""Return the current contents of the TextLog."""
-		return self.lines
+	@property
+	def lines(self) -> list[str]:
+		"""
+		:getter: Gets the text lines contained within the TextLog.
+		:setter: Sets the text lines.
+		"""
+		return self.__lines
 	
-	def set_lines(self, lines: list[str]):
-		"""Set the contents of the TextLog."""
-		self.lines = lines
+	@lines.setter
+	def lines(self, lines: list[str]):
+		self.__lines = lines
 	
 	def draw(self, s: Screenbuffer, clip: Rectangle | None = None):
 		super().draw(s, clip=clip)
@@ -46,7 +51,7 @@ class TextLog(Box):
 		# 
 		# We thus reverse the list of lines, and then reverse the list of chunks
 		# for each line.
-		for line in reversed(self.lines):
+		for line in reversed(self.__lines):
 			line_chunks = list(wcchunks(line, self._Widget__available_space.w))
 			number_of_chunks = len(line_chunks)
 			

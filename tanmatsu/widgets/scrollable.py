@@ -11,18 +11,21 @@ class Scrollable(Widget):
 	Widgets that need to scroll should inherit from this class.
 	
 	:param scroll_direction: Must be either :attr:`NONE`, :attr:`VERTICAL`,
-	  or :attr:`HORIZONTAL`. Defaults to :attr:`VERTICAL`.
+	                         :attr:`HORIZONTAL`, or :attr:`BOTH`.
+	                         Defaults to :attr:`VERTICAL`.
+	:paramtype scroll_direction: int
 	
-	The layout function of a descendant of this widget should contain:
-		
-		.. code-block:: python
-		   super().layout(*args, **kwargs)
-		   
-		   <calculate content size>
-		   
-		   self.set_scroll_content_size(content_size)
-		   self.layout_scrollbar()
-		   self.scroll()
+	The layout function of a descendant of this widget should look like:
+	
+	.. code-block:: python
+	   
+	   def layout(self, *args, **kwargs):
+	       super().layout(*args, **kwargs)
+	       
+	       content_size = <calculate content size>
+	       
+	       self.layout_scrollbar(content_size)
+	       self.scroll()
 	"""
 	
 	NONE       = 0b00
@@ -72,7 +75,8 @@ class Scrollable(Widget):
 
 	def layout_scrollbar(self, content_size: Dimensions):
 		"""
-		Layout the scrollbar. Must be called before :meth:`scroll`.
+		Layout the scrollbar. Must be called before :meth:`scroll`,
+		inside the layout function of descendants of this class.
 		"""
 		self.__content_size = content_size
 		
@@ -139,7 +143,9 @@ class Scrollable(Widget):
 	
 	def scroll(self, delta_x: int = 0, delta_y: int = 0):
 		"""
-		Scroll the widget by the specified deltas.
+		Scroll the widget by the specified deltas. Must be called after
+		:meth:`layout_scrollbar`, inside the layout function of
+		descendants of this class.
 		"""
 		if self.__scroll_direction & Scrollable.HORIZONTAL:
 			self.__scroll(delta_x, Scrollable.HORIZONTAL)

@@ -37,7 +37,6 @@ def wcslice(s: str, prefix_length: int) -> str:
 	Returns the substring that is `prefix_length` columns long, starting from
 	the beginning of string `s`.
 	"""
-	
 	i = 0
 	total_width = 0
 	
@@ -96,7 +95,6 @@ def wccolumn_to_offset(s: str, c: int) -> int:
 	Given column `c` in string `s`, returns the offset corresponding to that
 	column.
 	"""
-	
 	total_width = 0
 	
 	for (i, v) in enumerate(s):
@@ -114,7 +112,6 @@ def wccrop(s: str, length: int) -> str:
 	Returns string `s` cropped to `length`. The last character in the returned
 	string will be "…" if a crop took place.
 	"""
-	
 	cropped = wcslice(s, length)
 	
 	# Did the label get cropped?

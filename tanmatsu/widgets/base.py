@@ -9,6 +9,16 @@ from tanmatsu.geometry import Rectangle, Dimensions, Point
 class Widget(ABC):
 	"""
 	Abstract base class. Parent class of all widgets.
+	
+	:param w: used for calculating the width of this widget.
+	:paramtype w: tanmatsu.size.SizeResolver
+	
+	:param h: used for calculating the height of this widget.
+	:paramtype h: tanmatsu.size.SizeResolver
+	
+	:param theme: used for calculating the theme controlling the
+	              styles used to draw this widget.
+	:paramtype theme: tanmatsu.theme.Theme
 	"""
 	
 	def __init__(
@@ -65,11 +75,16 @@ class Widget(ABC):
 		Calculates the widget layout. Will be called before every :meth:`draw`.
 		
 		:param position: The location of this widget in space.
+		:paramtype position: Point
+		
 		:param parent_size: The size of the parent widget. Used when resolving
-		  sizes. See the classes in module :mod:`size`.
+		                    sizes. See the classes in module :mod:`size`.
+		:paramtype parent_size: Dimensions
+		
 		:param requested_size: The size that the parent widget requests this
-		  widget to be. Used when resolving sizes. See the classes in module
-		  :mod:`size`.
+		                       widget to be. Used when resolving sizes.
+		                       See the classes in module :mod:`size`.
+		:paramtype requested_size: Dimensions
 		"""
 		size = self.get_actual_size(parent_size, requested_size)
 		
@@ -85,11 +100,17 @@ class Widget(ABC):
 		"""
 		Draws the widget to the given screenbuffer.
 		
+		:param screenbuffer: The Screenbuffer to draw to.
+		:paramtype screenbuffer: Screenbuffer
+		
+		:param clip: An area, outside of which, this widget should not be drawn.
+		:paramtype clip: Rectangle
+		
 		.. note::
 		   If a widget has child widgets, it must make sure to pass the correct
 		   clip to them when drawing.
 		   
-		   The widget must pass `self._Widget__available_space` to the
+		   The widget must pass :attr:`self._Widget__available_space` to the
 		   :meth:`geometry.Rectangle.__and__` method of the clip it
 		   receives, and then pass the resulting clip to the child widget when
 		   calling :meth:`draw` on it, so that the clips correctly combine and
@@ -118,13 +139,20 @@ class Widget(ABC):
 	
 	def keyboard_event(
 		self,
-		key: ti.Keyboard_key,
+		key: ti.Keyboard_key | str,
 		modifier: ti.Keyboard_modifier
 	) -> bool:
 		"""
 		Process a keyboard event.
 		
-		:param modifier: A bitmask. See :class:`terminal.input.Keyboard_modifier`.
+		:param key: Either a string indicating the character entered,
+		            or a enum indicating the special key pressed
+		            (e.g., ENTER, TAB, HOME, and so on).
+		:paramtype key: tanmatsu.input.Keyboard_key | str
+		
+		:param modifier: A bitmask indicating the modifier key held down,
+		                 if any.
+		:paramtype modifier: tanmatsu.input.Keyboard_modifier
 		
 		:return:
 		  `True`: Treat the keyboard event as consumed. Do not pass the keyboard

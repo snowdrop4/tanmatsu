@@ -33,9 +33,9 @@ class Tanmatsu:
 	As a bare minimum, a program written with tanmatsu must perform the
 	following three steps:
 	
-	- Instantiate `Tanmatsu()` as a context manager.
-	- Set the root widget with :meth:`set_root_widget`.
-	- Start the main TUI loop with :meth:`loop`.
+	1. Instantiate `Tanmatsu()` as a context manager.
+	2. Set the root widget with :meth:`set_root_widget`.
+	3. Start the main TUI loop with :meth:`loop`.
 	
 	For example:
 	

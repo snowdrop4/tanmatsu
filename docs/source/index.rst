@@ -6,11 +6,13 @@
 tanmatsu documentation
 ======================
 
+Declarative TUI library.
+
 Contents
 --------
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
    :caption: Classes:
    
    screenbuffer
@@ -19,9 +21,10 @@ Contents
 
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
    :caption: Submodules:
    
+   debug
    geometry
    input
    size

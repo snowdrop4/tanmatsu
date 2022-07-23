@@ -6,11 +6,18 @@ __output_widget = None
 
 
 def set_output_widget(ow):
+	"""
+	Set the output widget for calls to :func:`print`.
+	"""
 	global __output_widget
 	__output_widget = ow
 
 
-def print(s):
+def print(s: str):
+	"""
+	Output string `s` to the output widget. This widget must support the
+	  :meth:`append` method (e.g., :class:`tanmatsu.widgets.TextLog`).
+	"""
 	if type(s) is not str:
 		s = str(s)
 	

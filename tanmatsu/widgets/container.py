@@ -8,8 +8,10 @@ class Container(Widget):
 	"""
 	A widget that can have children widgets. Abstract base class.
 	
-	:param children: Dictionary containing child widgets. Keys are `str` (the
-	  names of the widgets) and values are `Widget` objects (the children).
+	:param children: Dictionary containing child widgets. Keys are `str`
+	                 (the names of the widgets) and values are
+	                 `Widget` objects (the children).
+	:paramtype children: dict[str, Widget]
 	"""
 	
 	def __init__(self, *args, children: dict[str, Widget], **kwargs):

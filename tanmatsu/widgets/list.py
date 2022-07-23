@@ -14,11 +14,8 @@ class List(Box, Scrollable):
 	Widget that holds a number of widgets of a uniform height, with
 	a cursor to navigate between them.
 	
-	:ivar children: Child widgets.
-	:vartype children: list[Widget]
-	
-	:ivar cursor: Cursor position.
-	:vartype cursor: int
+	:param children: The widgets the List should contain.
+	:paramtype children: list[Widget]
 	"""
 	
 	def __init__(self,  *args, children: list[Widget], item_height: int, **kwargs):
@@ -30,14 +27,19 @@ class List(Box, Scrollable):
 		self.item_height = item_height
 	
 	@property
-	def cursor(self):
-		return self._cursor
+	def cursor(self) -> int:
+		"""
+		:getter: Gets cursor location, i.e., the index of the
+		         currently selected child.
+		:setter: Sets the cursor location.
+		"""
+		return self.__cursor
 	
 	@cursor.setter
-	def cursor(self, value):
+	def cursor(self, value: int):
 		value = max(value, 0)
 		value = min(value, len(self.children))
-		self._cursor = value
+		self.__cursor = value
 		
 		self.focused_child = self.children[self.cursor]
 		self.focusable_children = { "_": self.focused_child }
@@ -56,11 +58,15 @@ class List(Box, Scrollable):
 			self.scroll(None, delta_y=delta_y)
 	
 	@property
-	def children(self):
+	def children(self) -> list[Widget]:
+		"""
+		:getter: Gets the children, i.e., the list items.
+		:setter: Sets the children.
+		"""
 		return self._children
 	
 	@children.setter
-	def children(self, value):
+	def children(self, value: list[Widget]):
 		self._children = value
 		self.cursor = min(self.cursor, len(value))
 	
@@ -157,7 +163,7 @@ class List(Box, Scrollable):
 	
 	def keyboard_event(
 		self,
-		key: ti.Keyboard_key,
+		key: ti.Keyboard_key | str,
 		modifier: ti.Keyboard_modifier
 	) -> bool:
 		if super().keyboard_event(key, modifier):

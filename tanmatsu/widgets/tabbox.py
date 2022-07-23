@@ -26,7 +26,7 @@ class TabBox(Container):
 		self.tab_decoration_width = 2
 		self.tab_min_width = self.tab_min_label_width + self.tab_decoration_width
 	
-	def set_tab(self, w: Widget, l: str):
+	def add_tab(self, w: Widget, l: str):
 		"""
 		Creates a tab with label `l` containing widget `w`. If the label already
 		exists, then the widget corresponding to the label is updated instead.
@@ -171,7 +171,7 @@ class TabBox(Container):
 	
 	def keyboard_event(
 		self,
-		key: ti.Keyboard_key,
+		key: ti.Keyboard_key | str,
 		modifier: ti.Keyboard_modifier
 	) -> bool:
 		if super().keyboard_event(key, modifier):

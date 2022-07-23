@@ -1,7 +1,7 @@
 from wcwidth import wcswidth
 
 import tanmatsu.output as to
-from tanmatsu import theme, debug
+from tanmatsu import theme
 from tanmatsu.style import Style
 from tanmatsu.geometry import Rectangle, Point
 

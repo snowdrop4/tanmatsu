@@ -1,7 +1,7 @@
 geometry
 ========
 
-Classes representing geomtric coordinates and shapes.
+Classes representing geometric coordinates and shapes.
 
 Point
 -----

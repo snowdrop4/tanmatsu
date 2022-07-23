@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 
 class SizeResolver(ABC):
 	"""
-	Abstract base class. Used in :class:`widgets.Widget` and descendants
+	Abstract base class. Used in :class:`tanmatsu.widgets.Widget` and descendants
 	for calculating widget size.
 	"""
 	

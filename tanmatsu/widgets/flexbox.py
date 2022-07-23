@@ -28,19 +28,26 @@ class FlexBox(Container, Box, Scrollable):
 	):
 		super().__init__(*args, **kwargs)
 		
-		self.set_flex_direction(flex_direction)
+		self.flex_direction = flex_direction
 	
-	def get_flex_direction(self) -> int:
-		return self.flex_direction
+	@property
+	def flex_direction(self) -> int:
+		"""
+		:getter: Returns the flex direction.
+		:setter: Sets the flex direction.
+		         Must equal either :attr:`VERTICAL` or :attr:`HORIZONTAL`.
+		"""
+		return self.__flex_direction
 	
-	def set_flex_direction(self, flex_direction: int):
+	@flex_direction.setter
+	def flex_direction(self, flex_direction: int):
 		if flex_direction != FlexBox.VERTICAL and flex_direction != FlexBox.HORIZONTAL:
 			raise ValueError((
 				"FlexBox.set_flex_direction(): Invalid value for `flex_direction`. "
 				"Must equal either `FlexBox.VERTICAL` or `FlexBox.HORIZONTAL`."
 			))
 		
-		self.flex_direction = flex_direction
+		self.__flex_direction = flex_direction
 	
 	def layout(self, *args, **kwargs):
 		super().layout(*args, **kwargs)

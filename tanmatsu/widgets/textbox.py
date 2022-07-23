@@ -78,16 +78,10 @@ class TextBox(Box, Scrollable):
 	Widget containing editable or non-editable text.
 	
 	:param text: The text the TextBox should contain.
+	:paramtype text: str
+	
 	:param editable: Whether the TextBox should be editable or not.
-	
-	:ivar cursor: The position of the cursor.
-	:vartype cursor: int
-	
-	:ivar text: The text the TextBox should contain.
-	:vartype text: str
-	
-	:ivar editable: Whether the TextBox should be editable or not.
-	:vartype editable: bool
+	:paramtype editable: bool
 	"""
 	
 	def __init__(self, *args, text: str = "", editable: bool = True, **kwargs):
@@ -95,13 +89,29 @@ class TextBox(Box, Scrollable):
 		
 		self._cursor = 0
 		self._text = text
-		self.editable = editable
+		self.__editable = editable
 		
 		self.__cached_text = text
 		self.__cached_wrap_width = 0
 	
 	@property
-	def cursor(self):
+	def editable(self) -> bool:
+		"""
+		:getter: Gets whether the text box is editable.
+		:setter: Sets whether the text box is editable.
+		"""
+		return self.__editable
+	
+	@editable.setter
+	def editable(self, value: bool):
+		self.__editable = value
+	
+	@property
+	def cursor(self) -> int:
+		"""
+		:getter: Gets the cursor location.
+		:setter: Sets the cursor location.
+		"""
 		return self._cursor
 	
 	@cursor.setter
@@ -141,7 +151,11 @@ class TextBox(Box, Scrollable):
 			self.scroll(delta_y=delta_y)
 	
 	@property
-	def text(self):
+	def text(self) -> str:
+		"""
+		:getter: Gets the text contained within the text box.
+		:setter: Sets the text contained within the text box.
+		"""
 		return self._text
 	
 	@text.setter
@@ -371,7 +385,7 @@ class TextBox(Box, Scrollable):
 				
 				# If we're on the character the cursor is currently occupying,
 				#   set the theme appropriately.
-				if self.editable and self.cursor == characters_seen:
+				if self.__editable and self.cursor == characters_seen:
 					style = theme.DefaultTheme.cursor
 				else:
 					style = None
@@ -397,13 +411,13 @@ class TextBox(Box, Scrollable):
 	
 	def keyboard_event(
 		self,
-		key: ti.Keyboard_key,
+		key: ti.Keyboard_key | str,
 		modifier: ti.Keyboard_modifier
 	) -> bool:
 		if super().keyboard_event(key, modifier):
 			return True
 		
-		if self.editable is False:
+		if self.__editable is False:
 			return False
 		
 		match key:

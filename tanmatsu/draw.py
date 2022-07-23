@@ -1,8 +1,14 @@
-from tanmatsu import geometry, screenbuffer, widgets
+from tanmatsu import widgets
+from tanmatsu.style import Style
+from tanmatsu.geometry import Rectangle
+from tanmatsu.screenbuffer import Screenbuffer
 
 
 def rectangle(
-	s: screenbuffer.Screenbuffer, r: geometry.Rectangle, clip=None, style=None
+	s: Screenbuffer,
+	r: Rectangle,
+	clip: Rectangle | None = None,
+	style: Style | None = None
 ):
 	if clip and not r.intersects(clip):
 		return
@@ -23,20 +29,33 @@ def rectangle(
 
 
 def scrollbar(
-	s: screenbuffer.Screenbuffer,
-	r: geometry.Rectangle,
-	handle_length,
-	scroll_percent,
-	direction,
-	clip=None,
-	style=None,
+	s: Screenbuffer,
+	r: Rectangle,
+	handle_length: int,
+	scroll_percent: float,
+	direction: int,
+	clip: Rectangle | None = None,
+	style: Style | None = None,
 ):
+	"""
+	Draws a scrollbar.
+	
+	:param s: the :class:`tanmatsu.Screenbuffer` to draw to.
+	:param r: the :class:`tanmatsu.Rectangle` describing the position
+	          and dimensions of the scrollbar.
+	:param handle_length: how long the "handle" part of the scrollbar should be,
+	                      in rows/columns
+	:param scroll_percent: how far down the handle should be, from 0 to 1.0
+	:param direction: :attr:`tanmatsu.widgets.Scrollable.VERTICAL` or
+	                  :attr:`tanmatsu.widgets.Scrollable.HORIZONTAL`
+	:param clip: 
+	"""
 	# Derive the size of the scrollbar from `r`.
 	match direction:
 		case widgets.Scrollable.VERTICAL:
-			sbr = geometry.Rectangle(r.x2, r.y1, 1, r.h)
+			sbr = Rectangle(r.x2, r.y1, 1, r.h)
 		case widgets.Scrollable.HORIZONTAL:
-			sbr = geometry.Rectangle(r.x1, r.y2, r.w, 1)
+			sbr = Rectangle(r.x1, r.y2, r.w, 1)
 		case _:
 			raise ValueError((
 				"draw.scrollbar(): Invalid value for `direction`. "

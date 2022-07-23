@@ -23,6 +23,8 @@ sys.path.append(os.path.abspath('../../'))
 # -- Project information -----------------------------------------------------
 
 project = 'tanmatsu'
+copyright = '2022, tanmatsu'
+author = 'tanmatsu'
 
 # The full version, including alpha/beta/rc tags
 release = '0.0.1'

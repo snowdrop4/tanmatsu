@@ -1,23 +1,51 @@
+from abc import ABC, abstractmethod
+
 from tanmatsu.style import Style
 
 
-class Theme:
+class Theme(ABC):
 	"""Abstract base class."""
 	
-	default = None
-	"""The default style to be used, unless overridden."""
+	@property
+	@abstractmethod
+	def default(self) -> Style:
+		"""
+		The default style to be used, unless overridden
+		by one of the succeeding styles.
+		"""
+		raise NotImplementedError
 	
-	focused = None
-	"""Currently focused widget."""
+	@property
+	@abstractmethod
+	def focused(self) -> Style:
+		"""Style used for the currently focused widget."""
+		raise NotImplementedError
 	
-	active = None
-	"""Currently active tab (used by the TabBox widget, for example)."""
+	@property
+	@abstractmethod
+	def active(self) -> Style:
+		"""
+		Style used for the currently active tab
+		(e.g., in the `TabBox` widget).
+		"""
+		raise NotImplementedError
 	
-	inactive = None
-	"""Current inactive tab (used by the TabBox widget, for example)."""
+	@property
+	@abstractmethod
+	def inactive(self) -> Style:
+		"""
+		Style used for the currently inactive tab
+		(e.g., in the `TabBox` widget).
+		"""
+		raise NotImplementedError
 	
-	cursor = None
-	"""Cursor (used by the TextBox widget, for example)."""
+	@property
+	@abstractmethod
+	def cursor(self) -> Style:
+		"""
+		Style used for the cursor (e.g., in the `TextBox` widget).
+		"""
+		raise NotImplementedError
 
 
 class DefaultTheme(Theme):

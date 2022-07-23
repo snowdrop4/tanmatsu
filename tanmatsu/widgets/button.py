@@ -1,4 +1,4 @@
-from typing import Callable
+from typing import Callable, NoReturn
 
 from tri_declarative import with_meta
 from wcwidth import wcswidth
@@ -16,25 +16,56 @@ class Button(Box):
 	A button widget. Calls the callback when activated.
 	
 	:param label: The text to show on the button.
-	:param callback: The function the button should call when activated.
+	:paramtype label: str
 	
-	:ivar label: The text to show on the button.
-	:ivar callback: The function the button should call when activated.
+	:param callback: The function the button should call when activated.
+	:paramtype callback: Callable[..., NoReturn]
 	"""
 	
-	def __init__(self, *args, label: str = "Button", callback: Callable | None, **kwargs):
+	def __init__(self,
+		*args,
+		label: str = "Button",
+		callback: Callable[..., NoReturn] | None,
+		**kwargs
+	):
 		super().__init__(*args, **kwargs)
 		
-		self.label = label
+		self.__label = label
 		self.callback = callback
+	
+	@property
+	def label(self) -> str:
+		"""
+		:getter: Gets the button's label, i.e., the text to
+		         show on the button.
+		:setter: Sets the button's label.
+		"""
+		return self.__label
+	
+	@label.setter
+	def label(self, value: str):
+		self.__label = value
+	
+	@property
+	def callback(self) -> Callable[..., NoReturn]:
+		"""
+		:getter: Gets the button's callback function,
+		         i.e., the function called when the button is activated.
+		:setter: Sets the button's callback function.
+		"""
+		return self.__callback
+	
+	@callback.setter
+	def callback(self, value: Callable[..., NoReturn]):
+		self.__callback = value
 	
 	def draw(self, s: Screenbuffer, clip: Rectangle | None = None):
 		super().draw(s, clip=clip)
 		
-		label = wccrop(self.label, self._Widget__available_space.w)
+		label = wccrop(self.__label, self._Widget__available_space.w)
 		
 		widget_midpoint = self._Widget__available_space.w // 2
-		label_midpoint = wcswidth(self.label) // 2
+		label_midpoint = wcswidth(self.__label) // 2
 		x_centering_offset = max(0, widget_midpoint - label_midpoint)
 		
 		s.set_string(
@@ -47,15 +78,15 @@ class Button(Box):
 	
 	def keyboard_event(
 		self,
-		key: ti.Keyboard_key,
+		key: ti.Keyboard_key | str,
 		modifier: ti.Keyboard_modifier
 	) -> bool:
 		if super().keyboard_event(key, modifier):
 			return True
 		
 		if key == ti.Keyboard_key.ENTER:
-			if self.callback:
-				self.callback()
+			if self.__callback:
+				self.__callback()
 			return True
 		
 		return False
