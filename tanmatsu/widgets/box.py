@@ -11,10 +11,10 @@ class Box(Widget):
 	Widgets that need a border should inherit from this class.
 	
 	:param border: Whether the border should be drawn or not.
-	:type border: bool
+	:paramtype border: bool
 	
 	:param border_label: A label to be drawn in the top-left of the border.
-	:type border_label: str | None
+	:paramtype border_label: str | None
 	"""
 	
 	def __init__(self, *args, border: bool = True, border_label: str | None = None, **kwargs):

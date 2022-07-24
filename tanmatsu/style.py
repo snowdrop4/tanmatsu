@@ -9,8 +9,13 @@ class Style:
 	Represents the styling available to an invididual character in the terminal.
 	
 	:param foreground: The foreground (text) colour
+	:paramtype foreground: tuple[int, int, int]
+	
 	:param background: The background colour
+	:paramtype background: tuple[int, int, int]
+	
 	:param bold: Whether the text ought to be bold or not
+	:paramtype bold: bool
 	"""
 	
 	def __init__(
@@ -26,10 +31,11 @@ class Style:
 	@staticmethod
 	def inherit(other: Style, **kwargs):
 		"""
-		:param other: other `Style` object to copy.
-		
 		Create a copy of `other`, and then apply the values specified in
 		`**kwargs` to this copy.
+		
+		:param other: other `Style` object to copy.
+		:paramtype other: Style
 		
 		For example, assuming we have the base style:
 		

@@ -36,13 +36,21 @@ class SizeResolver(ABC):
 		The parent widget has the final say on how much it actually allocates.
 		
 		:param parent_size: The size of the parent.
+		:paramtype parent_size: int
+		
 		:param requested_size: The size the parent requests of us.
+		:paramtype requested_size: int
 		"""
 		pass
 
 
 class FixedInteger(SizeResolver):
-	"""Always resolve to a fixed sized."""
+	"""
+	Always resolve to a fixed sized.
+	
+	:param actual: A size, in rows/columns.
+	:paramtype actual: int
+	"""
 	
 	def __init__(self, actual: int):
 		self.actual = actual
@@ -74,7 +82,12 @@ class ParentRequested(SizeResolver):
 
 
 class ParentPercent(SizeResolver):
-	"""Resolve to a percent of the parent's size."""
+	"""
+	Resolve to a percent of the parent's size.
+	
+	:param actual: An integer between 0 and 100.
+	:paramtype actual: int
+	"""
 	
 	def __init__(self, actual: int):
 		self.actual = actual
@@ -96,10 +109,15 @@ class Clamp(SizeResolver):
 	size, and clamp it between said minimum and maximum.
 	
 	:param minv: The minimum size that this function will resolve to.
+	:paramtype minv: int
+	
 	:param actual: The percentage of the parent's size that this function
-	  will resolve to, assuming the parent's requested size is outside the
-	  bounds of the minimum and maximum size.
+	               will resolve to, assuming the parent's requested size
+	               is outside the bounds of the minimum and maximum size.
+	:paramtype actual: int
+	
 	:param maxv: The maximum size that this function will resolve to.
+	:paramtype maxv: int
 	"""
 	
 	def __init__(self, minv: int, actual: int, maxv: int):

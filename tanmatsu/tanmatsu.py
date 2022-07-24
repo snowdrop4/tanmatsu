@@ -394,8 +394,11 @@ class Tanmatsu:
 	
 	def set_root_widget(self, widget: Widget):
 		"""
-		Set the root widget to `widget`. A root widget must be set before
+		Set the root widget. A root widget must be set before
 		:meth:`loop` is called.
+		
+		:param widget: The widget to set as the root widget.
+		:paramtype widget: Widget
 		"""
 		self.root_widget = widget
 	

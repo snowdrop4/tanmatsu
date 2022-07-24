@@ -41,14 +41,25 @@ def scrollbar(
 	Draws a scrollbar.
 	
 	:param s: the :class:`tanmatsu.Screenbuffer` to draw to.
+	:paramtype s: Screenbuffer
+	
 	:param r: the :class:`tanmatsu.Rectangle` describing the position
 	          and dimensions of the scrollbar.
+	:paramtype r: Rectangle
+	
 	:param handle_length: how long the "handle" part of the scrollbar should be,
 	                      in rows/columns
+	:paramtype: handle_length: int
+	
 	:param scroll_percent: how far down the handle should be, from 0 to 1.0
+	:paramtype scroll_percent: float
+	
 	:param direction: :attr:`tanmatsu.widgets.Scrollable.VERTICAL` or
 	                  :attr:`tanmatsu.widgets.Scrollable.HORIZONTAL`
-	:param clip: 
+	:paramtype direction: int
+	
+	:param clip: An area, outside of which, the scrollbar should not be drawn.
+	:paramtype clip: Rectangle
 	"""
 	# Derive the size of the scrollbar from `r`.
 	match direction:

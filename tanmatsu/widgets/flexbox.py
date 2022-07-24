@@ -14,7 +14,8 @@ class FlexBox(Container, Box, Scrollable):
 	from CSS.
 	
 	:param flex_direction: Must be either :attr:`VERTICAL` or
-	  :attr:`HORIZONTAL`. Defaults to :attr:`VERTICAL`.
+	                       :attr:`HORIZONTAL`. Defaults to :attr:`VERTICAL`.
+	:paramtype flex_direction: int
 	"""
 	
 	VERTICAL   = 1

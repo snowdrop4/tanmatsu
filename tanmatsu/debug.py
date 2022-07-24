@@ -16,7 +16,7 @@ def set_output_widget(ow):
 def print(s: str):
 	"""
 	Output string `s` to the output widget. This widget must support the
-	  :meth:`append` method (e.g., :class:`tanmatsu.widgets.TextLog`).
+	:meth:`append` method (e.g., :class:`tanmatsu.widgets.TextLog`).
 	"""
 	if type(s) is not str:
 		s = str(s)
