@@ -25,6 +25,9 @@ def exhaust_file_descriptor(fd):
 
 class Tanmatsu:
 	"""
+	:param title: The title the terminal window should be set to.
+	:paramtype title: str
+	
 	This class fulfils two functions:
 	
 	- Configures the terminal emulator (setting proper modes and so on).
@@ -49,13 +52,17 @@ class Tanmatsu:
 	       t.loop()
 	"""
 	
-	def __init__(self):
+	def __init__(self, title: str | None = None):
+		# Get the terminal's w/h and set up a screenbuffer object
 		(w, h) = shutil.get_terminal_size()
 		self.screenbuffer = screenbuffer.Screenbuffer(w, h)
 		
 		self.__setup_stdinout()  # Set the proper stdin/stdout modes
 		self.__setup_terminal()  # Set the proper terminal emulator modes
 		self.__setup_selector()  # Set up input handling
+		
+		if title is not None:
+			to.set_terminal_title(title)
 	
 	def __setup_stdinout(self):
 		# Normally stdin and stdout are set to the same file descriptor.

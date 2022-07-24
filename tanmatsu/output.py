@@ -2,6 +2,9 @@ import sys
 import os
 
 
+# Otherwise known as:
+#     ESC
+#     \033
 ESCAPE = b"\x1B"
 
 HIGH = b"h"
@@ -12,7 +15,7 @@ LOW  = b"l"
 
 
 # ==============================================================================
-# Output
+# General Output
 # ==============================================================================
 
 def write(s: str):
@@ -26,7 +29,7 @@ def write_bytes(b: bytes):
 
 
 # ==============================================================================
-# Positioning
+# Cursor Positioning
 # ==============================================================================
 
 def set_position(x: int, y: int):
@@ -44,7 +47,7 @@ def set_position(x: int, y: int):
 
 
 # ==============================================================================
-# Resetting
+# Clear Screen
 # ==============================================================================
 
 def clear_screen():
@@ -53,7 +56,7 @@ def clear_screen():
 
 
 # ==============================================================================
-# Colours
+# Text Colours
 # ==============================================================================
 
 def set_foreground_colour_8bit(c: int):
@@ -105,7 +108,7 @@ def set_background_colour_24bit(c: tuple[int, int, int]):
 
 
 # ==============================================================================
-# Attributes
+# Text Attributes
 # ==============================================================================
 
 def str_bold(bold: bool):
@@ -125,7 +128,7 @@ def set_bold(bold: bool):
 
 
 # ==============================================================================
-# Modes
+# Terminal Modes
 # ==============================================================================
 
 def set_mode_alternate_screenbuffer(signal: bytes):
@@ -172,3 +175,11 @@ def set_mode_mouse_report_format_digits(signal: bytes):
 	:param signal: Must be either :attr:`HIGH` or :attr:`LOW`.
 	"""
 	write_bytes(ESCAPE + b'[?1006' + signal)
+
+
+# ==============================================================================
+# Terminal Title
+# ==============================================================================
+
+def set_terminal_title(title: str):
+	write_bytes(ESCAPE + b']2;' + title.encode() + ESCAPE + b'\\')
