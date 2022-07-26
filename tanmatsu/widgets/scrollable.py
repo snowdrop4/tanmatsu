@@ -50,7 +50,10 @@ class Scrollable(Widget):
 	def layout(self, *args, **kwargs):
 		super().layout(*args, **kwargs)
 	
-	def __get_scrollable_area_and_directions(self, content_size: Dimensions) -> tuple[Rectangle, bool, bool]:
+	def __get_scrollable_area_and_directions(
+		self,
+		content_size: Dimensions
+	) -> tuple[Rectangle, bool, bool]:
 		scrollable_area = self._Widget__available_space.duplicate()
 		
 		h_scroll_required = content_size.w > scrollable_area.w
@@ -93,14 +96,12 @@ class Scrollable(Widget):
 				self.__vertical_scrollbar_rectangle   = Rectangle(0,0,0,0)
 			case (False, True, Scrollable.VERTICAL  ) | (False, True, Scrollable.BOTH):
 				self.__horizontal_scrollbar_rectangle = Rectangle(0,0,0,0)
-			case (True, True, Scrollable.BOTH):
-				pass
-			case (_, _, _):
+			case (False, False, _):
 				self.__horizontal_scrollbar_rectangle = Rectangle(0,0,0,0)
 				self.__vertical_scrollbar_rectangle   = Rectangle(0,0,0,0)
 	
 	def draw(self, s: Screenbuffer, clip: Rectangle | None = None):
-		super().draw(s, clip=clip)
+		super().draw(s, clip)
 		
 		if (self.__scroll_direction != Scrollable.NONE):
 			if self.__scroll_direction & Scrollable.VERTICAL:

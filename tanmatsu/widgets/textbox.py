@@ -51,6 +51,8 @@ def wrap(text: str, max_width: int) -> Generator[tuple[str, str], None, None]:
 	while i < len(text):
 		newline = wcfind(text, "\n", i, i + max_width)
 		
+		# If there's no newline character between the current location (`i`)
+		# and the end of the maximum wrap length (`i + max_width`):
 		if newline == -1:
 			if i + max_width == len(text):  # last line ending exactly at the wrap width, with no "\n"
 				yield (text[i:], "⮷")
@@ -62,6 +64,7 @@ def wrap(text: str, max_width: int) -> Generator[tuple[str, str], None, None]:
 			else:  # normal wrapped line
 				yield (wcslice(text[i:], max_width), "⮷")
 				i += max_width
+		# If we can find a newline character before the end of the maximum wrap length:
 		else:
 			if newline + 1 == len(text):  # last line ending exactly at the wrap width, with a "\n"
 				yield (text[i:], " ")
@@ -91,6 +94,7 @@ class TextBox(Box, Scrollable):
 		self._text = text
 		self.__editable = editable
 		
+		self.__wrap_width = 0
 		self.__cached_text = text
 		self.__cached_wrap_width = 0
 	
@@ -128,7 +132,7 @@ class TextBox(Box, Scrollable):
 			characters_seen = 0
 			cursor_line = 0
 			
-			for (i, v) in enumerate(map(lambda x: len(x[0]), self.wrapped)):
+			for (i, v) in enumerate(map(lambda x: len(x[0]), self._wrapped)):
 				if characters_seen + v > self._cursor:
 					break
 				cursor_line += 1
@@ -163,20 +167,14 @@ class TextBox(Box, Scrollable):
 		self._text = value
 		self.cursor = min(self.cursor, len(self.text))
 	
-	@property
-	def wrap_width(self):
-		return self._Widget__available_space.w - 1
-	
-	@property
-	def wrapped(self):
+	def wrap(self, wrap_width):
 		# Optimisation: only re-wrap the text when it's actually necessary:
-		if (
-			   self.__cached_text       != self.text
-			or self.__cached_wrap_width != self.wrap_width
+		if (   self.__cached_text       != self.text
+			or self.__cached_wrap_width != wrap_width
 		):
-			self._wrapped = list(wrap(self.text, self.wrap_width))
+			self._wrapped = list(wrap(self.text, wrap_width))
 			self.__cached_text = self.text
-			self.__cached_wrap_width = self.wrap_width
+			self.__cached_wrap_width = wrap_width
 		
 		return self._wrapped
 	
@@ -241,9 +239,9 @@ class TextBox(Box, Scrollable):
 		# Wrap the line we're given. Add a " " on the end if it's the last line
 		# and doesn't end in a "\n", like the `wrap` function does.
 		if c2 == len(self.text) and self.text[-1] != "\n":
-			wrapped = list(wcchunks(self.text[c1:c2] + " ", self.wrap_width))
+			wrapped = list(wcchunks(self.text[c1:c2] + " ", self.__wrap_width))
 		else:
-			wrapped = list(wcchunks(self.text[c1:c2], self.wrap_width))
+			wrapped = list(wcchunks(self.text[c1:c2], self.__wrap_width))
 		
 		# Find which subline we're on, and the start of that subline.
 		if self.cursor < c1 or self.cursor > c2:
@@ -347,21 +345,33 @@ class TextBox(Box, Scrollable):
 	def layout(self, *args, **kwargs):
 		super().layout(*args, **kwargs)
 		
-		content_size = Dimensions(self._Widget__available_space.w, len(self.wrapped))
+		# Wrap the text
+		self.__wrap_width = self._Widget__available_space.w - 1  # leave space for gutter
+		self._wrapped = list(self.wrap(self.__wrap_width))
+		
+		# Get the area available, sans any scroll bars
+		content_size = Dimensions(self._Widget__available_space.w, len(self._wrapped))
+		self.scrollable_area = self.get_scrollable_area(content_size)
+		
+		# Rewrap the text, if necessary
+		self.__wrap_width = self.scrollable_area.w - 1  # leave space for gutter
+		self._wrapped = list(self.wrap(self.__wrap_width))
+		
+		# Layout the scrollbar
 		self.layout_scrollbar(content_size)
 		self.scroll()
 	
 	def draw(self, s: Screenbuffer, clip: Rectangle | None = None):
-		super().draw(s, clip=clip)
+		super().draw(s, clip)
 		
 		start_line = self._Scrollable__scroll_position.y
 		end_line   = self._Scrollable__scroll_position.y + self._Widget__available_space.h
 		
 		# We need to keep track of all characters, skipped or not, so we know
 		#   where the cursor is.
-		characters_seen = sum(map(lambda x: len(x[0]), self.wrapped[:start_line]))
+		characters_seen = sum(map(lambda x: len(x[0]), self._wrapped[:start_line]))
 		
-		for (i, (line, gutter)) in enumerate(self.wrapped[start_line:end_line]):
+		for (i, (line, gutter)) in enumerate(self._wrapped[start_line:end_line]):
 			y = self._Widget__available_space.y + i
 			
 			# Skip non-visible lines
