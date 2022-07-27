@@ -1,35 +1,33 @@
 import tanmatsu
-from tanmatsu import widgets, size, debug
+from tanmatsu import widgets
 import tests.utils as test
 
 
 class ButtonList(widgets.List):
 	class Meta:
-		children = [ widgets.Button(label="Delete tab", callback=None) ]
-		item_height = 10
+		border_label = "List"
+		children = [
+			widgets.Button(label="Button 1", callback=None),
+			widgets.Button(label="Button 2", callback=None),
+			widgets.Button(label="Button 3", callback=None),
+		]
+		item_height = 5
 
 
-class Split(widgets.FlexBox):
-	text_box = widgets.TextBox()
-	text_log = widgets.TextLog()
+class VertSplit(widgets.FlexBox):
+	text_box = widgets.TextBox(border_label="Text Box", text=test.random_prose())
+	text_log = widgets.TextLog(border_label="Text Log")
+	button_list = ButtonList()
 	
 	class Meta:
 		flex_direction = widgets.FlexBox.HORIZONTAL
-		border_label = "hello! really really looooooooooooooooooooong label xd たたふたた asdasd"
 
 
-class RootWidget(widgets.TabBox):
-	split = Split()
-	list = ButtonList()
-
-
-with tanmatsu.Tanmatsu() as t:
-	f = RootWidget()
-	t.set_root_widget(f)
+with tanmatsu.Tanmatsu(title="Tanmatsu!") as t:
+	rw = VertSplit()
+	t.set_root_widget(rw)
 	
-	f.list.children[0].callback = lambda: f.del_tab_by_label("list")
-	
-	f.split.text_box.text = test.random_prose()
-	debug.set_output_widget(f.split.text_log)
+	for (i, v) in enumerate(rw.button_list.children):
+		v.callback = lambda i=i: rw.text_log.append_line(f"Button {i + 1} pressed")
 	
 	t.loop()
