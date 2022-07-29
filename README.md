@@ -70,6 +70,10 @@ with Tanmatsu(title="Tanmatsu!") as t:
 	t.loop()
 ```
 
+# Installation
+
+`pip install tanmatsu`
+
 # Documentation
 
 https://tanmatsu.readthedocs.io/en/latest/
@@ -79,29 +83,33 @@ https://tanmatsu.readthedocs.io/en/latest/
 * Python >=3.11
 * GNU/Linux
 * Full-featured terminal emulator (e.g., Gnome VTE)
+* A font with unicode symbols (e.g., [Noto](https://fonts.google.com/noto))
 
 # Dependencies
 
 * tri.declarative
 * parsy
-* sphinx
 * wcwidth
+
+Development dependancies:
+
+* sphinx
 
 # Development
 
 ## Installing
 
-1. Install [pyenv](https://github.com/pyenv/pyenv) (intructions in the `README.md`)
-2. Install [pipenv](https://github.com/pypa/pipenv) with `pip3 install pipenv`
-3. Run `pipenv install` from the repository directory to set up a virtual environment with the necessary python version and packages
+1. If not running python 3.11, install [pyenv](https://github.com/pyenv/pyenv).
+2. Install [poetry](https://python-poetry.org/docs/).
+3. Run `poetry install` from the repository directory to set up a virtual environment with the necessary python version and packages
 
 ## Running
 
-`pipenv run python3 main.py`
+`poetry run python3 main.py`
 
 ## Testing
 
-`pipenv run python3 -m unittest`
+`poetry run python3 -m unittest`
 
 # License
 
