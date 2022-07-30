@@ -1,11 +1,10 @@
 from tri_declarative import with_meta
-from wcwidth import wcswidth
 
 import tanmatsu.input as ti
-from tanmatsu import draw, theme, debug
+from tanmatsu import draw, theme
 from tanmatsu.wctools import wccrop
 from tanmatsu.screenbuffer import Screenbuffer
-from tanmatsu.geometry import Rectangle, Dimensions, Point
+from tanmatsu.geometry import Rectangle
 from tanmatsu.style import Style
 from .base import Widget
 from .container import Container

@@ -1,4 +1,4 @@
-from tanmatsu import draw, theme, debug
+from tanmatsu import draw, theme
 from tanmatsu.wctools import wccrop
 from tanmatsu.geometry import Rectangle
 from tanmatsu.screenbuffer import Screenbuffer

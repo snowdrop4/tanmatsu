@@ -1,7 +1,7 @@
 import re
 from enum import (Enum, auto, IntFlag)
 
-from parsy import (generate, string, regex, test_char, char_from, any_char, fail, index)
+from parsy import (generate, string, regex, test_char, any_char, fail)
 
 from tanmatsu.geometry import Point
 

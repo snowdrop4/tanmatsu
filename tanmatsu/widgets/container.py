@@ -1,4 +1,3 @@
-from asyncio import wait
 from tri_declarative import declarative
 
 from .base import Widget
