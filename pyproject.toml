@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "tanmatsu"
-version = "0.0.1.2"
+version = "0.0.2"
 description = "Declarative Terminal User Interface Library"
 authors = ["snowdrop4 <82846066+snowdrop4@users.noreply.github.com>"]
 license = "MIT"
