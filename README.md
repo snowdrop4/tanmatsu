@@ -138,6 +138,10 @@ Development dependancies:
 
 `poetry run python3 -m unittest`
 
+# Changelog
+
+See [CHANGELOG.md](../master/CHANGELOG.md).
+
 # License
 
-MIT. For more information, see `LICENSE.md`
+MIT. For more information, see [LICENSE.md](../master/LICENSE.md).
