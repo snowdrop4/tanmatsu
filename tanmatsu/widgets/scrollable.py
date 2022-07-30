@@ -29,7 +29,7 @@ class Scrollable(Widget):
 	"""
 	
 	NONE       = 0b00
-	"""Not scrollable."""
+	"""Not scrollable at all."""
 	
 	VERTICAL   = 0b01
 	"""Scrollable vertically."""
@@ -42,7 +42,7 @@ class Scrollable(Widget):
 	
 	def __init__(self, *args, scroll_direction: int = VERTICAL, **kwargs):
 		super().__init__(*args, **kwargs)
-		self.set_scroll_direction(scroll_direction)
+		self.scroll_direction = scroll_direction
 		
 		self.__scroll_position = Point(0, 0)
 		self.__content_size = Dimensions(0, 0)
@@ -124,15 +124,24 @@ class Scrollable(Widget):
 					clip=clip,
 				)
 	
+	@property
 	def scrollable(self) -> bool:
-		"""Whether the widget is scrollable or not."""
+		"""
+		:getter: Get whether the widget is scrollable or not.
+		         I.e., whether the scroll direction ≠ :code:`Scrollable.NONE`.
+		"""
 		return self.__scroll_direction != Scrollable.NONE
 	
-	def get_scroll_direction(self) -> int:
+	@property
+	def scroll_direction(self) -> int:
+		"""
+		:getter: Get the scroll direction.
+		:setter: Set the scroll direction.
+		"""
 		return self.__scroll_direction
 	
-	def set_scroll_direction(self, scroll_direction: int):
-		"""Set the scroll direction to `scroll_direction`."""
+	@scroll_direction.setter
+	def scroll_direction(self, scroll_direction: int):
 		if scroll_direction > 0b11 or scroll_direction < 0b00:
 			raise ValueError(("Scrollable.set_scroll_direction(): "
 				"`scroll_direction` is a bitmask and must be equal to "
