@@ -362,7 +362,7 @@ class TextBox(Box, Scrollable):
 		self.scroll()
 	
 	def draw(self, s: Screenbuffer, clip: Rectangle | None = None):
-		super().draw(s, clip)
+		super().draw(s, clip=clip)
 		
 		start_line = self._Scrollable__scroll_position.y
 		end_line   = self._Scrollable__scroll_position.y + self._Widget__available_space.h

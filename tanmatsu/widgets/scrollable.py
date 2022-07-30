@@ -101,7 +101,7 @@ class Scrollable(Widget):
 				self.__vertical_scrollbar_rectangle   = Rectangle(0,0,0,0)
 	
 	def draw(self, s: Screenbuffer, clip: Rectangle | None = None):
-		super().draw(s, clip)
+		super().draw(s, clip=clip)
 		
 		if (self.__scroll_direction != Scrollable.NONE):
 			if self.__scroll_direction & Scrollable.VERTICAL:

@@ -140,7 +140,7 @@ class List(Box, Scrollable):
 		self.scroll()
 	
 	def draw(self, s: Screenbuffer, clip: Rectangle | None = None):
-		super().draw(s, clip)
+		super().draw(s, clip=clip)
 		
 		for (i, v) in enumerate(self.children):
 			item_clip = Rectangle(
