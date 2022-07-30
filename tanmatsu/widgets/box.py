@@ -17,11 +17,48 @@ class Box(Widget):
 	:paramtype border_label: str | None
 	"""
 	
-	def __init__(self, *args, border: bool = True, border_label: str | None = None, **kwargs):
+	def __init__(
+		self,
+		*args,
+		border: bool = True,
+		border_label: str | None = None,
+		**kwargs
+	):
 		super().__init__(*args, **kwargs)
 		
 		self.__border = border
 		self.__border_label = border_label
+	
+	@property
+	def border(self) -> bool:
+		"""
+		:getter: Get whether a border is drawn around this widget.
+		:setter: Set whether a border is drawn around this widget.
+		"""
+		return self.__border
+	
+	@border.setter
+	def border(self, border: bool):
+		self.__border = border
+	
+	@property
+	def border_label(self) -> str | None:
+		"""
+		:getter: Get the label drawn in the upper left of this
+		         widget's border.
+		:setter: Set the label that should be drawn in the upper
+		         left of this widget's border. If set to :code:`None`,
+		         no border label will be drawn.
+		"""
+		return self.__border_label
+	
+	@border_label.setter
+	def border_label(self, label: str | None):
+		"""
+		:param label: The label text. 
+		:paramtype label: str | None
+		"""
+		self.__border_label = label
 	
 	def layout(self, *args, **kwargs):
 		super().layout(*args, **kwargs)
