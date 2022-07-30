@@ -29,9 +29,9 @@ class List(Box, Scrollable):
 	@property
 	def cursor(self) -> int:
 		"""
-		:getter: Gets cursor location, i.e., the index of the
+		:getter: Get cursor location, i.e., the index of the
 		         currently selected child.
-		:setter: Sets the cursor location.
+		:setter: Set the cursor location.
 		"""
 		return self.__cursor
 	
@@ -60,8 +60,8 @@ class List(Box, Scrollable):
 	@property
 	def children(self) -> list[Widget]:
 		"""
-		:getter: Gets the children, i.e., the list items.
-		:setter: Sets the children.
+		:getter: Get the children, i.e., the list items.
+		:setter: Set the children.
 		"""
 		return self._children
 	
@@ -70,10 +70,11 @@ class List(Box, Scrollable):
 		self._children = value
 		self.cursor = min(self.cursor, len(value))
 	
+	@property
 	def active_child(self) -> Widget:
 		"""
-		Return the currently active child widget (i.e., the widget that
-		the cursor is currently pointing to).
+		:getter: Get the currently active child widget (i.e., the widget that
+		         the cursor is currently pointing to).
 		"""
 		return self.children[self.cursor]
 	
