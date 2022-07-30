@@ -26,41 +26,61 @@ class TabBox(Container):
 		self.tab_decoration_width = 2
 		self.tab_min_width = self.tab_min_label_width + self.tab_decoration_width
 	
-	def add_tab(self, w: Widget, l: str):
+	def add_child(self, name: str, widget: Widget):
 		"""
-		Creates a tab with label `l` containing widget `w`. If the label already
-		exists, then the widget corresponding to the label is updated instead.
-		"""
-		self.children[l] = w
-	
-	def del_tab_by_label(self, l: str):
-		"""Deletes the tab with label `l`."""
-		w = self.children[l]
+		Add a tab named `name` containing widget `widget`.
+		If a tab with that name already exists,
+		then the widget corresponding to the name is updated instead.
 		
+		:param name: The name of the tab to add.
+		:paramtype name: str
+		
+		:param widget: The widget object to add.
+		:paramtype widget: Widget
+		"""
+		self.children[name] = widget
+	
+	def del_child_by_name(self, name: str):
+		"""
+		Delete the tab with name `name`.
+		
+		:param name: The name of the tab to delete.
+		:paramtype name: str
+		
+		:raises KeyError: if a tab named `name` does not exist.
+		"""
 		# Change the active tab if we're about to delete the currently active tab.
-		if w == self.__active_tab:
+		if self.children[name] == self.__active_tab:
 			self.right()
 		
-		del self.children[l]
+		del self.children[name]
 	
-	def del_tab_by_widget(self, w: Widget):
-		"""Deletes the tab containing widget `w`."""
+	def del_child_by_widget(self, widget: Widget):
+		"""
+		Delete the tab containing widget `widget`.
 		
+		:param widget: The widget object to delete.
+		:paramtype widget: Widget
+		
+		:raises KeyError: if the object `widget` is not contained within any tabs.
+		"""
 		# Change the active tab if we're about to delete the currently active tab.
-		if w == self.__active_tab:
+		if widget == self.__active_tab:
 			self.right()
 		
-		for (child_label, child_widget) in self.children.items():
-			if child_widget == w:
-				del self.children[child_label]
-				break
+		for (child_name, child_widget) in self.children.items():
+			if child_widget == widget:
+				del self.children[child_name]
+				return
+		
+		raise KeyError(str(widget))
 	
 	def left(self):
-		"""Switches tab to the left."""
+		"""Switch the currently active tab to the left."""
 		self.__switch_tab(list(reversed(self.children.items())))
 	
 	def right(self):
-		"""Switches tab to the right."""
+		"""Switch the currently active tab to the right."""
 		self.__switch_tab(list(self.children.items()))
 	
 	def __switch_tab(self, tabs):
