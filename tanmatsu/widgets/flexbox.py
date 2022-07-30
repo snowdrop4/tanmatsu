@@ -3,7 +3,6 @@ from tri_declarative import with_meta
 from tanmatsu.screenbuffer import Screenbuffer
 from tanmatsu.geometry import Rectangle, Dimensions, Point
 from .box import Box
-from .base import Widget
 from .container import Container
 from .scrollable import Scrollable
 
@@ -50,15 +49,6 @@ class FlexBox(Container, Box, Scrollable):
 			))
 		
 		self.__flex_direction = flex_direction
-	
-	def add_child(self, name: str, widget: Widget):
-		super().add_child(name, widget)
-	
-	def del_child_by_name(self, name: str):
-		super().del_child_by_name(name)
-	
-	def del_child_by_widget(self, widget: Widget):
-		super().del_child_by_widget(widget)
 	
 	def layout(self, *args, **kwargs):
 		super().layout(*args, **kwargs)
