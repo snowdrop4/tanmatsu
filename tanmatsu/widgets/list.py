@@ -55,7 +55,7 @@ class List(Box, Scrollable):
 			if active_item_y2 > self.viewport.y2:
 				delta_y = active_item_y2 - self.viewport.y2 - 1
 			
-			self.scroll(None, delta_y=delta_y)
+			self.scroll(delta_y=delta_y)
 	
 	@property
 	def children(self) -> list[Widget]:

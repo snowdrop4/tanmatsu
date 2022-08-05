@@ -22,6 +22,8 @@ wcwidth = "^0.2"
 
 [tool.poetry.dev-dependencies]
 sphinx = "^5"
+pyre-check = "*"
+mypy = "*"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

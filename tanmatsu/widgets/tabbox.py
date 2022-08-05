@@ -159,7 +159,7 @@ class TabBox(Container):
 		s: Screenbuffer,
 		tab_rectangle: Rectangle,
 		label: str,
-		clip: Rectangle,
+		clip: Rectangle | None,
 		style: Style
 	):
 		def draw_pillar(x, top):

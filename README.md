@@ -121,6 +121,8 @@ https://tanmatsu.readthedocs.io/en/latest/
 Development dependancies:
 
 * sphinx
+* pyre-checker
+* mypy
 
 # Development
 

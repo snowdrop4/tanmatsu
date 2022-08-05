@@ -154,6 +154,8 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+.pyre_configuration
+.watchmanconfig
 
 # pytype static type analyzer
 .pytype/

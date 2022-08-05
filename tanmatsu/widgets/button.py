@@ -47,7 +47,7 @@ class Button(Box):
 		self.__label = value
 	
 	@property
-	def callback(self) -> Callable[..., NoReturn]:
+	def callback(self) -> Callable[..., NoReturn] | None:
 		"""
 		:getter: Gets the button's callback function,
 		         i.e., the function called when the button is activated.
@@ -56,7 +56,7 @@ class Button(Box):
 		return self.__callback
 	
 	@callback.setter
-	def callback(self, value: Callable[..., NoReturn]):
+	def callback(self, value: Callable[..., NoReturn] | None):
 		self.__callback = value
 	
 	def draw(self, s: Screenbuffer, clip: Rectangle | None = None):

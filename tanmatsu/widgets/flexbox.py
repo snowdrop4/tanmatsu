@@ -1,3 +1,4 @@
+from typing import Callable, Any
 from math import floor
 from fractions import Fraction
 
@@ -5,6 +6,7 @@ from tri_declarative import with_meta
 
 from tanmatsu.screenbuffer import Screenbuffer
 from tanmatsu.geometry import Rectangle, Dimensions, Point
+from .base import Widget
 from .box import Box
 from .container import Container
 from .scrollable import Scrollable
@@ -74,10 +76,10 @@ class FlexBox(Container, Box, Scrollable):
 		#   account the decreased amount of space available.
 		
 		if self.flex_direction == FlexBox.HORIZONTAL:
-			x_sizes = self.__layout_children_flex_axis(
+			x_sizes = self.__calc_children_sizes_flex_axis(
 				self._Widget__available_space.w,
 				lambda widget: widget.w)
-			y_sizes = self.__layout_children_nonflex_axis(
+			y_sizes = self.__calc_children_sizes_nonflex_axis(
 				self._Widget__available_space.h,
 				lambda widget: widget.h
 			)
@@ -87,10 +89,10 @@ class FlexBox(Container, Box, Scrollable):
 				max(y_sizes.values(), default=0)
 			)
 		else:
-			x_sizes = self.__layout_children_nonflex_axis(
+			x_sizes = self.__calc_children_sizes_nonflex_axis(
 				self._Widget__available_space.w,
 				lambda widget: widget.w)
-			y_sizes = self.__layout_children_flex_axis(
+			y_sizes = self.__calc_children_sizes_flex_axis(
 				self._Widget__available_space.h,
 				lambda widget: widget.h
 			)
@@ -108,11 +110,11 @@ class FlexBox(Container, Box, Scrollable):
 		# ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
 		
 		if self.flex_direction == FlexBox.HORIZONTAL:
-			x_sizes = self.__layout_children_flex_axis(
+			x_sizes = self.__calc_children_sizes_flex_axis(
 				usable_space.w,
 				lambda widget: widget.w
 			)
-			y_sizes = self.__layout_children_nonflex_axis(
+			y_sizes = self.__calc_children_sizes_nonflex_axis(
 				usable_space.h,
 				lambda widget: widget.h
 			)
@@ -122,11 +124,11 @@ class FlexBox(Container, Box, Scrollable):
 				max(y_sizes.values(), default=0)
 			)
 		else:
-			x_sizes = self.__layout_children_nonflex_axis(
+			x_sizes = self.__calc_children_sizes_nonflex_axis(
 				usable_space.w,
 				lambda widget: widget.w
 			)
-			y_sizes = self.__layout_children_flex_axis(
+			y_sizes = self.__calc_children_sizes_flex_axis(
 				usable_space.h,
 				lambda widget: widget.h
 			)
@@ -158,9 +160,12 @@ class FlexBox(Container, Box, Scrollable):
 		self.layout_scrollbar(content_size)
 		self.scroll()
 	
-	def __layout_children_flex_axis(self, usable_space: int, getter):
+	def __calc_children_sizes_flex_axis(self,
+		usable_space: int,
+		getter: Callable[[Widget], Any]
+	) -> dict[Widget, int]:
 		# Keep track of all the size resolutions we have done
-		resolved_sizes = { }
+		calculated_sizes = { }
 		
 		# Keep track of how many widgets we need to layout
 		remaining_widgets = 0
@@ -193,7 +198,7 @@ class FlexBox(Container, Box, Scrollable):
 		#   resolve to a fraction of the remaining space.
 		for i in fixed_integer:
 			size = getter(i).size
-			resolved_sizes[i] = size
+			calculated_sizes[i] = size
 			space_left -= size
 			remaining_widgets -= 1
 		
@@ -221,7 +226,7 @@ class FlexBox(Container, Box, Scrollable):
 		for i in fraction:
 			real_fraction = getter(i).fraction / total_fraction
 			size = floor(real_fraction * space_left_for_fractions)
-			resolved_sizes[i] = size
+			calculated_sizes[i] = size
 			space_left -= size
 			remaining_widgets -= 1
 		
@@ -236,25 +241,28 @@ class FlexBox(Container, Box, Scrollable):
 			auto_each = max(space_left // remaining_widgets, 0)
 			
 			for i in auto:
-				resolved_sizes[i] = auto_each
+				calculated_sizes[i] = auto_each
 				space_left -= auto_each
 				remaining_widgets -= 1
 			
-		return resolved_sizes
+		return calculated_sizes
 	
-	def __layout_children_nonflex_axis(self, usable_space: int, getter):
-		resolved_sizes = { }
+	def __calc_children_sizes_nonflex_axis(self,
+		usable_space: int,
+		getter: Callable[[Widget], Any]
+	) -> dict[Widget, int]:
+		calculated_sizes = { }
 		
 		for i in self.children.values():
 			match type(getter(i)).__name__:
 				case "FixedInteger":
-					resolved_sizes[i] = getter(i).size
+					calculated_sizes[i] = getter(i).size
 				case "Fraction":
-					resolved_sizes[i] = floor(getter(i).fraction * usable_space)
+					calculated_sizes[i] = floor(getter(i).fraction * usable_space)
 				case "Auto":
-					resolved_sizes[i] = usable_space
+					calculated_sizes[i] = usable_space
 		
-		return resolved_sizes
+		return calculated_sizes
 	
 	def draw(self, s: Screenbuffer, clip: Rectangle | None = None):
 		super().draw(s, clip=clip)

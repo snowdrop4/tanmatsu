@@ -95,6 +95,7 @@ def wccolumn_to_offset(s: str, c: int) -> int:
 	Given column `c` in string `s`, returns the offset corresponding to that
 	column.
 	"""
+	i = 0
 	total_width = 0
 	
 	for (i, v) in enumerate(s):
