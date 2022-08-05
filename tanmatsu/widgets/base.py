@@ -37,33 +37,13 @@ class Widget(ABC):
 		self.__calculated_size = None
 		self.__available_space = None
 	
-	def get_min_size(self, parent_size: Dimensions) -> Dimensions:
+	@property
+	def size(self) -> Dimensions | None:
 		"""
-		Returns the minimum possible size that the widget could resolve to
-		  when :meth:`layout` is called.
+		Returns the widget's size, if it has one. Widgets that have not had
+		their :meth:`layout` method called have not been given a size.
 		"""
-		return Dimensions(self.w.min(parent_size.w), self.h.min(parent_size.h))
-	
-	def get_max_size(self, parent_size: Dimensions) -> Dimensions:
-		"""
-		Returns the maximum possible size that the widget could resolve to
-		  when :meth:`layout` is called.
-		"""
-		return Dimensions(self.w.max(parent_size.w), self.h.max(parent_size.h))
-	
-	def get_actual_size(
-		self,
-		parent_size: Dimensions,
-		requested_size: Dimensions
-	) -> Dimensions:
-		"""
-		Returns the actual size that the widget will resolve to
-		  when :meth:`layout` is called.
-		"""
-		return Dimensions(
-			self.w.resolve(parent_size.w, requested_size.w),
-			self.h.resolve(parent_size.h, requested_size.h),
-		)
+		return self.__calculated_size
 	
 	def layout(
 		self,
@@ -76,16 +56,9 @@ class Widget(ABC):
 		:param position: The location of this widget in space.
 		:paramtype position: Point
 		
-		:param parent_size: The size of the parent widget. Used when resolving
-		                    sizes. See the classes in module :mod:`size`.
-		:paramtype parent_size: Dimensions
-		
-		:param requested_size: The size that the parent widget requests this
-		                       widget to be. Used when resolving sizes.
-		                       See the classes in module :mod:`size`.
-		:paramtype requested_size: Dimensions
+		:param size: The size of this widget.
+		:paramtype size: Dimensions
 		"""
-		# The actual size of the widget.
 		self.__calculated_size = Rectangle(position.x, position.y, size.w, size.h)
 		
 		# The remaining space after subtracting decorations,

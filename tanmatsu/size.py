@@ -1,7 +1,12 @@
 import fractions
+from abc import ABC
 
 
-class FixedInteger():
+class Size(ABC):
+	pass
+
+
+class FixedInteger(Size):
 	"""
 	Resolve to a fixed size.
 	
@@ -13,7 +18,7 @@ class FixedInteger():
 		self.size = size
 
 
-class Fraction():
+class Fraction(Size):
 	"""
 	Resolve to a fraction of the parent's available space, after subtracting
 	space taken up by any :class:`FixedInteger` sizes.
@@ -29,10 +34,10 @@ class Fraction():
 		self.fraction = fractions.Fraction(numerator, denominator)
 
 
-class Auto():
+class Auto(Size):
 	"""
 	Resolve to a proportion of the parent's available space, divided
-	up equally amongst all :class:`Auto`s.
+	up equally amongst all :class:`Auto`\ s.
 	"""
 	def __init__(self):
 		pass

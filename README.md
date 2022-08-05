@@ -118,7 +118,7 @@ https://tanmatsu.readthedocs.io/en/latest/
 * parsy
 * wcwidth
 
-Development dependancies:
+Development dependencies:
 
 * sphinx
 * pyre-checker

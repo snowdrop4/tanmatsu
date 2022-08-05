@@ -78,7 +78,8 @@ class FlexBox(Container, Box, Scrollable):
 		if self.flex_direction == FlexBox.HORIZONTAL:
 			x_sizes = self.__calc_children_sizes_flex_axis(
 				self._Widget__available_space.w,
-				lambda widget: widget.w)
+				lambda widget: widget.w
+			)
 			y_sizes = self.__calc_children_sizes_nonflex_axis(
 				self._Widget__available_space.h,
 				lambda widget: widget.h
@@ -91,7 +92,8 @@ class FlexBox(Container, Box, Scrollable):
 		else:
 			x_sizes = self.__calc_children_sizes_nonflex_axis(
 				self._Widget__available_space.w,
-				lambda widget: widget.w)
+				lambda widget: widget.w
+			)
 			y_sizes = self.__calc_children_sizes_flex_axis(
 				self._Widget__available_space.h,
 				lambda widget: widget.h
@@ -160,6 +162,19 @@ class FlexBox(Container, Box, Scrollable):
 		self.layout_scrollbar(content_size)
 		self.scroll()
 	
+	# Takes the amount of space available in a given axis, and a function that,
+	#   given a widget, returns the size object for that same axis.
+	# 
+	# For example:
+	# 
+	# self.__calc_children_sizes_flex_axis(
+	#     usable_space=usable_space.w,
+	#     getter=lambda widget: widget.w
+	# )
+	# 
+	# Returns a dictionary mapping children to their sizes for the axis
+	#   specified, with these objects flexed along this axis (i.e., laid out
+	#   as a cohesive unit; sharing the space available between them).
 	def __calc_children_sizes_flex_axis(self,
 		usable_space: int,
 		getter: Callable[[Widget], Any]

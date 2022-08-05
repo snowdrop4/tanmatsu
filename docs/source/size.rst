@@ -3,10 +3,10 @@ size
 
 Classes used for calculating widget size.
 
-SizeResolver
+Size
 ------------
 
-.. autoclass:: tanmatsu.size.SizeResolver
+.. autoclass:: tanmatsu.size.Size
    :members:
 
 
@@ -17,23 +17,23 @@ FixedInteger
    :members:
 
 
-ParentRequested
----------------
+Fraction
+--------
 
-.. autoclass:: tanmatsu.size.ParentRequested
+.. autoclass:: tanmatsu.size.Fraction
    :members:
 
 
-ParentPercent
--------------
+Auto
+----
 
-.. autoclass:: tanmatsu.size.ParentPercent
+.. autoclass:: tanmatsu.size.Auto
    :members:
 
 
-Clamp
------
+.. Clamp
+.. -----
 
-.. autoclass:: tanmatsu.size.Clamp
-   :members:
-   :special-members:
+.. .. autoclass:: tanmatsu.size.Clamp
+..    :members:
+..    :special-members:
