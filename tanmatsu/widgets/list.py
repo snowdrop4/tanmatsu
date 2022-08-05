@@ -133,7 +133,7 @@ class List(Box, Scrollable):
 				self.item_height,
 			)
 			
-			v.layout(position, size, size)
+			v.layout(position, size)
 		
 		# Scroll bar
 		# ‾‾‾‾‾‾‾‾‾‾

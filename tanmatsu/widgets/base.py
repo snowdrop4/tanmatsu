@@ -23,8 +23,8 @@ class Widget(ABC):
 	
 	def __init__(
 		self,
-		w: size.SizeResolver = size.ParentRequested(),
-		h: size.SizeResolver = size.ParentRequested(),
+		w = size.Auto(),
+		h = size.Auto(),
 		theme: theme.Theme = theme.DefaultTheme(),
 	):
 		self.w = w
@@ -68,8 +68,7 @@ class Widget(ABC):
 	def layout(
 		self,
 		position: Point,
-		parent_size: Dimensions,
-		requested_size: Dimensions
+		size: Dimensions,
 	):
 		"""
 		Calculates the widget layout. Will be called before every :meth:`draw`.
@@ -86,8 +85,6 @@ class Widget(ABC):
 		                       See the classes in module :mod:`size`.
 		:paramtype requested_size: Dimensions
 		"""
-		size = self.get_actual_size(parent_size, requested_size)
-		
 		# The actual size of the widget.
 		self.__calculated_size = Rectangle(position.x, position.y, size.w, size.h)
 		

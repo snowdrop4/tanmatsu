@@ -379,7 +379,7 @@ class Tanmatsu:
 		# Layout root widget
 		position = Point(0, 0)
 		size = Dimensions(self.screenbuffer.w, self.screenbuffer.h)
-		self.root_widget.layout(position, size, size)
+		self.root_widget.layout(position, size)
 		
 		# Draw root widget to the screenbuffer
 		clip = Rectangle(0, 0, self.screenbuffer.w, self.screenbuffer.h)

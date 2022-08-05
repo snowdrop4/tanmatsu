@@ -1,147 +1,74 @@
-from abc import ABC, abstractmethod
+import fractions
 
 
-class SizeResolver(ABC):
+class FixedInteger():
 	"""
-	Abstract base class. Used in :class:`tanmatsu.widgets.Widget` and descendants
-	for calculating widget size.
+	Resolve to a fixed size.
+	
+	:param size: A size, in rows/columns.
+	:paramtype size: int
 	"""
 	
+	def __init__(self, size: int):
+		self.size = size
+
+
+class Fraction():
+	"""
+	Resolve to a fraction of the parent's available space, after subtracting
+	space taken up by any :class:`FixedInteger` sizes.
+	
+	:param numerator: Numerator of the fraction.
+	:paramtype numerator: int
+	
+	:param denominator: Denominator of the fraction.
+	:paramtype denominator: int
+	"""
+	
+	def __init__(self, numerator, denominator):
+		self.fraction = fractions.Fraction(numerator, denominator)
+
+
+class Auto():
+	"""
+	Resolve to a proportion of the parent's available space, divided
+	up equally amongst all :class:`Auto`s.
+	"""
 	def __init__(self):
 		pass
+
+
+# class Clamp():
+# 	"""
+# 	Resolve to the parent's requested size, as long as it is between a set
+# 	minimum and maximum. Otherwise, resolve to a percentage of the parent's
+# 	size, and clamp it between said minimum and maximum.
 	
-	@abstractmethod
-	def min(self, parent_size: int) -> int:
-		"""
-		Return the minimum possible size :meth:`resolve` could resolve to,
-		given the parent's size.
-		"""
-		pass
+# 	:param minv: The minimum size that this function will resolve to.
+# 	:paramtype minv: int
 	
-	@abstractmethod
-	def max(self, parent_size: int) -> int:
-		"""
-		Return the maximum possible size :meth:`resolve` could resolve to,
-		given the parent's size.
-		"""
-		pass
+# 	:param actual: The percentage of the parent's size that this function
+# 	               will resolve to, assuming the parent's requested size
+# 	               is outside the bounds of the minimum and maximum size.
+# 	:paramtype actual: int
 	
-	@abstractmethod
-	def resolve(self, parent_size: int, requested_size: int) -> int:
-		"""
-		Resolve the actual size we request to be allocated by the parent widget,
-		given the parent's size and the size the parent requests of us.
+# 	:param maxv: The maximum size that this function will resolve to.
+# 	:paramtype maxv: int
+# 	"""
+# 	def __init__(self, minv: int, percent: Fraction, maxv: int):
+# 		self.minv = minv
+# 		self.percent = percent
+# 		self.maxv = maxv
+	
+# 	def resolve(self, parent_size: int, requested_size) -> int:
+# 		if (
+# 			requested_size >= self.minv and\
+# 			requested_size <= self.maxv
+# 		):
+# 			return requested_size
 		
-		We can choose to handshake the parent's requested size or not.
-		The parent widget has the final say on how much it actually allocates.
+# 		clamped = floor(self.percent * parent_size)
+# 		clamped = max(self.minv, clamped)
+# 		clamped = min(self.maxv, clamped)
 		
-		:param parent_size: The size of the parent.
-		:paramtype parent_size: int
-		
-		:param requested_size: The size the parent requests of us.
-		:paramtype requested_size: int
-		"""
-		pass
-
-
-class FixedInteger(SizeResolver):
-	"""
-	Always resolve to a fixed sized.
-	
-	:param actual: A size, in rows/columns.
-	:paramtype actual: int
-	"""
-	
-	def __init__(self, actual: int):
-		self.actual = actual
-	
-	def min(self, parent_size: int) -> int:
-		return self.actual
-	
-	def max(self, parent_size: int) -> int:
-		return self.actual
-	
-	def resolve(self, parent_size: int, requested_size: int) -> int:
-		return self.actual
-
-
-class ParentRequested(SizeResolver):
-	"""Always resolve to the parent's requested size."""
-	
-	def __init__(self):
-		pass
-	
-	def min(self, parent_size: int) -> int:
-		return 1
-	
-	def max(self, parent_size: int) -> int:
-		return parent_size
-	
-	def resolve(self, parent_size: int, requested_size: int) -> int:
-		return requested_size
-
-
-class ParentPercent(SizeResolver):
-	"""
-	Resolve to a percent of the parent's size.
-	
-	:param actual: An integer between 0 and 100.
-	:paramtype actual: int
-	"""
-	
-	def __init__(self, actual: int):
-		self.actual = actual
-	
-	def min(self, parent_size: int) -> int:
-		return int((self.actual * parent_size) / 100)
-	
-	def max(self, parent_size: int) -> int:
-		return int((self.actual * parent_size) / 100)
-	
-	def resolve(self, parent_size: int, requested_size: int) -> int:
-		return int((self.actual * parent_size) / 100)
-
-
-class Clamp(SizeResolver):
-	"""
-	Resolve to the parent's requested size, as long as it is between a set
-	minimum and maximum. Otherwise, resolve to a percentage of the parent's
-	size, and clamp it between said minimum and maximum.
-	
-	:param minv: The minimum size that this function will resolve to.
-	:paramtype minv: int
-	
-	:param actual: The percentage of the parent's size that this function
-	               will resolve to, assuming the parent's requested size
-	               is outside the bounds of the minimum and maximum size.
-	:paramtype actual: int
-	
-	:param maxv: The maximum size that this function will resolve to.
-	:paramtype maxv: int
-	"""
-	
-	def __init__(self, minv: int, actual: int, maxv: int):
-		self.minv   = minv
-		self.actual = actual
-		self.maxv   = maxv
-	
-	def min(self, parent_size: int) -> int:
-		return self.minv
-	
-	def max(self, parent_size: int) -> int:
-		return self.maxv
-	
-	def resolve(self, parent_size: int, requested_size: int) -> int:
-		if (
-			requested_size >= self.minv and\
-			requested_size <= self.maxv
-		):
-			return requested_size
-		
-		percent_of_parent = int((self.actual * parent_size) / 100)
-		
-		clamped = percent_of_parent
-		clamped = max(self.minv, clamped)
-		clamped = min(self.maxv, clamped)
-		
-		return clamped
+# 		return clamped

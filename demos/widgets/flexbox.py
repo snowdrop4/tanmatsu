@@ -2,13 +2,16 @@
 import sys, os
 sys.path.insert(1, os.path.normpath(os.path.join(sys.path[0], '../..')))
 
-from tanmatsu import Tanmatsu
+from tanmatsu import Tanmatsu, size
 from tanmatsu.widgets import FlexBox, TextBox
 
 
 class Left(FlexBox):
 	top = TextBox(text="How much wood would a woodchuck chuck if a woodchuck could chuck wood?")
 	bottom = TextBox(text="He would chuck, he would, as much as he could, and chuck as much wood as a woodchuck would if a woodchuck could chuck wood.")
+	
+	class Meta:
+		w = size.Fraction(1, 3)
 
 
 class VertSplit(FlexBox):
