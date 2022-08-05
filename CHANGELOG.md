@@ -1,3 +1,9 @@
+# 0.1.1
+
+## Bugfixes
+
+* Fix scrolling
+
 # 0.1.0
 
 ## Features

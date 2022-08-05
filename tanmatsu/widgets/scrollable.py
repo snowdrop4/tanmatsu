@@ -232,24 +232,24 @@ class Scrollable(Widget):
 		if super().mouse_event(button, modifier, state, position):
 			return True
 		
-		if self.scrollable() is False:
+		if self.scrollable is False:
 			return False
 		
 		match button, modifier:
 			# Mouse wheel
 			case ti.Mouse_button.SCROLL_UP,    ti.Mouse_modifier.NONE:
-				self.scroll(None, delta_y=-1)
+				self.scroll(delta_y=-1)
 			case ti.Mouse_button.SCROLL_DOWN,  ti.Mouse_modifier.NONE:
-				self.scroll(None, delta_y=+1)
+				self.scroll(delta_y=+1)
 			case ti.Mouse_button.SCROLL_LEFT,  ti.Mouse_modifier.NONE:
-				self.scroll(None, delta_x=-1)
+				self.scroll(delta_x=-1)
 			case ti.Mouse_button.SCROLL_RIGHT, ti.Mouse_modifier.NONE:
-				self.scroll(None, delta_x=+1)
+				self.scroll(delta_x=+1)
 			# Mouse wheel + shift
 			case ti.Mouse_button.SCROLL_UP,    ti.Mouse_modifier.SHIFT:
-				self.scroll(None, delta_x=-1)
+				self.scroll(delta_x=-1)
 			case ti.Mouse_button.SCROLL_DOWN,  ti.Mouse_modifier.SHIFT:
-				self.scroll(None, delta_x=+1)
+				self.scroll(delta_x=+1)
 			# Fallthrough
 			case _:
 				return False
