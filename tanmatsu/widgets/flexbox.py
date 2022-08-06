@@ -39,6 +39,23 @@ class FlexBox(Container, Box, Scrollable):
 	"""Layout items around the center of the flex."""
 	
 	SPACE_BETWEEN = 4
+	"""
+	Layout items, with the first item at the start of the flex, and the last
+	item at the end of the flex. Free is space equally distributed
+	between all the items.
+	"""
+	
+	SPACE_AROUND  = 5
+	"""
+	Layout items with free space distributed such that each item has equal
+	non-collapsing margins on either side.
+	"""
+	
+	SPACE_EVENLY  = 6
+	"""
+	Layout items with free space distributed such that the gaps between any two
+	items, and any item and the nearest edge, are the same.
+	"""
 	
 	def __init__(
 		self,
@@ -86,7 +103,9 @@ class FlexBox(Container, Box, Scrollable):
 		if (justify_content != FlexBox.FLEX_START and
 			justify_content != FlexBox.FLEX_END and 
 		    justify_content != FlexBox.CENTER and
-			justify_content != FlexBox.SPACE_BETWEEN
+			justify_content != FlexBox.SPACE_BETWEEN and
+			justify_content != FlexBox.SPACE_AROUND and
+			justify_content != FlexBox.SPACE_EVENLY
 		):
 			raise ValueError((
 				"FlexBox.justify_content: Invalid value for `justify_content`. "
@@ -188,6 +207,12 @@ class FlexBox(Container, Box, Scrollable):
 				self.__layout_flex_end(x_sizes, y_sizes)
 			case self.CENTER:
 				self.__layout_flex_center(x_sizes, y_sizes)
+			case self.SPACE_BETWEEN:
+				self.__layout_flex_space_between(x_sizes, y_sizes)
+			case self.SPACE_AROUND:
+				self.__layout_flex_space_around(x_sizes, y_sizes)
+			case self.SPACE_EVENLY:
+				self.__layout_flex_space_evenly(x_sizes, y_sizes)
 			case _:
 				raise NotImplementedError("Unimplemented justify_content value")
 		
@@ -197,13 +222,15 @@ class FlexBox(Container, Box, Scrollable):
 	def __layout_flex_start(self,
 		x_sizes: dict[Widget, int],
 		y_sizes: dict[Widget, int],
-		start_pos: Point | None = None
+		start_pos_offset: int = 0,
+		gap: int = 0
 	):
-		# Keep track of the current position for drawing
-		if start_pos:
-			curr_pos = start_pos
+		curr_pos = self._Widget__available_space.top_left()
+		
+		if self.flex_direction == FlexBox.HORIZONTAL:
+			curr_pos.x += start_pos_offset
 		else:
-			curr_pos = self._Widget__available_space.top_left()
+			curr_pos.y += start_pos_offset
 		
 		for i in self.children.values():
 			widget_pos = Point(
@@ -217,9 +244,9 @@ class FlexBox(Container, Box, Scrollable):
 			
 			# Update the position for the next widget
 			if self.flex_direction == FlexBox.HORIZONTAL:
-				curr_pos.x += widget_size.w
+				curr_pos.x += widget_size.w + gap
 			else:
-				curr_pos.y += widget_size.h
+				curr_pos.y += widget_size.h + gap
 	
 	def __layout_flex_end(self,
 		x_sizes: dict[Widget, int],
@@ -262,19 +289,82 @@ class FlexBox(Container, Box, Scrollable):
 			self.__layout_flex_start(x_sizes, y_sizes)
 			return
 		
-		# Keep track of the current position for drawing
-		if self.flex_direction == FlexBox.HORIZONTAL:
-			start_pos = Point(
-				self._Widget__available_space.x + (available_space - total_widget_size) // 2,
-				self._Widget__available_space.y
-			)
-		else:
-			start_pos = Point(
-				self._Widget__available_space.x,
-				self._Widget__available_space.y + (available_space - total_widget_size) // 2,
-			)
+		# Work out our starting position offset
+		start_pos_offset = (available_space - total_widget_size) // 2
 		
-		self.__layout_flex_start(x_sizes, y_sizes, start_pos=start_pos)
+		self.__layout_flex_start(x_sizes, y_sizes, start_pos_offset=start_pos_offset)
+	
+	def __layout_flex_space_between(self,
+		x_sizes: dict[Widget, int],
+		y_sizes: dict[Widget, int]
+	):
+		# Work out how much space our widgets take up
+		if self.flex_direction == FlexBox.HORIZONTAL:
+			total_widget_size = sum(x_sizes.values())
+			available_space = self._Widget__available_space.w
+		else:
+			total_widget_size = sum(y_sizes.values())
+			available_space = self._Widget__available_space.h
+		
+		# If the widgets are larger than the available space,
+		#   just layout as if we were FLEX_START.
+		if total_widget_size >= available_space:
+			self.__layout_flex_start(x_sizes, y_sizes)
+			return
+		
+		# Work out the gap we need between each widget
+		gap = (available_space - total_widget_size) // (len(self.children) - 1)
+		
+		self.__layout_flex_start(x_sizes, y_sizes, gap=gap)
+	
+	def __layout_flex_space_around(self,
+		x_sizes: dict[Widget, int],
+		y_sizes: dict[Widget, int]
+	):
+		# Work out how much space our widgets take up
+		if self.flex_direction == FlexBox.HORIZONTAL:
+			total_widget_size = sum(x_sizes.values())
+			available_space = self._Widget__available_space.w
+		else:
+			total_widget_size = sum(y_sizes.values())
+			available_space = self._Widget__available_space.h
+		
+		# If the widgets are larger than the available space,
+		#   just layout as if we were FLEX_START.
+		if total_widget_size >= available_space:
+			self.__layout_flex_start(x_sizes, y_sizes)
+			return
+		
+		# Work out the gap we need to place between each 
+		gap = (available_space - total_widget_size) // len(self.children)
+		
+		# Work out our starting position offset
+		start_pos_offset = gap // 2
+		
+		self.__layout_flex_start(x_sizes, y_sizes, start_pos_offset=start_pos_offset, gap=gap)
+	
+	def __layout_flex_space_evenly(self,
+		x_sizes: dict[Widget, int],
+		y_sizes: dict[Widget, int]
+	):
+		# Work out how much space our widgets take up
+		if self.flex_direction == FlexBox.HORIZONTAL:
+			total_widget_size = sum(x_sizes.values())
+			available_space = self._Widget__available_space.w
+		else:
+			total_widget_size = sum(y_sizes.values())
+			available_space = self._Widget__available_space.h
+		
+		# If the widgets are larger than the available space,
+		#   just layout as if we were FLEX_START.
+		if total_widget_size >= available_space:
+			self.__layout_flex_start(x_sizes, y_sizes)
+			return
+		
+		# Work out the gap we need to place between each 
+		gap = (available_space - total_widget_size) // (len(self.children) + 1)
+		
+		self.__layout_flex_start(x_sizes, y_sizes, start_pos_offset=gap, gap=gap)
 	
 	# Takes the amount of space available in a given axis, and a function that,
 	#   given a widget, returns the size object for that same axis.
