@@ -36,6 +36,8 @@ class FlexBox(Container, Box, Scrollable):
 	"""Layout items beginning from the end of the flex."""
 	
 	CENTER        = 3
+	"""Layout items around the center of the flex."""
+	
 	SPACE_BETWEEN = 4
 	
 	def __init__(
@@ -184,16 +186,24 @@ class FlexBox(Container, Box, Scrollable):
 				self.__layout_flex_start(x_sizes, y_sizes)
 			case self.FLEX_END:
 				self.__layout_flex_end(x_sizes, y_sizes)
+			case self.CENTER:
+				self.__layout_flex_center(x_sizes, y_sizes)
+			case _:
+				raise NotImplementedError("Unimplemented justify_content value")
 		
 		self.layout_scrollbar(content_size)
 		self.scroll()
 	
 	def __layout_flex_start(self,
 		x_sizes: dict[Widget, int],
-		y_sizes: dict[Widget, int]
+		y_sizes: dict[Widget, int],
+		start_pos: Point | None = None
 	):
 		# Keep track of the current position for drawing
-		curr_pos = self._Widget__available_space.top_left()
+		if start_pos:
+			curr_pos = start_pos
+		else:
+			curr_pos = self._Widget__available_space.top_left()
 		
 		for i in self.children.values():
 			widget_pos = Point(
@@ -233,6 +243,38 @@ class FlexBox(Container, Box, Scrollable):
 			
 			# Layout the widget
 			i.layout(widget_pos, widget_size)
+	
+	def __layout_flex_center(self,
+		x_sizes: dict[Widget, int],
+		y_sizes: dict[Widget, int]
+	):
+		# Work out how much space our widgets take up
+		if self.flex_direction == FlexBox.HORIZONTAL:
+			total_widget_size = sum(x_sizes.values())
+			available_space = self._Widget__available_space.w
+		else:
+			total_widget_size = sum(y_sizes.values())
+			available_space = self._Widget__available_space.h
+		
+		# If the widgets are larger than the available space,
+		#   just layout as if we were FLEX_START.
+		if total_widget_size >= available_space:
+			self.__layout_flex_start(x_sizes, y_sizes)
+			return
+		
+		# Keep track of the current position for drawing
+		if self.flex_direction == FlexBox.HORIZONTAL:
+			start_pos = Point(
+				self._Widget__available_space.x + (available_space - total_widget_size) // 2,
+				self._Widget__available_space.y
+			)
+		else:
+			start_pos = Point(
+				self._Widget__available_space.x,
+				self._Widget__available_space.y + (available_space - total_widget_size) // 2,
+			)
+		
+		self.__layout_flex_start(x_sizes, y_sizes, start_pos=start_pos)
 	
 	# Takes the amount of space available in a given axis, and a function that,
 	#   given a widget, returns the size object for that same axis.

@@ -18,7 +18,7 @@ class Button2(Button):
 	class Meta:
 		label = "Button 2"
 		callback = None
-		w = size.Fraction(1, 4)
+		w = size.FixedInteger(50)
 		h = size.FixedInteger(5)
 
 
@@ -28,7 +28,7 @@ class Buttons(FlexBox):
 	
 	class Meta:
 		flex_direction = FlexBox.HORIZONTAL
-		justify_content = FlexBox.FLEX_END
+		justify_content = FlexBox.CENTER
 
 
 class TextBoxes(FlexBox):
