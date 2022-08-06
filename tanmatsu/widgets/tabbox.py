@@ -122,7 +122,7 @@ class TabBox(Container):
 		
 		# Layout the active tab:
 		self.__active_tab.layout(
-			self._Widget__available_space.origin_point(),
+			self._Widget__available_space.top_left(),
 			self._Widget__available_space.dimensions()
 		)
 	

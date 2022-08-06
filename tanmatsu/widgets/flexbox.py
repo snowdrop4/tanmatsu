@@ -29,12 +29,26 @@ class FlexBox(Container, Box, Scrollable):
 	HORIZONTAL = 2
 	"""Flex from left to right. Equivalent to `flex-direction: row` in CSS."""
 	
+	FLEX_START    = 1
+	"""Layout items beginning from the start of the flex."""
+	
+	FLEX_END      = 2
+	"""Layout items beginning from the end of the flex."""
+	
+	CENTER        = 3
+	SPACE_BETWEEN = 4
+	
 	def __init__(
-		self, *args, flex_direction: int = VERTICAL, **kwargs,
+		self,
+		*args,
+		flex_direction: int = VERTICAL,
+		justify_content: int = FLEX_START,
+		**kwargs,
 	):
 		super().__init__(*args, **kwargs)
 		
 		self.flex_direction = flex_direction
+		self.justify_content = justify_content
 	
 	@property
 	def flex_direction(self) -> int:
@@ -49,11 +63,36 @@ class FlexBox(Container, Box, Scrollable):
 	def flex_direction(self, flex_direction: int):
 		if flex_direction != FlexBox.VERTICAL and flex_direction != FlexBox.HORIZONTAL:
 			raise ValueError((
-				"FlexBox.set_flex_direction(): Invalid value for `flex_direction`. "
+				"FlexBox.flex_direction: Invalid value for `flex_direction`. "
 				"Must equal either `FlexBox.VERTICAL` or `FlexBox.HORIZONTAL`."
 			))
 		
 		self.__flex_direction = flex_direction
+	
+	@property
+	def justify_content(self) -> int:
+		"""
+		:getter: Returns the justify content setting.
+		:setter: Sets the justify content setting.
+		         Must equal either :attr:`FLEX_START`, :attr:`FLEX_END`,
+		         :attr:`CENTER`, or :attr:`SPACE_BETWEEN`.
+		"""
+		return self.__justify_content
+	
+	@justify_content.setter
+	def justify_content(self, justify_content: int):
+		if (justify_content != FlexBox.FLEX_START and
+			justify_content != FlexBox.FLEX_END and 
+		    justify_content != FlexBox.CENTER and
+			justify_content != FlexBox.SPACE_BETWEEN
+		):
+			raise ValueError((
+				"FlexBox.justify_content: Invalid value for `justify_content`. "
+				"Must equal `FlexBox.FLEX_START`, `FlexBox.FLEX_END`, "
+				"`FlexBox.CENTER`, or `FlexBox.SPACE_BETWEEN`."
+			))
+		
+		self.__justify_content = justify_content
 	
 	def layout(self, *args, **kwargs):
 		super().layout(*args, **kwargs)
@@ -140,8 +179,21 @@ class FlexBox(Container, Box, Scrollable):
 				sum(y_sizes.values())
 			)
 		
+		match self.justify_content:
+			case self.FLEX_START:
+				self.__layout_flex_start(x_sizes, y_sizes)
+			case self.FLEX_END:
+				self.__layout_flex_end(x_sizes, y_sizes)
+		
+		self.layout_scrollbar(content_size)
+		self.scroll()
+	
+	def __layout_flex_start(self,
+		x_sizes: dict[Widget, int],
+		y_sizes: dict[Widget, int]
+	):
 		# Keep track of the current position for drawing
-		curr_pos = self._Widget__available_space.origin_point()
+		curr_pos = self._Widget__available_space.top_left()
 		
 		for i in self.children.values():
 			widget_pos = Point(
@@ -158,9 +210,29 @@ class FlexBox(Container, Box, Scrollable):
 				curr_pos.x += widget_size.w
 			else:
 				curr_pos.y += widget_size.h
+	
+	def __layout_flex_end(self,
+		x_sizes: dict[Widget, int],
+		y_sizes: dict[Widget, int]
+	):
+		# Keep track of the current position for drawing
+		curr_pos = self._Widget__available_space.top_right()
 		
-		self.layout_scrollbar(content_size)
-		self.scroll()
+		for i in reversed(self.children.values()):
+			widget_size = Dimensions(x_sizes[i], y_sizes[i])
+			
+			if self.flex_direction == FlexBox.HORIZONTAL:
+				curr_pos.x -= widget_size.w
+			else:
+				curr_pos.y -= widget_size.h
+			
+			widget_pos = Point(
+				curr_pos.x - self._Scrollable__scroll_position.x,
+				curr_pos.y - self._Scrollable__scroll_position.y
+			)
+			
+			# Layout the widget
+			i.layout(widget_pos, widget_size)
 	
 	# Takes the amount of space available in a given axis, and a function that,
 	#   given a widget, returns the size object for that same axis.
@@ -262,6 +334,10 @@ class FlexBox(Container, Box, Scrollable):
 			
 		return calculated_sizes
 	
+	# Returns a dictionary mapping children to their sizes for the axis
+	#   specified, with these objects *not* flexed along this axis (i.e.,
+	#   laid out, without the size of one widget along this axis affecting
+	#   the size of any of the other widgets).
 	def __calc_children_sizes_nonflex_axis(self,
 		usable_space: int,
 		getter: Callable[[Widget], Any]

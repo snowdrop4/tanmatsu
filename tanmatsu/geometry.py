@@ -169,16 +169,30 @@ class Rectangle():
 		"""Returns a copy of this rectangle."""
 		return Rectangle(self.x, self.y, self.w, self.h)
 	
-	def origin_point(self) -> Point:
+	def top_left(self) -> Point:
 		"""
-		Returns the near `x`, `y`. In other words, the origin point
+		Returns the near `x` and `y`. In other words, the origin point
 		(top left) of the rectangle.
 		"""
 		return Point(self.x, self.y)
 	
-	def end_point(self) -> Point:
+	def top_right(self) -> Point:
 		"""
-		Returns the far `x`, `y`. In other words, the end point
+		Returns the far `x`, and the near `y`. In other words, the top
+		right of the rectangle.
+		"""
+		return Point(self.x2, self.y1)
+	
+	def bottom_left(self) -> Point:
+		"""
+		Returns the near `x`, and the far `y`. In other words, the bottom
+		left of the rectangle.
+		"""
+		return Point(self.x1, self.y2)
+	
+	def bottom_right(self) -> Point:
+		"""
+		Returns the far `x` and `y`. In other words, the end point
 		(bottom right) of the rectangle.
 		"""
 		return Point(self.x2, self.y2)

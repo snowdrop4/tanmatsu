@@ -3,25 +3,50 @@ import sys, os
 sys.path.insert(1, os.path.normpath(os.path.join(sys.path[0], '../..')))
 
 from tanmatsu import Tanmatsu, size
-from tanmatsu.widgets import FlexBox, TextBox
+from tanmatsu.widgets import FlexBox, TextBox, Button
 
 
-class Left(FlexBox):
-	top = TextBox(text="How much wood would a woodchuck chuck if a woodchuck could chuck wood?")
-	bottom = TextBox(text="He would chuck, he would, as much as he could, and chuck as much wood as a woodchuck would if a woodchuck could chuck wood.")
+class Button1(Button):
+	class Meta:
+		label = "Button 1"
+		callback = None
+		w = size.Fraction(1, 4)
+		h = size.FixedInteger(5)
+
+
+class Button2(Button):
+	class Meta:
+		label = "Button 2"
+		callback = None
+		w = size.Fraction(1, 4)
+		h = size.FixedInteger(5)
+
+
+class Buttons(FlexBox):
+	b1 = Button1()
+	b2 = Button2()
 	
 	class Meta:
-		w = size.Fraction(1, 3)
+		flex_direction = FlexBox.HORIZONTAL
+		justify_content = FlexBox.FLEX_END
 
 
-class VertSplit(FlexBox):
-	left  = Left()
-	right = TextBox(text="T A N M A T S U")
+class TextBoxes(FlexBox):
+	top = TextBox(text="How much wood would a woodchuck chuck if a woodchuck could chuck wood?")
+	bottom = TextBox(text="He would chuck, he would, as much as he could, and chuck as much wood as a woodchuck would if a woodchuck could chuck wood.")
 	
 	class Meta:
 		flex_direction = FlexBox.HORIZONTAL
 
 
+class Main(FlexBox):
+	top    = TextBoxes()
+	bottom = Buttons()
+	
+	class Meta:
+		flex_direction = FlexBox.VERTICAL
+
+
 with Tanmatsu() as t:
-	t.set_root_widget(VertSplit())
+	t.set_root_widget(Main())
 	t.loop()
