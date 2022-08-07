@@ -1,6 +1,7 @@
-from typing import Callable, Any
+from enum import Enum, auto
 from math import floor
 from fractions import Fraction
+from typing import Callable, Any
 
 from tri_declarative import with_meta
 
@@ -12,56 +13,61 @@ from .container import Container
 from .scrollable import Scrollable
 
 
-@with_meta
-class FlexBox(Container, Box, Scrollable):
-	"""
-	A widget that contains other widgets. Has similar behaviour to `flexbox`
-	from CSS.
+class FlexDirection(Enum):
+	COLUMN = auto()
+	"""Flex from top to bottom."""
 	
-	:param flex_direction: Must be either :attr:`VERTICAL` or
-	                       :attr:`HORIZONTAL`. Defaults to :attr:`VERTICAL`.
-	:paramtype flex_direction: int
-	"""
-	
-	VERTICAL   = 1
-	"""Flex from top to bottom. Equivalent to `flex-direction: column` in CSS."""
-	
-	HORIZONTAL = 2
-	"""Flex from left to right. Equivalent to `flex-direction: row` in CSS."""
-	
-	FLEX_START    = 1
+	ROW    = auto()
+	"""Flex from left to right."""
+
+
+class JustifyContent(Enum):
+	FLEX_START    = auto()
 	"""Layout items beginning from the start of the flex."""
 	
-	FLEX_END      = 2
+	FLEX_END      = auto()
 	"""Layout items beginning from the end of the flex."""
 	
-	CENTER        = 3
+	CENTER        = auto()
 	"""Layout items around the center of the flex."""
 	
-	SPACE_BETWEEN = 4
+	SPACE_BETWEEN = auto()
 	"""
 	Layout items, with the first item at the start of the flex, and the last
 	item at the end of the flex. Free is space equally distributed
 	between all the items.
 	"""
 	
-	SPACE_AROUND  = 5
+	SPACE_AROUND  = auto()
 	"""
 	Layout items with free space distributed such that each item has equal
 	non-collapsing margins on either side.
 	"""
 	
-	SPACE_EVENLY  = 6
+	SPACE_EVENLY  = auto()
 	"""
 	Layout items with free space distributed such that the gaps between any two
 	items, and any item and the nearest edge, are the same.
+	"""
+
+@with_meta
+class FlexBox(Container, Box, Scrollable):
+	"""
+	A widget that contains other widgets. Has similar behaviour to `flexbox`
+	from CSS.
+	
+	:param flex_direction: Which direction the items should be flexed.
+	:paramtype flex_direction: FlexDirection
+	
+	:param justify_content: How the items should be distributed along the flex.
+	:paramtype justify_content: JustifyContent
 	"""
 	
 	def __init__(
 		self,
 		*args,
-		flex_direction: int = VERTICAL,
-		justify_content: int = FLEX_START,
+		flex_direction: FlexDirection = FlexDirection.COLUMN,
+		justify_content: JustifyContent = JustifyContent.FLEX_START,
 		**kwargs,
 	):
 		super().__init__(*args, **kwargs)
@@ -70,49 +76,27 @@ class FlexBox(Container, Box, Scrollable):
 		self.justify_content = justify_content
 	
 	@property
-	def flex_direction(self) -> int:
+	def flex_direction(self) -> FlexDirection:
 		"""
 		:getter: Returns the flex direction.
 		:setter: Sets the flex direction.
-		         Must equal either :attr:`VERTICAL` or :attr:`HORIZONTAL`.
 		"""
 		return self.__flex_direction
 	
 	@flex_direction.setter
-	def flex_direction(self, flex_direction: int):
-		if flex_direction != FlexBox.VERTICAL and flex_direction != FlexBox.HORIZONTAL:
-			raise ValueError((
-				"FlexBox.flex_direction: Invalid value for `flex_direction`. "
-				"Must equal either `FlexBox.VERTICAL` or `FlexBox.HORIZONTAL`."
-			))
-		
+	def flex_direction(self, flex_direction: FlexDirection):
 		self.__flex_direction = flex_direction
 	
 	@property
-	def justify_content(self) -> int:
+	def justify_content(self) -> JustifyContent:
 		"""
 		:getter: Returns the justify content setting.
 		:setter: Sets the justify content setting.
-		         Must equal either :attr:`FLEX_START`, :attr:`FLEX_END`,
-		         :attr:`CENTER`, or :attr:`SPACE_BETWEEN`.
 		"""
 		return self.__justify_content
 	
 	@justify_content.setter
-	def justify_content(self, justify_content: int):
-		if (justify_content != FlexBox.FLEX_START and
-			justify_content != FlexBox.FLEX_END and 
-		    justify_content != FlexBox.CENTER and
-			justify_content != FlexBox.SPACE_BETWEEN and
-			justify_content != FlexBox.SPACE_AROUND and
-			justify_content != FlexBox.SPACE_EVENLY
-		):
-			raise ValueError((
-				"FlexBox.justify_content: Invalid value for `justify_content`. "
-				"Must equal `FlexBox.FLEX_START`, `FlexBox.FLEX_END`, "
-				"`FlexBox.CENTER`, or `FlexBox.SPACE_BETWEEN`."
-			))
-		
+	def justify_content(self, justify_content: JustifyContent):
 		self.__justify_content = justify_content
 	
 	def layout(self, *args, **kwargs):
@@ -135,7 +119,7 @@ class FlexBox(Container, Box, Scrollable):
 		# Then, later, we need to layout the widgets again, taking into
 		#   account the decreased amount of space available.
 		
-		if self.flex_direction == FlexBox.HORIZONTAL:
+		if self.flex_direction == FlexDirection.ROW:
 			x_sizes = self.__calc_children_sizes_flex_axis(
 				self._Widget__available_space.w,
 				lambda widget: widget.w
@@ -171,7 +155,7 @@ class FlexBox(Container, Box, Scrollable):
 		# Layout all the children widgets
 		# ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
 		
-		if self.flex_direction == FlexBox.HORIZONTAL:
+		if self.flex_direction == FlexDirection.ROW:
 			x_sizes = self.__calc_children_sizes_flex_axis(
 				usable_space.w,
 				lambda widget: widget.w
@@ -201,17 +185,17 @@ class FlexBox(Container, Box, Scrollable):
 			)
 		
 		match self.justify_content:
-			case self.FLEX_START:
+			case JustifyContent.FLEX_START:
 				self.__layout_flex_start(x_sizes, y_sizes)
-			case self.FLEX_END:
+			case JustifyContent.FLEX_END:
 				self.__layout_flex_end(x_sizes, y_sizes)
-			case self.CENTER:
+			case JustifyContent.CENTER:
 				self.__layout_flex_center(x_sizes, y_sizes)
-			case self.SPACE_BETWEEN:
+			case JustifyContent.SPACE_BETWEEN:
 				self.__layout_flex_space_between(x_sizes, y_sizes)
-			case self.SPACE_AROUND:
+			case JustifyContent.SPACE_AROUND:
 				self.__layout_flex_space_around(x_sizes, y_sizes)
-			case self.SPACE_EVENLY:
+			case JustifyContent.SPACE_EVENLY:
 				self.__layout_flex_space_evenly(x_sizes, y_sizes)
 			case _:
 				raise NotImplementedError("Unimplemented justify_content value")
@@ -227,7 +211,7 @@ class FlexBox(Container, Box, Scrollable):
 	):
 		curr_pos = self._Widget__available_space.top_left()
 		
-		if self.flex_direction == FlexBox.HORIZONTAL:
+		if self.flex_direction == FlexDirection.ROW:
 			curr_pos.x += start_pos_offset
 		else:
 			curr_pos.y += start_pos_offset
@@ -243,7 +227,7 @@ class FlexBox(Container, Box, Scrollable):
 			i.layout(widget_pos, widget_size)
 			
 			# Update the position for the next widget
-			if self.flex_direction == FlexBox.HORIZONTAL:
+			if self.flex_direction == FlexDirection.ROW:
 				curr_pos.x += widget_size.w + gap
 			else:
 				curr_pos.y += widget_size.h + gap
@@ -258,7 +242,7 @@ class FlexBox(Container, Box, Scrollable):
 		for i in reversed(self.children.values()):
 			widget_size = Dimensions(x_sizes[i], y_sizes[i])
 			
-			if self.flex_direction == FlexBox.HORIZONTAL:
+			if self.flex_direction == FlexDirection.ROW:
 				curr_pos.x -= widget_size.w
 			else:
 				curr_pos.y -= widget_size.h
@@ -276,7 +260,7 @@ class FlexBox(Container, Box, Scrollable):
 		y_sizes: dict[Widget, int]
 	):
 		# Work out how much space our widgets take up
-		if self.flex_direction == FlexBox.HORIZONTAL:
+		if self.flex_direction == FlexDirection.ROW:
 			total_widget_size = sum(x_sizes.values())
 			available_space = self._Widget__available_space.w
 		else:
@@ -299,7 +283,7 @@ class FlexBox(Container, Box, Scrollable):
 		y_sizes: dict[Widget, int]
 	):
 		# Work out how much space our widgets take up
-		if self.flex_direction == FlexBox.HORIZONTAL:
+		if self.flex_direction == FlexDirection.ROW:
 			total_widget_size = sum(x_sizes.values())
 			available_space = self._Widget__available_space.w
 		else:
@@ -322,7 +306,7 @@ class FlexBox(Container, Box, Scrollable):
 		y_sizes: dict[Widget, int]
 	):
 		# Work out how much space our widgets take up
-		if self.flex_direction == FlexBox.HORIZONTAL:
+		if self.flex_direction == FlexDirection.ROW:
 			total_widget_size = sum(x_sizes.values())
 			available_space = self._Widget__available_space.w
 		else:
@@ -348,7 +332,7 @@ class FlexBox(Container, Box, Scrollable):
 		y_sizes: dict[Widget, int]
 	):
 		# Work out how much space our widgets take up
-		if self.flex_direction == FlexBox.HORIZONTAL:
+		if self.flex_direction == FlexDirection.ROW:
 			total_widget_size = sum(x_sizes.values())
 			available_space = self._Widget__available_space.w
 		else:
@@ -405,6 +389,8 @@ class FlexBox(Container, Box, Scrollable):
 					fraction.append(i)
 				case "Auto":
 					auto.append(i)
+				case _:
+					raise NotImplementedError("Unimplemented size value")
 			
 			remaining_widgets += 1
 		
@@ -484,6 +470,8 @@ class FlexBox(Container, Box, Scrollable):
 					calculated_sizes[i] = floor(getter(i).fraction * usable_space)
 				case "Auto":
 					calculated_sizes[i] = usable_space
+				case _:
+					raise NotImplementedError("Unimplemented size value")
 		
 		return calculated_sizes
 	

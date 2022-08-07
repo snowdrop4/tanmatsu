@@ -27,7 +27,7 @@
 
 # About
 
-Declarative TUI (Terminal User Interface) library, with layout features modelled after modern web components.
+Declarative TUI (Terminal User Interface) library, with layout features modelled after modern CSS.
 
 Widget objects can be created by defining a class that inherits from the desired widget class.
 
@@ -84,7 +84,7 @@ class VertSplit(widgets.FlexBox):
     button_list = ButtonList()
     
     class Meta:
-        flex_direction = widgets.FlexBox.HORIZONTAL
+        flex_direction = widgets.FlexDirection.ROW
 
 
 with Tanmatsu(title="Tanmatsu!") as t:

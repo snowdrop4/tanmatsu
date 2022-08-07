@@ -20,7 +20,7 @@ class VertSplit(widgets.FlexBox):
 	button_list = ButtonList()
 	
 	class Meta:
-		flex_direction = widgets.FlexBox.HORIZONTAL
+		flex_direction = widgets.FlexDirection.ROW
 
 
 with tanmatsu.Tanmatsu(title="Tanmatsu!") as t:

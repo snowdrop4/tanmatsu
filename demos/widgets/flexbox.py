@@ -1,9 +1,11 @@
 # Let demo import from root directory
 import sys, os
+
+from tanmatsu.widgets.flexbox import JustifyContent
 sys.path.insert(1, os.path.normpath(os.path.join(sys.path[0], '../..')))
 
 from tanmatsu import Tanmatsu, size
-from tanmatsu.widgets import FlexBox, TextBox, Button
+from tanmatsu.widgets import FlexBox, TextBox, Button, FlexDirection, JustifyContent
 
 
 class Button1(Button):
@@ -36,8 +38,8 @@ class Buttons(FlexBox):
 	b3 = Button3()
 	
 	class Meta:
-		flex_direction = FlexBox.HORIZONTAL
-		justify_content = FlexBox.SPACE_BETWEEN
+		flex_direction = FlexDirection.ROW
+		justify_content = JustifyContent.SPACE_BETWEEN
 
 
 class TextBoxes(FlexBox):
@@ -45,7 +47,7 @@ class TextBoxes(FlexBox):
 	bottom = TextBox(text="He would chuck, he would, as much as he could, and chuck as much wood as a woodchuck would if a woodchuck could chuck wood.")
 	
 	class Meta:
-		flex_direction = FlexBox.HORIZONTAL
+		flex_direction = FlexDirection.ROW
 
 
 class Main(FlexBox):
@@ -53,7 +55,7 @@ class Main(FlexBox):
 	bottom = Buttons()
 	
 	class Meta:
-		flex_direction = FlexBox.VERTICAL
+		flex_direction = FlexDirection.COLUMN
 
 
 with Tanmatsu() as t:

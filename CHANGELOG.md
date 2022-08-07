@@ -1,3 +1,14 @@
+# 0.2.0
+
+## Features
+
+* `widgets.FlexBox`: add `justify_content` layout option
+
+# Changes
+
+* `widgets.FlexBox`: rename possible values for `flex_direction` to `column` and `row`, to 100% match CSS.
+* `size`: change behaviour and rename the classes used for specifying widget size to be more robust
+
 # 0.1.1
 
 ## Bugfixes

@@ -5,7 +5,7 @@ sys.path.insert(1, os.path.normpath(os.path.join(sys.path[0], '../..')))
 from datetime import datetime
 
 from tanmatsu import Tanmatsu, size
-from tanmatsu.widgets import TextLog, Button, FlexBox
+from tanmatsu.widgets import TextLog, Button, FlexBox, FlexDirection
 
 
 class TimestampTextLog(TextLog):
@@ -26,7 +26,7 @@ class SuperCoolFlexBox(FlexBox):
 	)
 	
 	class Meta:
-		flex_direction = FlexBox.VERTICAL
+		flex_direction = FlexDirection.COLUMN
 
 
 with Tanmatsu() as t:

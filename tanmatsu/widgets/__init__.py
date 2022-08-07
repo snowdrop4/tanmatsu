@@ -5,7 +5,7 @@ from .scrollable import Scrollable
 from .container import Container
 
 # Container widgets
-from .flexbox import FlexBox
+from .flexbox import FlexBox, FlexDirection, JustifyContent
 from .tabbox import TabBox
 from .list import List
 
