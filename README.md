@@ -27,7 +27,7 @@
 
 # About
 
-Declarative TUI (Terminal User Interface) library, with layout features modelled after modern CSS.
+Tanmatsu (端末; "terminal" in Japanese) is a Declarative TUI (Terminal User Interface) library, with layout features modelled after modern CSS.
 
 Widget objects can be created by defining a class that inherits from the desired widget class.
 
@@ -105,6 +105,31 @@ with Tanmatsu(title="Tanmatsu!") as t:
 
 https://tanmatsu.readthedocs.io/en/latest/
 
+# Feature List & Roadmap
+
+* 🟨 Unicode support
+    - 🟩 Multi-column character support (e.g., `ｆｕｌｌｗｉｄｔｈ` or `漢字`)
+    - 🟨 Emoji support
+* 🟨 Widgets
+    - 🟩 Button
+    - 🟩 Flexbox
+        - 🟩 flex-direction
+        - 🟩 justify-content
+        - 🟨 align-items
+        - 🟨 align-content
+        - 🟨 flex-wrap
+        - 🟨 row-gap/column-gap
+    - 🟨 Grid
+    - 🟩 List
+    - 🟩 Tab Box
+    - 🟩 Text Box
+        - 🟩 Fully editable
+        - 🟩 Line wrap
+    - 🟩 Text Log
+* 🟩 Scrolling
+* 🟩 Tab/Shift+Tab navigation
+* 🟨 MacOS support
+
 # Requirements
 
 * Python >=3.11
@@ -112,7 +137,9 @@ https://tanmatsu.readthedocs.io/en/latest/
 * Full-featured terminal emulator (e.g., Gnome VTE)
 * A font with unicode symbols (e.g., [Noto](https://fonts.google.com/noto))
 
-# Dependencies
+# Development
+
+## Dependencies
 
 * tri.declarative
 * parsy
@@ -123,8 +150,6 @@ Development dependencies:
 * sphinx
 * pyre-checker
 * mypy
-
-# Development
 
 ## Installing
 
