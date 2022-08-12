@@ -111,6 +111,40 @@ class FlexBox(Container, Box, Scrollable):
 			self.scroll()
 			return
 		
+		def calc_widget_sizes(space: Rectangle) -> (
+			tuple[dict[Widget, int], dict[Widget, int], Dimensions]
+		):
+			if self.flex_direction == FlexDirection.ROW:
+				x_sizes = self.__calc_children_sizes_flex_axis(
+					space.w,
+					lambda widget: widget.w
+				)
+				y_sizes = self.__calc_children_sizes_nonflex_axis(
+					space.h,
+					lambda widget: widget.h
+				)
+				
+				content_size = Dimensions(
+					sum(x_sizes.values()),
+					max(y_sizes.values(), default=0)
+				)
+			else:
+				x_sizes = self.__calc_children_sizes_nonflex_axis(
+					space.w,
+					lambda widget: widget.w
+				)
+				y_sizes = self.__calc_children_sizes_flex_axis(
+					space.h,
+					lambda widget: widget.h
+				)
+				
+				content_size = Dimensions(
+					max(x_sizes.values(), default=0),
+					sum(y_sizes.values())
+				)
+			
+			return (x_sizes, y_sizes, content_size)
+		
 		# Calculate the size of all the children widgets
 		# ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
 		
@@ -118,74 +152,27 @@ class FlexBox(Container, Box, Scrollable):
 		#   as if there were no scrollbars.
 		# Then, if the total size of all the widgets exceeds the
 		#   total space available, we will need to subtract extra
-		#   space to accomodate the presence of scrollbar(s).
-		# Then, later, we need to layout the widgets again, taking into
-		#   account the decreased amount of space available.
+		#   space to accomodate the presence of scrollbar(s), and recalculate
+		#   the size of all the widgets, taking into account the decreased
+		#   amount of space available.
 		
-		if self.flex_direction == FlexDirection.ROW:
-			x_sizes = self.__calc_children_sizes_flex_axis(
-				self._Widget__available_space.w,
-				lambda widget: widget.w
-			)
-			y_sizes = self.__calc_children_sizes_nonflex_axis(
-				self._Widget__available_space.h,
-				lambda widget: widget.h
-			)
-			
-			content_size = Dimensions(
-				sum(x_sizes.values()),
-				max(y_sizes.values(), default=0)
-			)
-		else:
-			x_sizes = self.__calc_children_sizes_nonflex_axis(
-				self._Widget__available_space.w,
-				lambda widget: widget.w
-			)
-			y_sizes = self.__calc_children_sizes_flex_axis(
-				self._Widget__available_space.h,
-				lambda widget: widget.h
-			)
-			
-			content_size = Dimensions(
-				max(x_sizes.values(), default=0),
-				sum(y_sizes.values())
-			)
+		(x_sizes, y_sizes, content_size) = calc_widget_sizes(self._Widget__available_space)
 		
 		# Get the actual area we have available to layout widgets in,
 		#   minus any space required by any scrollbars.
 		usable_space = self.get_scrollable_area(content_size)
 		
+		# Recalculate widget sizes (if necessary)
+		# ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
+		
+		hori_too_big = self.flex_direction == FlexDirection.ROW    and content_size.w > usable_space.w
+		vert_too_big = self.flex_direction == FlexDirection.COLUMN and content_size.h > usable_space.h
+		
+		if (hori_too_big or vert_too_big):
+			(x_sizes, y_sizes, content_size) = calc_widget_sizes(self._Widget__available_space)
+		
 		# Layout all the children widgets
 		# ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
-		
-		if self.flex_direction == FlexDirection.ROW:
-			x_sizes = self.__calc_children_sizes_flex_axis(
-				usable_space.w,
-				lambda widget: widget.w
-			)
-			y_sizes = self.__calc_children_sizes_nonflex_axis(
-				usable_space.h,
-				lambda widget: widget.h
-			)
-			
-			content_size = Dimensions(
-				sum(x_sizes.values()),
-				max(y_sizes.values(), default=0)
-			)
-		else:
-			x_sizes = self.__calc_children_sizes_nonflex_axis(
-				usable_space.w,
-				lambda widget: widget.w
-			)
-			y_sizes = self.__calc_children_sizes_flex_axis(
-				usable_space.h,
-				lambda widget: widget.h
-			)
-			
-			content_size = Dimensions(
-				max(x_sizes.values(), default=0),
-				sum(y_sizes.values())
-			)
 		
 		match self.justify_content:
 			case JustifyContent.FLEX_START:
