@@ -90,8 +90,9 @@ class TextBox(Box, Scrollable):
 	def __init__(self, *args, text: str = "", editable: bool = True, **kwargs):
 		super().__init__(*args, **kwargs)
 		
-		self._cursor = 0
+		self._cursor = 0 # cursor offset in the text
 		self._text = text
+		self._wrapped = [] # list of wrapped lines
 		self.__editable = editable
 		
 		self.__wrap_width = 0

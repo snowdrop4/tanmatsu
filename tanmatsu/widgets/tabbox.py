@@ -17,13 +17,18 @@ class TabBox(Container):
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)
 		
-		(label, widget) = list(self.children.items())[0]
-		self.__active_tab = widget
-		self.focusable_children = { label: widget }
-		
 		self.tab_min_label_width = 10
 		self.tab_decoration_width = 2
 		self.tab_min_width = self.tab_min_label_width + self.tab_decoration_width
+		
+		self.__tab_width = None
+		self.__border_rectangle = None
+		self.__tab_bar_rectangle = None
+		
+		# Set the first child as the focused tab by default
+		(label, widget) = list(self.children.items())[0]
+		self.__active_tab = widget
+		self.focusable_children = { label: widget }
 	
 	def add_child(self, name: str, widget: Widget):
 		"""

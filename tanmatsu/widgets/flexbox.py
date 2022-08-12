@@ -72,7 +72,10 @@ class FlexBox(Container, Box, Scrollable):
 	):
 		super().__init__(*args, **kwargs)
 		
+		self.__flex_direction = None  # Silence typechecker
 		self.flex_direction = flex_direction
+		
+		self.__justify_content = None  # Silence typechecker
 		self.justify_content = justify_content
 	
 	@property

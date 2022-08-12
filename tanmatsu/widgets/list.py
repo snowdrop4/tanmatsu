@@ -22,9 +22,14 @@ class List(Box, Scrollable):
 		super().__init__(*args, **kwargs)
 		
 		self._children = children
-		self.cursor = 0
+		self.focusable_children = {  }
 		
 		self.item_height = item_height
+		
+		self.__cursor = None  # Silence typechecker
+		self.cursor = 0
+		
+		self.__gutter = None
 	
 	@property
 	def cursor(self) -> int:
@@ -50,10 +55,10 @@ class List(Box, Scrollable):
 			
 			delta_y = 0
 			
-			if active_item_y1 < self.viewport.y1:
-				delta_y = active_item_y1 - self.viewport.y1
-			if active_item_y2 > self.viewport.y2:
-				delta_y = active_item_y2 - self.viewport.y2 - 1
+			if active_item_y1 < self._viewport.y1:
+				delta_y = active_item_y1 - self._viewport.y1
+			if active_item_y2 > self._viewport.y2:
+				delta_y = active_item_y2 - self._viewport.y2 - 1
 			
 			self.scroll(delta_y=delta_y)
 	
@@ -101,7 +106,7 @@ class List(Box, Scrollable):
 		# First, record the space we want the gutter to occupy (to be used as a
 		#   clip when drawing said gutter later).
 		# Second, modify `self._Widget__available_space` to compensate.
-		self.gutter = Rectangle(
+		self.__gutter = Rectangle(
 			self._Widget__available_space.x,
 			self._Widget__available_space.y,
 			1,
@@ -156,10 +161,10 @@ class List(Box, Scrollable):
 			if i == self.cursor:
 				for j in range(0, self.item_height):
 					s.set(
-						self.gutter.x,
+						self.__gutter.x,
 						item_clip.y + j,
 						">",
-						clip=clip & self.gutter
+						clip=clip & self.__gutter
 					)
 	
 	def keyboard_event(

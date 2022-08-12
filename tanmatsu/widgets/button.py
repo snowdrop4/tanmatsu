@@ -31,6 +31,8 @@ class Button(Box):
 		super().__init__(*args, **kwargs)
 		
 		self.__label = label
+		
+		self.__callback = None  # Silence typechecker
 		self.callback = callback
 	
 	@property

@@ -42,10 +42,21 @@ class Scrollable(Widget):
 	
 	def __init__(self, *args, scroll_direction: int = VERTICAL, **kwargs):
 		super().__init__(*args, **kwargs)
+		self._viewport = None
+		
+		self.__scroll_direction = None  # Silence the typechecker
 		self.scroll_direction = scroll_direction
 		
 		self.__scroll_position = Point(0, 0)
 		self.__content_size = Dimensions(0, 0)
+		
+		self.__vertical_scrollbar_rectangle = None
+		self.__vertical_scroll_percent = None
+		self.__vertical_scrollbar_handle_length = None
+		
+		self.__horizontal_scrollbar_rectangle = None
+		self.__horizontal_scroll_percent = None
+		self.__horizontal_scrollbar_handle_length = None
 	
 	def layout(self, *args, **kwargs):
 		super().layout(*args, **kwargs)
@@ -215,7 +226,7 @@ class Scrollable(Widget):
 			self.__horizontal_scrollbar_handle_length = scrollbar_handle_length
 			self.__horizontal_scroll_percent = scroll_percent
 		
-		self.viewport = Rectangle(
+		self._viewport = Rectangle(
 			self._Widget__available_space.x + self.__scroll_position.x,
 			self._Widget__available_space.y + self.__scroll_position.y,
 			self._Widget__available_space.w,

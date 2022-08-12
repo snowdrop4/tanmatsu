@@ -28,6 +28,9 @@ class Box(Widget):
 		
 		self.__border = border
 		self.__border_label = border_label
+		self.__cropped_label = border_label
+		
+		self.__border_rectangle = None
 	
 	@property
 	def border(self) -> bool:

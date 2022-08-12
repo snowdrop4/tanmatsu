@@ -63,6 +63,8 @@ class Tanmatsu:
 		
 		if title is not None:
 			to.set_terminal_title(title)
+		
+		self.root_widget = None
 	
 	def __setup_stdinout(self):
 		# Normally stdin and stdout are set to the same file descriptor.
