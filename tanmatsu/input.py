@@ -319,7 +319,7 @@ def select_keys_with_alt():
 	# presented with input like `\x1Bq`, there is no way of knowing whether
 	# the user pressed pressed ALT and `q`, or whether they pressed the ESCAPE
 	# key and then the `q` key with such speed as to cause both keycodes to
-	# appear in the input buffer before it nextgets processed and cleared.
+	# appear in the input buffer before it next gets processed and cleared.
 	# Both actions would produce the same raw byte sequence in the input buffer.
 	# 
 	# Thus, in the above case, we just have to assume the user pressed
