@@ -1,5 +1,7 @@
 # Let demo import from root directory
-import sys, os
+import os
+import sys
+
 sys.path.insert(1, os.path.normpath(os.path.join(sys.path[0], '../..')))
 
 from tanmatsu import Tanmatsu

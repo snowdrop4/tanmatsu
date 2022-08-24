@@ -1,7 +1,7 @@
 from tanmatsu import widgets
-from tanmatsu.style import Style
 from tanmatsu.geometry import Rectangle
 from tanmatsu.screenbuffer import Screenbuffer
+from tanmatsu.style import Style
 
 
 def rectangle(

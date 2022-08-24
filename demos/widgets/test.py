@@ -1,9 +1,12 @@
 # Let demo import from root directory
-import sys, os, fcntl
+import fcntl
+import os
+import sys
+
 sys.path.insert(1, os.path.normpath(os.path.join(sys.path[0], '../..')))
 
 from tanmatsu import Tanmatsu
-from tanmatsu.widgets import List, Button, TextLog
+from tanmatsu.widgets import Button, List, TextLog
 
 
 def exhaust_file_descriptor(fd):

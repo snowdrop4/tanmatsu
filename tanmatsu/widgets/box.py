@@ -1,7 +1,8 @@
 from tanmatsu import draw, theme
-from tanmatsu.wctools import wccrop
 from tanmatsu.geometry import Rectangle
 from tanmatsu.screenbuffer import Screenbuffer
+from tanmatsu.wctools import wccrop
+
 from .base import Widget
 
 

@@ -1,6 +1,5 @@
-import sys
 import os
-
+import sys
 
 # Otherwise known as:
 #     ESC

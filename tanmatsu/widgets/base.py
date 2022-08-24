@@ -2,8 +2,8 @@ from abc import ABC, abstractmethod
 
 import tanmatsu.input as ti
 from tanmatsu import size, theme
+from tanmatsu.geometry import Dimensions, Point, Rectangle
 from tanmatsu.screenbuffer import Screenbuffer
-from tanmatsu.geometry import Rectangle, Dimensions, Point
 
 
 class Widget(ABC):

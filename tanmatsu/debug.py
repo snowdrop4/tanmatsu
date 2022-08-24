@@ -1,6 +1,5 @@
 import builtins
 
-
 __lines = []
 __output_widget = None
 

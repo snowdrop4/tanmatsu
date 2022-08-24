@@ -2,10 +2,11 @@ from tri_declarative import with_meta
 
 import tanmatsu.input as ti
 from tanmatsu import draw, theme
-from tanmatsu.wctools import wccrop
-from tanmatsu.screenbuffer import Screenbuffer
 from tanmatsu.geometry import Rectangle
+from tanmatsu.screenbuffer import Screenbuffer
 from tanmatsu.style import Style
+from tanmatsu.wctools import wccrop
+
 from .base import Widget
 from .container import Container
 

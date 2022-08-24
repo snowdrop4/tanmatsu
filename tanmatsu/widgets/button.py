@@ -7,6 +7,7 @@ import tanmatsu.input as ti
 from tanmatsu.geometry import Rectangle
 from tanmatsu.screenbuffer import Screenbuffer
 from tanmatsu.wctools import wccrop
+
 from .box import Box
 
 

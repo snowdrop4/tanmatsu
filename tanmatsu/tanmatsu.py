@@ -1,16 +1,16 @@
-import os
-import sys
 import fcntl
-import signal
-import shutil
-import termios
+import os
 import selectors
+import shutil
+import signal
+import sys
+import termios
 
 import tanmatsu.input as ti
 import tanmatsu.output as to
-from tanmatsu import screenbuffer, debug
+from tanmatsu import debug, screenbuffer
+from tanmatsu.geometry import Dimensions, Point, Rectangle
 from tanmatsu.widgets.base import Widget
-from tanmatsu.geometry import Rectangle, Dimensions, Point
 
 
 def exhaust_file_descriptor(fd):

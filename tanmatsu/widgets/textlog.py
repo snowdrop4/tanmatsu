@@ -1,8 +1,9 @@
 from tri_declarative import with_meta
 
-from tanmatsu.wctools import wcchunks
 from tanmatsu.geometry import Rectangle
 from tanmatsu.screenbuffer import Screenbuffer
+from tanmatsu.wctools import wcchunks
+
 from .box import Box
 
 

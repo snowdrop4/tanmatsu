@@ -1,11 +1,14 @@
 # Let demo import from root directory
-import sys, os
+import os
+import sys
 
 from tanmatsu.widgets.flexbox import JustifyContent
+
 sys.path.insert(1, os.path.normpath(os.path.join(sys.path[0], '../..')))
 
 from tanmatsu import Tanmatsu, size
-from tanmatsu.widgets import FlexBox, TextBox, Button, FlexDirection, JustifyContent
+from tanmatsu.widgets import (Button, FlexBox, FlexDirection, JustifyContent,
+                              TextBox)
 
 
 class Button1(Button):

@@ -1,6 +1,6 @@
 import tanmatsu
-from tanmatsu import widgets
 import tests.utils as test
+from tanmatsu import widgets
 
 
 class ButtonList(widgets.List):

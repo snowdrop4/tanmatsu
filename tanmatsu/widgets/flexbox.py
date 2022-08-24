@@ -1,12 +1,13 @@
 from enum import Enum, auto
-from math import floor
 from fractions import Fraction
-from typing import Callable, Any
+from math import floor
+from typing import Any, Callable
 
 from tri_declarative import with_meta
 
+from tanmatsu.geometry import Dimensions, Point, Rectangle
 from tanmatsu.screenbuffer import Screenbuffer
-from tanmatsu.geometry import Rectangle, Dimensions, Point
+
 from .base import Widget
 from .box import Box
 from .container import Container

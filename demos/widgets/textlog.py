@@ -1,11 +1,13 @@
 # Let demo import from root directory
-import sys, os
+import os
+import sys
+
 sys.path.insert(1, os.path.normpath(os.path.join(sys.path[0], '../..')))
 
 from datetime import datetime
 
 from tanmatsu import Tanmatsu, size
-from tanmatsu.widgets import TextLog, Button, FlexBox, FlexDirection
+from tanmatsu.widgets import Button, FlexBox, FlexDirection, TextLog
 
 
 class TimestampTextLog(TextLog):

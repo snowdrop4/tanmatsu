@@ -2,9 +2,8 @@ import os
 import sys
 import termios
 
-import terminal.output as to
 import terminal as tt
-
+import terminal.output as to
 
 stdin = sys.stdin.fileno()
 

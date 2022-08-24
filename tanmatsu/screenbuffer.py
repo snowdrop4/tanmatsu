@@ -2,8 +2,8 @@ from wcwidth import wcswidth
 
 import tanmatsu.output as to
 from tanmatsu import theme
+from tanmatsu.geometry import Point, Rectangle
 from tanmatsu.style import Style
-from tanmatsu.geometry import Rectangle, Point
 
 
 class Screenbuffer:

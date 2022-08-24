@@ -1,8 +1,9 @@
 from tri_declarative import with_meta
 
 import tanmatsu.input as ti
+from tanmatsu.geometry import Dimensions, Point, Rectangle
 from tanmatsu.screenbuffer import Screenbuffer
-from tanmatsu.geometry import Rectangle, Dimensions, Point
+
 from .base import Widget
 from .box import Box
 from .scrollable import Scrollable

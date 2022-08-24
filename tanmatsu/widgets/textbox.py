@@ -4,9 +4,11 @@ from tri_declarative import with_meta
 
 import tanmatsu.input as ti
 from tanmatsu import theme
-from tanmatsu.wctools import wcslice, wcfind, wcoffset_to_column, wccolumn_to_offset, wcchunks
-from tanmatsu.geometry import Rectangle, Dimensions
+from tanmatsu.geometry import Dimensions, Rectangle
 from tanmatsu.screenbuffer import Screenbuffer
+from tanmatsu.wctools import (wcchunks, wccolumn_to_offset, wcfind,
+                              wcoffset_to_column, wcslice)
+
 from .box import Box
 from .scrollable import Scrollable
 
